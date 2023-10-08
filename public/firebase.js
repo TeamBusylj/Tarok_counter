@@ -30,8 +30,10 @@ const provider = new GoogleAuthProvider()
 const signInButton = document.getElementById("signInGoogle")
 const signOutButton = document.getElementById("signOutGoogle")
 const signInMessage = document.getElementById("signInMessage")
+var uid = null
 signOutButton.style.display = "none"
 signInMessage.style.display = "none"
+
 
 const userSignIn = async () => {
     signInWithPopup(auth, provider)
@@ -39,6 +41,7 @@ const userSignIn = async () => {
             const user = result.user
             console.log(result);
             console.log(result.user.uid);
+            uid = result.user.uid
             writeUserData(result.user.uid, result.user.displayName, result.user.email, window.listOfPlayers)
         }).catch((error) => {
             console.log(error.code, error.message)
@@ -82,3 +85,10 @@ function writeUserData(userId, name, email, gameData) {
 
     });
 }
+export function updateUserData() {
+    const db = getDatabase();
+    set(ref(db, 'users/' + uid), {
+        gameData: window.listOfPlayers
+    });
+}
+window.updateUserData = updateUserData
