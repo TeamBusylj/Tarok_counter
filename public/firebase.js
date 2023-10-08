@@ -44,6 +44,7 @@ const userSignIn = async () => {
             uid = result.user.uid
             localStorage.uid = uid
             writeUserData(result.user.uid, result.user.displayName, result.user.email, window.listOfPlayers)
+            loadDataFromWeb()
         }).catch((error) => {
             console.log(error.code, error.message)
         })
@@ -53,7 +54,8 @@ const userSignOut = async () => {
     signOut(auth)
         .then((result) => {
             console.log("signed out");
-            localStorage.uid = null
+            localStorage.clear();
+            location.reload()
         }).catch((error) => {
 
         })
@@ -62,10 +64,12 @@ const userSignOut = async () => {
 onAuthStateChanged(auth, (user) => {
     if (user) {
         signOutButton.style.display = "block";
+        signInButton.style.display = "none"
         signInMessage.style.display = "block";
         signInMessage.innerHTML = user.displayName;
         signInMessage.innerHTML = user.email
     } else {
+        signInButton.style.display = "block"
         signOutButton.style.display = "none";
         signInMessage.style.display = "none";
     }
@@ -79,13 +83,14 @@ signOutButton.addEventListener('click', userSignOut);
 const database = getDatabase(app);
 console.log(database);
 function writeUserData(userId, name, email, gameData) {
+
     const db = getDatabase();
-    if (!loadDataFromWeb()) {
-        set(ref(db, 'users/' + userId), {
-            username: name,
-            email: email,
-        });
-    }
+
+    const updates = {};
+    updates['users/' + userId + '/email'] = email;
+    updates['users/' + userId + '/username'] = name;
+
+    return update(ref(db), updates);
 
 }
 export function updateUserData(key, value) {

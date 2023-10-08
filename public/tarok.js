@@ -846,7 +846,7 @@ function padArraysToLongest(obj) {
 function count(animate) {
     document.getElementById("actionBar").style.pointerEvents = "auto";
     document.getElementById("actionBar").style.display = "flex"
-
+    document.getElementById("homescreen").style.display = "none"
     padArraysToLongest(listOfPlayers);
     localStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(listOfPlayers),);
     localStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(listOfPlayers["!gamesData"]),);
