@@ -631,7 +631,7 @@ function upload(encrypted) {
         shareButton.addEventListener("click", function () {
             localStorage.setItem(JSON.stringify(Object.keys(text).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(text),);
             localStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(text["!gamesData"]),);
-            updateUserData()
+            updateUserData(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(text["!gamesData"]))
             try {
                 Android.saveStorage(JSON.stringify(localStorage).replace("\\\\", "\\\\\\\\"));
             }
@@ -803,7 +803,7 @@ function newGame() {
         }
         newElement.style.display = "none";
         localStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(listOfPlayers),);
-        updateUserData()
+        updateUserData(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(text["!gamesData"]))
         listOfPlayersCopy = JSON.parse(JSON.stringify(listOfPlayers));
         removeElement(document.getElementById("newgame"), document.getElementById("game"))
         count(true);
@@ -850,7 +850,7 @@ function count(animate) {
     padArraysToLongest(listOfPlayers);
     localStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(listOfPlayers),);
     localStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(listOfPlayers["!gamesData"]),);
-    updateUserData()
+    updateUserData(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(text["!gamesData"]))
     try {
         Android.saveStorage(JSON.stringify(localStorage).replace("\\\\", "\\\\\\\\"));
     }

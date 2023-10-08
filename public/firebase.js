@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+import { getDatabase, ref, set, child, get } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -90,10 +90,10 @@ function writeUserData(userId, name, email, gameData) {
     }
 
 }
-export function updateUserData() {
+export function updateUserData(key, value) {
     const db = getDatabase();
     set(ref(db, 'users/' + uid), {
-        gameData: JSON.stringify(window.listOfPlayers)
+        [key]: value
     });
 }
 window.updateUserData = updateUserData
@@ -103,7 +103,7 @@ export function loadDataFromWeb() {
         get(child(dbRef, `users/${localStorage.uid}`)).then((snapshot) => {
             if (snapshot.exists()) {
 
-                window.listOfPlayers = JSON.parse(snapshot.val())c
+                window.listOfPlayers = JSON.parse(snapshot.val())
             } else {
                 console.log("No data available");
                 return false
@@ -114,4 +114,4 @@ export function loadDataFromWeb() {
     }
     return true
 }
-window.updateUserData = updateUserData
+window.loadDataFromWeb = loadDataFromWeb
