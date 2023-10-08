@@ -42,6 +42,7 @@ const userSignIn = async () => {
             console.log(result);
             console.log(result.user.uid);
             uid = result.user.uid
+            localStorage.uid = uid
             writeUserData(result.user.uid, result.user.displayName, result.user.email, window.listOfPlayers)
         }).catch((error) => {
             console.log(error.code, error.message)
@@ -52,6 +53,7 @@ const userSignOut = async () => {
     signOut(auth)
         .then((result) => {
             console.log("signed out");
+            localStorage.uid = null
         }).catch((error) => {
 
         })
@@ -78,17 +80,38 @@ const database = getDatabase(app);
 console.log(database);
 function writeUserData(userId, name, email, gameData) {
     const db = getDatabase();
-    set(ref(db, 'users/' + userId), {
-        username: name,
-        email: email,
-        gameData: gameData
+    if (!loadDataFromWeb()) {
+        set(ref(db, 'users/' + userId), {
+            username: name,
+            email: email,
+            gameData: "{}"
 
-    });
+        });
+    }
+
 }
 export function updateUserData() {
     const db = getDatabase();
     set(ref(db, 'users/' + uid), {
-        gameData: window.listOfPlayers
+        gameData: JSON.stringify(window.listOfPlayers)
     });
+}
+window.updateUserData = updateUserData
+export function loadDataFromWeb() {
+    if (localStorage.uid !== null) {
+        const dbRef = ref(getDatabase());
+        get(child(dbRef, `users/${localStorage.uid}`)).then((snapshot) => {
+            if (snapshot.exists()) {
+
+                window.listOfPlayers = JSON.parse(snapshot.val())c
+            } else {
+                console.log("No data available");
+                return false
+            }
+        }).catch((error) => {
+            console.error(error);
+        });
+    }
+    return true
 }
 window.updateUserData = updateUserData
