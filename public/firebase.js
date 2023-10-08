@@ -54,7 +54,6 @@ const userSignOut = async () => {
     signOut(auth)
         .then((result) => {
             console.log("signed out");
-            localStorage.clear();
             location.reload()
         }).catch((error) => {
 
@@ -112,7 +111,7 @@ export function loadDataFromWeb() {
             let data = snapshot.val()["games"]
             console.log(data);
             for (const [key, value] of Object.entries(data)) {
-                localStorage.setItem(key, value)
+                sessionStorage.setItem(key, value)
             };
             return true
         } else {

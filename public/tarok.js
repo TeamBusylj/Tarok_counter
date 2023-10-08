@@ -629,11 +629,11 @@ function upload(encrypted) {
         newElement.appendChild(copyButton);
         newElement.appendChild(shareButton);
         shareButton.addEventListener("click", function () {
-            localStorage.setItem(JSON.stringify(Object.keys(text).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(text),);
-            localStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(text["!gamesData"]),);
+            sessionStorage.setItem(JSON.stringify(Object.keys(text).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(text),);
+            sessionStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(text["!gamesData"]),);
             updateUserData(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(text["!gamesData"]))
             try {
-                Android.saveStorage(JSON.stringify(localStorage).replace("\\\\", "\\\\\\\\"));
+                Android.saveStorage(JSON.stringify(sessionStorage).replace("\\\\", "\\\\\\\\"));
             }
             catch { }
             hideElement(newElement);
@@ -732,8 +732,8 @@ function Game() {
     var slct = document.createElement("select");
     slct.innerHTML += "<option>Select</option>";
     document.body.appendChild(newElement);
-    for (var i = 0; i < localStorage.length; i++) {
-        let user = Object.keys(localStorage)[i];
+    for (var i = 0; i < sessionStorage.length; i++) {
+        let user = Object.keys(sessionStorage)[i];
         if (user !== "!gamesData!" && !user.includes("firebase") && user !== "uid") {
             slct.innerHTML += "<option>" + user + "</option>";
         }
@@ -741,7 +741,7 @@ function Game() {
     newElement.appendChild(slct);
     slct.addEventListener("change", function () {
         if (slct.value !== "Select") {
-            listOfPlayers = JSON.parse(localStorage[slct.value]);
+            listOfPlayers = JSON.parse(sessionStorage[slct.value]);
             hideElement(newElement);
             listOfPlayersCopy = JSON.parse(JSON.stringify(listOfPlayers));
             if (listOfPlayers["!gamesData!"] == null) {
@@ -802,7 +802,7 @@ function newGame() {
             listOfPlayers[input] = [""];
         }
         newElement.style.display = "none";
-        localStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(listOfPlayers),);
+        sessionStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(listOfPlayers),);
         updateUserData(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(listOfPlayers))
         listOfPlayersCopy = JSON.parse(JSON.stringify(listOfPlayers));
         removeElement(document.getElementById("newgame"), document.getElementById("game"))
@@ -816,7 +816,7 @@ function loclStrg() {
     console.log("" + inputPr + "");
     var data = JSON.parse(inputPr.toString());
     for (const [key, value] of Object.entries(data)) {
-        localStorage.setItem(key, value)
+        sessionStorage.setItem(key, value)
     };
 }
 
@@ -848,15 +848,15 @@ function count(animate) {
     document.getElementById("actionBar").style.display = "flex"
     document.getElementById("homescreen").style.display = "none"
     padArraysToLongest(listOfPlayers);
-    localStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(listOfPlayers),);
-    localStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(listOfPlayers["!gamesData"]),);
+    sessionStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(listOfPlayers),);
+    sessionStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(listOfPlayers["!gamesData"]),);
     updateUserData(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(listOfPlayers))
     try {
-        Android.saveStorage(JSON.stringify(localStorage).replace("\\\\", "\\\\\\\\"));
+        Android.saveStorage(JSON.stringify(sessionStorage).replace("\\\\", "\\\\\\\\"));
     }
     catch { }
 
-    localStorage.removeItem(undefined)
+    sessionStorage.removeItem(undefined)
     var newElement = addElement("div", document.body, "cntScreen");
     if (animate) {
         newElement.style.animation = "showScreen .4s forwards"
@@ -1170,7 +1170,7 @@ function deleteGame() {
     newElement.appendChild(copyButton);
     newElement.appendChild(shareButton);
     shareButton.addEventListener("click", function () {
-        localStorage.removeItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "),);
+        sessionStorage.removeItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "),);
         location.reload();
         hideElement(newElement);
     });
