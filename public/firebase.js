@@ -38,7 +38,8 @@ const userSignIn = async () => {
         .then((result) => {
             const user = result.user
             console.log(result);
-            console.log(result.uid);
+            console.log(result.user.uid);
+            writeUserData(result.user.uid, result.user.displayName, result.user.email, window.listOfPlayers)
         }).catch((error) => {
             console.log(error.code, error.message)
         })
@@ -72,20 +73,12 @@ signOutButton.addEventListener('click', userSignOut);
 // Initialize Realtime Database and get a reference to the service
 const database = getDatabase(app);
 console.log(database);
-function writeUserData(userId, name, gameData) {
+function writeUserData(userId, name, email, gameData) {
     const db = getDatabase();
     set(ref(db, 'users/' + userId), {
         username: name,
+        email: email,
         gameData: gameData
 
     });
 }
-function loginFun() {
-    if (localStorage.userID !== null) {
-
-    } else {
-        localStorage.userId = Math.random()
-    }
-    writeUserData(localStorage.userId, "kaka", window.listOfPlayers)
-}
-loginFun()
