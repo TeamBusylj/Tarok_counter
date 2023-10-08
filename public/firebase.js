@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"
-import { getDatabase, ref, set, child, get } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+import { getDatabase, ref, set, child, get, update } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -84,34 +84,40 @@ function writeUserData(userId, name, email, gameData) {
         set(ref(db, 'users/' + userId), {
             username: name,
             email: email,
-            gameData: "{}"
-
         });
     }
 
 }
 export function updateUserData(key, value) {
     const db = getDatabase();
-    set(ref(db, 'users/' + uid), {
-        [key]: value
-    });
+
+    const updates = {};
+    updates['/users/' + localStorage.uid + "/games/" + key] = value;
+
+
+    return update(ref(db), updates);
 }
 window.updateUserData = updateUserData
 export function loadDataFromWeb() {
-    if (localStorage.uid !== null) {
-        const dbRef = ref(getDatabase());
-        get(child(dbRef, `users/${localStorage.uid}`)).then((snapshot) => {
-            if (snapshot.exists()) {
 
-                window.listOfPlayers = JSON.parse(snapshot.val())
-            } else {
-                console.log("No data available");
-                return false
-            }
-        }).catch((error) => {
-            console.error(error);
-        });
-    }
-    return true
+    const dbRef = ref(getDatabase());
+    get(child(dbRef, `users/${localStorage.uid}`)).then((snapshot) => {
+        if (snapshot.exists()) {
+            console.log(snapshot.val()["games"]);
+            let data = snapshot.val()["games"]
+            console.log(data);
+            for (const [key, value] of Object.entries(data)) {
+                localStorage.setItem(key, value)
+            };
+            return true
+        } else {
+            console.log("No data available");
+            return false
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+
+
 }
 window.loadDataFromWeb = loadDataFromWeb
