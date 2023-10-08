@@ -38,6 +38,7 @@ const userSignIn = async () => {
         .then((result) => {
             const user = result.user
             console.log(result);
+            console.log(result.uid);
         }).catch((error) => {
             console.log(error.code, error.message)
         })
