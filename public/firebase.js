@@ -32,7 +32,7 @@ const signOutButton = document.getElementById("signOutGoogle")
 const signInMessage = document.getElementById("signInMessage")
 var uid = null
 signOutButton.style.display = "none"
-signInMessage.style.display = "none"
+
 
 
 const userSignIn = async () => {
@@ -54,7 +54,7 @@ const userSignOut = async () => {
     signOut(auth)
         .then((result) => {
             console.log("signed out");
-            sessionStorage.clear()
+            localStorage.clear()
             location.reload()
         }).catch((error) => {
 
@@ -63,15 +63,15 @@ const userSignOut = async () => {
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        signOutButton.style.display = "block";
+        signOutButton.style.display = "flex";
         signInButton.style.display = "none"
-        signInMessage.style.display = "block";
-        signInMessage.innerHTML = user.displayName;
-        signInMessage.innerHTML = user.email
+
+        signInMessage.innerHTML = "Pozdravljeni, " + user.displayName + ".";
     } else {
-        signInButton.style.display = "block"
+        signInButton.style.display = "flex"
         signOutButton.style.display = "none";
-        signInMessage.style.display = "none";
+
+        signInMessage.innerHTML = "Za shranjevanje podatkov se prijavite.";
     }
 })
 
@@ -83,24 +83,26 @@ signOutButton.addEventListener('click', userSignOut);
 const database = getDatabase(app);
 console.log(database);
 function writeUserData(userId, name, email, gameData) {
+    if (localStorage.uid !== null) {
+        const db = getDatabase();
 
-    const db = getDatabase();
+        const updates = {};
+        updates['users/' + userId + '/email'] = email;
+        updates['users/' + userId + '/username'] = name;
 
-    const updates = {};
-    updates['users/' + userId + '/email'] = email;
-    updates['users/' + userId + '/username'] = name;
-
-    return update(ref(db), updates);
-
+        return update(ref(db), updates);
+    }
 }
 export function updateUserData(key, value) {
-    const db = getDatabase();
+    if (localStorage.uid !== null) {
+        const db = getDatabase();
 
-    const updates = {};
-    updates['/users/' + localStorage.uid + "/games/" + key] = value;
+        const updates = {};
+        updates['/users/' + localStorage.uid + "/games/" + key] = value;
 
 
-    return update(ref(db), updates);
+        return update(ref(db), updates);
+    }
 }
 window.updateUserData = updateUserData
 export function loadDataFromWeb() {
@@ -112,7 +114,10 @@ export function loadDataFromWeb() {
             let data = snapshot.val()["games"]
             console.log(data);
             for (const [key, value] of Object.entries(data)) {
-                sessionStorage.setItem(key, value)
+                const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
+                gamesObject[key] = value;
+                localStorage.setItem("games", JSON.stringify(gamesObject));
+
             };
             return true
         } else {

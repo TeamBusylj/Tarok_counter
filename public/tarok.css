@@ -16,14 +16,28 @@ div#bottomBar {
 #homescreen {
     display: flex;
     flex-direction: column;
-    height: 90vh;
+    height: 80vh;
     width: 40vw;
     transition: all .2s;
     margin: auto;
 
 }
 
-.signInGoogle {
+#signInMessage {
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--colorTxtDialog);
+    display: block;
+    width: 90%;
+    padding: 10px;
+    text-align: center;
+    background-color: var(--colorDialog);
+    border-radius: 20px;
+
+}
+
+.signInGoogle,
+.signOutGoogle {
     display: flex;
     flex-direction: row;
     align-items: center;

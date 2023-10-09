@@ -171,7 +171,7 @@ function klop(newElement2, gamename) {
         console.log(plNombers)
         for (const pl of plNombers) {
             console.log(pl)
-            tockice.push(pl.value)
+            tockice.push("-" + pl.value)
         }
 
         console.log(tockice)
@@ -629,11 +629,12 @@ function upload(encrypted) {
         newElement.appendChild(copyButton);
         newElement.appendChild(shareButton);
         shareButton.addEventListener("click", function () {
-            sessionStorage.setItem(JSON.stringify(Object.keys(text).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(text),);
-            sessionStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(text["!gamesData"]),);
-            updateUserData(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(text["!gamesData"]))
+            const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
+            gamesObject[JSON.stringify(Object.keys(text).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")] = JSON.stringify(text);
+            localStorage.setItem("games", JSON.stringify(gamesObject));
+            updateUserData(JSON.stringify(Object.keys(text).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(text["!gamesData"]))
             try {
-                Android.saveStorage(JSON.stringify(sessionStorage).replace("\\\\", "\\\\\\\\"));
+                Android.saveStorage(JSON.stringify(localStorage).replace("\\\\", "\\\\\\\\"));
             }
             catch { }
             hideElement(newElement);
@@ -722,34 +723,37 @@ function hideElement(newElement) {
 function Game() {
     var newElement = document.createElement("div");
     newElement.setAttribute("class", "whlScreen");
-    document.getElementById("homescreen").style.filter = "brightness(.3)";
+    document.getElementById("homescreen").style.filter = document.getElementById("signInMessage").style.filter = "brightness(.3)";
+
     dodajOpis(newElement, "Izberite igro.");
     var iks = addElement("div", newElement, "iks");
     iks.innerHTML = showIks;
     iks.addEventListener("click", function (e) {
         document.getElementById("game").style.animation = "none";
         hideElement(newElement);
-        document.getElementById("homescreen").style.filter = "brightness(1)";
+        document.getElementById("homescreen").style.filter = document.getElementById("signInMessage").style.filter = "brightness(1)";
     });
     var slct = document.createElement("select");
     slct.innerHTML += "<option>Izberi</option>";
     document.body.appendChild(newElement);
-    for (var i = 0; i < sessionStorage.length; i++) {
-        let user = Object.keys(sessionStorage)[i];
-        if (user !== "!gamesData!" && !user.includes("firebase") && user !== "uid") {
+    const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
+    for (var i = 0; i < Object.keys(gamesObject).length; i++) {
+        let user = Object.keys(gamesObject)[i];
+        if (user !== "!gamesData!") {
             slct.innerHTML += "<option>" + user + "</option>";
         }
     }
     newElement.appendChild(slct);
     slct.addEventListener("change", function () {
         if (slct.value !== "Select") {
-            listOfPlayers = JSON.parse(sessionStorage[slct.value]);
+            listOfPlayers = JSON.parse(gamesObject[slct.value]);
             hideElement(newElement);
             listOfPlayersCopy = JSON.parse(JSON.stringify(listOfPlayers));
             if (listOfPlayers["!gamesData!"] == null) {
                 listOfPlayers["!gamesData!"] = {};
             }
-            document.getElementById("homescreen").style.filter = "brightness(1)";
+            document.getElementById("homescreen").style.filter = document.getElementById("signInMessage").style.filter = "brightness(1)";
+
             count(true);
         }
     });
@@ -771,9 +775,11 @@ function newGame() {
     iks.innerHTML = showIks;
     iks.addEventListener("click", function (e) {
         hideElement(newElement);
-        document.getElementById("homescreen").style.filter = "brightness(1)";
+        document.getElementById("homescreen").style.filter = document.getElementById("signInMessage").style.filter = "brightness(1)";
+
     });
-    document.getElementById("homescreen").style.filter = "brightness(.3)";
+    document.getElementById("homescreen").style.filter = document.getElementById("signInMessage").style.filter = "brightness(.3)";
+
     let lnbrk = addElement("div", newElement, "break");
     lnbrk.style.height = "50px";
     var onePl = document.createElement("input");
@@ -798,14 +804,17 @@ function newGame() {
         onePl2.focus();
     });
     endPl.addEventListener("click", function () {
-        document.getElementById("homescreen").style.filter = "brightness(1)";
+        document.getElementById("homescreen").style.filter = document.getElementById("signInMessage").style.filter = "brightness(1)";
+
         listOfPlayers["!gamesData!"] = {};
         for (var i = 0; i < document.getElementsByTagName("input").length; i++) {
             let input = document.getElementsByTagName("input")[i].value;
             listOfPlayers[input] = [""];
         }
         newElement.style.display = "none";
-        sessionStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(listOfPlayers),);
+        const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
+        gamesObject[JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")] = JSON.stringify(listOfPlayers);
+        localStorage.setItem("games", JSON.stringify(gamesObject));
         updateUserData(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(listOfPlayers))
         listOfPlayersCopy = JSON.parse(JSON.stringify(listOfPlayers));
         removeElement(document.getElementById("newgame"), document.getElementById("game"))
@@ -819,7 +828,7 @@ function loclStrg() {
     console.log("" + inputPr + "");
     var data = JSON.parse(inputPr.toString());
     for (const [key, value] of Object.entries(data)) {
-        sessionStorage.setItem(key, value)
+        localStorage.setItem(key, value)
     };
 }
 
@@ -849,17 +858,19 @@ function padArraysToLongest(obj) {
 function count(animate) {
     document.getElementById("actionBar").style.pointerEvents = "auto";
     document.getElementById("actionBar").style.display = "flex"
-    document.getElementById("homescreen").style.display = "none"
+    document.getElementById("homescreen").style.display = document.getElementById("signInMessage").style.display = "none"
+
     padArraysToLongest(listOfPlayers);
-    sessionStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(listOfPlayers),);
-    sessionStorage.setItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(listOfPlayers["!gamesData"]),);
+    const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
+    gamesObject[JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")] = JSON.stringify(listOfPlayers);
+    localStorage.setItem("games", JSON.stringify(gamesObject));
     updateUserData(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(listOfPlayers))
     try {
-        Android.saveStorage(JSON.stringify(sessionStorage).replace("\\\\", "\\\\\\\\"));
+        Android.saveStorage(JSON.stringify(localStorage).replace("\\\\", "\\\\\\\\"));
     }
     catch { }
 
-    sessionStorage.removeItem(undefined)
+    localStorage.removeItem(undefined)
     var newElement = addElement("div", document.body, "cntScreen");
     if (animate) {
         newElement.style.animation = "showScreen .4s forwards"
@@ -893,6 +904,7 @@ function count(animate) {
         newElement.appendChild(prnt);
 
     }
+
     var stGame = 1
     let pointsList = {}
     document.body.appendChild(newElement);
@@ -915,27 +927,29 @@ function count(animate) {
             points = Array.from(set);
             points.push(points[0])
         }
-        console.log(points)
+
         for (const player of nameOne) {
 
-            console.log(points)
 
             var kkk = document.createElement("p");
             if (points[nameOne.indexOf(player)] !== "") {
-                if (listOfPlayers["!gamesData!"][stGame][4]) { kkk.innerHTML = parseInt(points[nameOne.indexOf(player)]) * 2; }
+                console.log("tola" + listOfPlayers["!gamesData!"][stGame][4] + stGame);
+                if (listOfPlayers["!gamesData!"][stGame][4]) { console.log(parseInt(points[nameOne.indexOf(player)]) * 2); points[nameOne.indexOf(player)] = parseInt(points[nameOne.indexOf(player)]) * 2; kkk.innerHTML = parseInt(points[nameOne.indexOf(player)]); console.log(parseInt(points[nameOne.indexOf(player)]) * 2); }
                 else { kkk.innerHTML = parseInt(points[nameOne.indexOf(player)]) }
             }
 
-            console.log(".chlName_" + player)
+
             document.querySelector(".chlName_" + player).appendChild(kkk);
             kkk.style.marginTop = "-15px";
-            console.log(listOfPlayers["!gamesData!"][stGame][1][0] == player)
+
             if (listOfPlayers["!gamesData!"][stGame][4] && listOfPlayers["!gamesData!"][stGame][1][0] == player) {
                 kkk.innerHTML = kkk.innerHTML + "*";
             }
             // kkk.setAttribute("onclick", 'gameData("' + stGame + '")');
             kkk.classList.add("word_" + stGame);
-            if (points[nameOne.indexOf(player)] !== "") pointsList[player] += parseInt(points[nameOne.indexOf(player)])
+            console.log(pointsList[player], parseInt(points[nameOne.indexOf(player)]))
+            if (points[nameOne.indexOf(player)] !== "") { pointsList[player] = pointsList[player] + parseInt(points[nameOne.indexOf(player)]) }
+            console.log(pointsList[player])
             kkk.addEventListener("click", function () {
                 gameData(event.target.getAttribute("class").slice(5), stGame);
             });
@@ -943,12 +957,12 @@ function count(animate) {
         for (const key in listOfPlayers) {
 
             if (nameOne.includes(key) || key == "!gamesData!") { continue } else {
-                console.log(key)
+
                 var kkk = document.createElement("p");
                 kkk.innerHTML = "&nbsp;";
 
                 document.querySelector(".chlName_" + key).appendChild(kkk);
-                console.log(".chlName_" + key)
+
                 kkk.style.marginTop = "-15px";
 
 
@@ -984,6 +998,7 @@ function count(animate) {
     for (const key in listOfPlayers) {
         if (key !== "!gamesData!") {
             document.querySelector(".rezult_" + key).innerHTML = pointsList[key]
+
         }
     }
 }
@@ -1173,7 +1188,7 @@ function deleteGame() {
     newElement.appendChild(copyButton);
     newElement.appendChild(shareButton);
     shareButton.addEventListener("click", function () {
-        sessionStorage.removeItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "),);
+        localStorage.removeItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "),);
         location.reload();
         hideElement(newElement);
     });
