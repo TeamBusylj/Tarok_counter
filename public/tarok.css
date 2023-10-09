@@ -12,29 +12,65 @@ div#bottomBar {
     bottom: 0;
 
 }
-#actionBar{
- display: none;
- background-color: var(--bgColor);
+
+#homescreen {
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+    width: 40vw;
+    transition: all .2s;
+    margin: auto;
+
+}
+
+.signInGoogle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+#Capa_1 {
+    height: 90%;
+    fill: var(--colorTxt);
+}
+
+#actionBar {
+    display: none;
+    background-color: var(--bgColor);
     transition: all .2s;
     align-items: center;
     justify-content: center;
     height: 50px;
-pointer-events: auto;
+    pointer-events: auto;
 }
-i{margin: 5px;}
-@media (max-width:400px) { .bottomBtn {font-size: 0;}} 
 
-@media (min-width:400px) { .bottomBtn {font-size: .9rem;} }
-.bottomBtn {
-  flex-basis: auto;
-       
-        height: 70%;
-     
-        display: flex;
-        align-items: center;
-       
-        text-align: center;
+i {
+    margin: 5px;
+}
+
+@media (max-width:400px) {
+    .bottomBtn {
+        font-size: 0;
     }
+}
+
+@media (min-width:400px) {
+    .bottomBtn {
+        font-size: .9rem;
+    }
+}
+
+.bottomBtn {
+    flex-basis: auto;
+
+    height: 70%;
+
+    display: flex;
+    align-items: center;
+
+    text-align: center;
+}
 
 .opis {
     font-size: 1.2rem;
@@ -44,16 +80,16 @@ i{margin: 5px;}
 }
 
 span.ripple {
-  width: 1px;
-  height: 1px;
-  opacity: .4;
-filter: brightness(2);
+    width: 1px;
+    height: 1px;
+    opacity: .4;
+    filter: brightness(2);
     position: absolute;
     border-radius: 50%;
     transition: all .3s;
     transform: scale(1) translate(-50%, -50%);
     /*animation: ripple 3000ms linear forwards;*/
-    background-color:inherit;
+    background-color: inherit;
 }
 
 .fadeOutIt {
@@ -75,10 +111,12 @@ filter: brightness(2);
         transform: scale(0) translate(-50%, -50%);
         opacity: 0;
     }
+
     20% {
         transform: scale(.4) translate(-75%, -75%);
         opacity: 1;
     }
+
     100% {
         transform: scale(2) translate(-25%, -25%);
         opacity: .4;
@@ -86,7 +124,7 @@ filter: brightness(2);
 }
 
 html {
-overscroll-behavior:none;
+    overscroll-behavior: none;
     font-size: 1.2em;
     -webkit-user-select: none;
     /* Safari */
@@ -143,27 +181,14 @@ overscroll-behavior:none;
     right: 10px;
     top: 10px;
     height: calc(3vw + 3vh);
-    
+
 }
 
-.iksFont{
-    font-size:calc(3vw + 3vh) !important ;
+.iksFont {
+    font-size: calc(3vw + 3vh) !important;
 }
 
-#newgame {
-    position: absolute;
-    top: 35%;
-    left: 50%;
-    -ms-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-}
-#linkadd {
-    position: absolute;
-    top: 65%;
-    left: 50%;
-    -ms-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-}
+
 
 .namePlayers {
     padding-bottom: 10px;
@@ -181,13 +206,7 @@ overscroll-behavior:none;
     overflow: hidden;
 }
 
-#game {
-    position: absolute;
-    top:50%;
-    left: 50%;
-    -ms-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-}
+
 
 .undo {
     position: fixed;
@@ -202,7 +221,7 @@ overscroll-behavior:none;
 
 .chl {
 
-    overscroll-behavior:none;
+    overscroll-behavior: none;
 
     height: calc(100vh - 200px);
     margin-top: 60px;
@@ -211,22 +230,26 @@ overscroll-behavior:none;
     background-color: var(--colorDialog);
     color: var(--colorTxtDialog);
     padding: 2px;
-  overflow: scroll;
+    overflow: scroll;
     flex: 1;
     position: relative;
     text-align: center;
 }
-.chl::-webkit-scrollbar  {
+
+.chl::-webkit-scrollbar {
     display: none;
-  }
-  
-  /* Hide scrollbar for IE, Edge and Firefox */
-  .chl {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.chl {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
 .prnt {
- 
+
     overflow-y: auto;
     color: var(--colorTxtDialog);
     padding: 0px 10px 10px 10px;
@@ -277,8 +300,12 @@ button {
     overflow: hidden;
     position: relative;
     flex-basis: 100px;
+    display: flex;
     border-radius: 30px;
+    flex-direction: row;
     text-align: center;
+    justify-content: center;
+    align-items: center;
     padding: 14px;
     border-width: 0;
     background-color: var(--colorBtn);
@@ -324,13 +351,13 @@ input {
     animation: showScreen .3s forwards;
 }
 
-input:focus-visible{
+input:focus-visible {
     outline: var(--colorBtn) solid 3px;
 }
 
 .cntScreen {
     background-color: var(--bgColor);
- 
+
     color: var(--colorTxt);
     display: flex;
     flex-direction: row;
@@ -340,7 +367,7 @@ input:focus-visible{
     justify-content: center;
     align-items: top;
     height: 100%;
- 
+
 }
 
 .brightnesslow {

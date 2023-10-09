@@ -54,6 +54,7 @@ const userSignOut = async () => {
     signOut(auth)
         .then((result) => {
             console.log("signed out");
+            sessionStorage.clear()
             location.reload()
         }).catch((error) => {
 

@@ -722,15 +722,17 @@ function hideElement(newElement) {
 function Game() {
     var newElement = document.createElement("div");
     newElement.setAttribute("class", "whlScreen");
+    document.getElementById("homescreen").style.filter = "brightness(.3)";
     dodajOpis(newElement, "Izberite igro.");
     var iks = addElement("div", newElement, "iks");
     iks.innerHTML = showIks;
     iks.addEventListener("click", function (e) {
         document.getElementById("game").style.animation = "none";
         hideElement(newElement);
+        document.getElementById("homescreen").style.filter = "brightness(1)";
     });
     var slct = document.createElement("select");
-    slct.innerHTML += "<option>Select</option>";
+    slct.innerHTML += "<option>Izberi</option>";
     document.body.appendChild(newElement);
     for (var i = 0; i < sessionStorage.length; i++) {
         let user = Object.keys(sessionStorage)[i];
@@ -747,9 +749,7 @@ function Game() {
             if (listOfPlayers["!gamesData!"] == null) {
                 listOfPlayers["!gamesData!"] = {};
             }
-            document.getElementById("newgame").style.display = "none";
-            document.getElementById("game").style.display = "none";
-            document.getElementById("linkadd").style.display = "none";
+            document.getElementById("homescreen").style.filter = "brightness(1)";
             count(true);
         }
     });
@@ -771,7 +771,9 @@ function newGame() {
     iks.innerHTML = showIks;
     iks.addEventListener("click", function (e) {
         hideElement(newElement);
+        document.getElementById("homescreen").style.filter = "brightness(1)";
     });
+    document.getElementById("homescreen").style.filter = "brightness(.3)";
     let lnbrk = addElement("div", newElement, "break");
     lnbrk.style.height = "50px";
     var onePl = document.createElement("input");
@@ -796,6 +798,7 @@ function newGame() {
         onePl2.focus();
     });
     endPl.addEventListener("click", function () {
+        document.getElementById("homescreen").style.filter = "brightness(1)";
         listOfPlayers["!gamesData!"] = {};
         for (var i = 0; i < document.getElementsByTagName("input").length; i++) {
             let input = document.getElementsByTagName("input")[i].value;
