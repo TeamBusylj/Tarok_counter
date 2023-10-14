@@ -1,3 +1,6 @@
+
+
+
 function adaptColor(bg, txt, btn, dialog, txtDialog) {
     document.body.style.setProperty("--bgColor", bg);
     document.body.style.setProperty("--colorTxt", txt);
@@ -27,6 +30,7 @@ async function addScore(firstPlayer) {
     /* await resolveAfter(10);
  
      await resolveAfter(parseInt(transitionDUr.toString().replace(".","").slice(0, 2)+"00")/8);*/
+    document.querySelector(".cntScreen").style.pointerEvents = document.querySelector("#actionBar").style.pointerEvents = "none"
     transitionDUr = 0
     listOfPlayersCopy = JSON.parse(JSON.stringify(listOfPlayers));
     var newElement = addElement("div", null, "whlScreen");
@@ -411,7 +415,11 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
                             bonusi[key][3] = false;
                         }
                         newElement.style.filter = "brightness(1)";
-                        hideElement(bonusDialog);
+
+                        bonusDialog.style.animation = "hideScreen .2s forwards";
+                        setTimeout(() => {
+                            bonusDialog.remove();
+                        }, 200);
                     });
                 });
             });
@@ -451,6 +459,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
         console.log(bonusTocke);
         console.log(bnsi);
         if (difNu.value !== "" || properties[1] == false) {
+            console.log("evo")
             if (slct2 !== "" || teamWork) {
                 let nearestMultipleOf5 = Math.round(razlika / 5) * 5;
                 razlika = nearestMultipleOf5;
@@ -554,7 +563,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 function download() {
     var text = JSON.stringify(listOfPlayers);
     console.log(text);
-    var result = "https://teambusylj.github.io/SloRadio/tarok.html#" + encodeURIComponent(text);
+    var result = "https://tarock-counter.web.app#" + encodeURIComponent(text);
     var newElement = addElement("div", document.body, "whlScreen");
     document.querySelector(".cntScreen").style.filter = document.getElementById("bottomBar").style.filter = "brightness(.3)";
     var iks = addElement("div", newElement, "iks");
@@ -632,7 +641,7 @@ function upload(encrypted) {
             const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
             gamesObject[JSON.stringify(Object.keys(text).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")] = JSON.stringify(text);
             localStorage.setItem("games", JSON.stringify(gamesObject));
-            updateUserData(JSON.stringify(Object.keys(text).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")["!gamesData"], JSON.stringify(text["!gamesData"]))
+            updateUserData()
             try {
                 Android.saveStorage(JSON.stringify(localStorage).replace("\\\\", "\\\\\\\\"));
             }
@@ -679,39 +688,18 @@ function uploadLink() {
 
 
 
-/*function plusScore(playedUser, user, score) {
-    if (listOfPlayers[playedUser][0] !== "") {
-        listOfPlayers[user].push(score * 2);
-        listOfPlayers[playedUser].push(parseInt(score * 2) + "*");
-        if (score > 0 && listOfPlayers[playedUser][0].length > 0) {
-            listOfPlayers[playedUser][0] = listOfPlayers[playedUser][0].replace("*", "",);
-        }
-    }
-    else {
-        listOfPlayers[user].push(score);
-        listOfPlayers[playedUser].push(score);
-    }
-}
-*/
-/*function aloneplusScore(user, score) {
-    if (listOfPlayers[user][0] !== "") {
-        listOfPlayers[user].push(parseInt(score * 2) + "*");
-        if (score > 0 && listOfPlayers[user][0].length > 0) {
-            listOfPlayers[user][0] = listOfPlayers[user][0].replace("*", "");
-        }
-    }
-    else {
-        listOfPlayers[user].push(score);
-    }
-}
-*/
 function hideElement(newElement) {
 
-    document.getElementById("actionBar").style.pointerEvents = "auto";
+
     newElement.style.animation = "hideScreen .2s forwards";
     try {
         document.querySelector(".cntScreen").style.filter = "";
         document.getElementById("bottomBar").style.filter = "";
+
+        setTimeout(() => {
+            document.getElementById("actionBar").style.pointerEvents = "auto";
+            document.querySelector(".cntScreen").style.pointerEvents = "auto"
+        }, 500);
 
     }
     catch { }
@@ -723,7 +711,7 @@ function hideElement(newElement) {
 function Game() {
     var newElement = document.createElement("div");
     newElement.setAttribute("class", "whlScreen");
-    document.getElementById("homescreen").style.filter = document.getElementById("signInMessage").style.filter = "brightness(.3)";
+    document.getElementById("homescreen").style.filter = document.getElementById("bottomBar").style.filter = document.getElementById("signInMessage").style.filter = "brightness(.3)";
 
     dodajOpis(newElement, "Izberite igro.");
     var iks = addElement("div", newElement, "iks");
@@ -731,7 +719,7 @@ function Game() {
     iks.addEventListener("click", function (e) {
         document.getElementById("game").style.animation = "none";
         hideElement(newElement);
-        document.getElementById("homescreen").style.filter = document.getElementById("signInMessage").style.filter = "brightness(1)";
+        document.getElementById("homescreen").style.filter = document.getElementById("signInMessage").style.filter = document.getElementById("bottomBar").style.filter = "brightness(1)";
     });
     var slct = document.createElement("select");
     slct.innerHTML += "<option>Izberi</option>";
@@ -778,7 +766,7 @@ function newGame() {
         document.getElementById("homescreen").style.filter = document.getElementById("signInMessage").style.filter = "brightness(1)";
 
     });
-    document.getElementById("homescreen").style.filter = document.getElementById("signInMessage").style.filter = "brightness(.3)";
+    document.getElementById("homescreen").style.filter = document.getElementById("bottomBar").style.filter = document.getElementById("signInMessage").style.filter = "brightness(.3)";
 
     let lnbrk = addElement("div", newElement, "break");
     lnbrk.style.height = "50px";
@@ -815,7 +803,7 @@ function newGame() {
         const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
         gamesObject[JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")] = JSON.stringify(listOfPlayers);
         localStorage.setItem("games", JSON.stringify(gamesObject));
-        updateUserData(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(listOfPlayers))
+        updateUserData()
         listOfPlayersCopy = JSON.parse(JSON.stringify(listOfPlayers));
         removeElement(document.getElementById("newgame"), document.getElementById("game"))
         count(true);
@@ -858,13 +846,15 @@ function padArraysToLongest(obj) {
 function count(animate) {
     document.getElementById("actionBar").style.pointerEvents = "auto";
     document.getElementById("actionBar").style.display = "flex"
+    document.getElementById("bottomBar").style.filter = "";
+    document.getElementById("actionBarStart").style.display = "none"
     document.getElementById("homescreen").style.display = document.getElementById("signInMessage").style.display = "none"
 
     padArraysToLongest(listOfPlayers);
     const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
     gamesObject[JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")] = JSON.stringify(listOfPlayers);
     localStorage.setItem("games", JSON.stringify(gamesObject));
-    updateUserData(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "), JSON.stringify(listOfPlayers))
+    updateUserData()
     try {
         Android.saveStorage(JSON.stringify(localStorage).replace("\\\\", "\\\\\\\\"));
     }
@@ -898,7 +888,7 @@ function count(animate) {
         })
         prnt.setAttribute("class", "prnt prntName_" + name);
         prnt.addEventListener("click", function () {
-            if (!event.target.getAttribute("class").includes("word")) addScore(name)
+            if (!event.target.className.includes("word")) { addScore(name) }
         })
         prnt.appendChild(chl);
         newElement.appendChild(prnt);
@@ -914,12 +904,15 @@ function count(animate) {
         }
     }
     for (const game in listOfPlayers["!gamesData!"]) {
-        let nameOne = listOfPlayers["!gamesData!"][stGame][1]
-        let points = listOfPlayers["!gamesData!"][stGame][3]
+        console.log(game);
+        let nameOne = listOfPlayers["!gamesData!"][game][1]
+        let points = listOfPlayers["!gamesData!"][game][3]
 
         if (!Array.isArray(nameOne)) {
+            console.log(nameOne)
             const set = new Set([nameOne]);
             nameOne = Array.from(set);
+            console.log(nameOne)
 
         }
         if (!Array.isArray(points)) {
@@ -930,29 +923,34 @@ function count(animate) {
 
         for (const player of nameOne) {
 
-
+            let playerPoints = points[nameOne.indexOf(player)]
             var kkk = document.createElement("p");
-            if (points[nameOne.indexOf(player)] !== "") {
-                console.log("tola" + listOfPlayers["!gamesData!"][stGame][4] + stGame);
-                if (listOfPlayers["!gamesData!"][stGame][4]) { console.log(parseInt(points[nameOne.indexOf(player)]) * 2); points[nameOne.indexOf(player)] = parseInt(points[nameOne.indexOf(player)]) * 2; kkk.innerHTML = parseInt(points[nameOne.indexOf(player)]); console.log(parseInt(points[nameOne.indexOf(player)]) * 2); }
-                else { kkk.innerHTML = parseInt(points[nameOne.indexOf(player)]) }
+            if (playerPoints !== "") {
+
+                if (listOfPlayers["!gamesData!"][game][4]) { playerPoints = parseInt(playerPoints) * 2; kkk.innerHTML = parseInt(playerPoints); }
+                else { kkk.innerHTML = parseInt(playerPoints) }
             }
 
 
             document.querySelector(".chlName_" + player).appendChild(kkk);
             kkk.style.marginTop = "-15px";
 
-            if (listOfPlayers["!gamesData!"][stGame][4] && listOfPlayers["!gamesData!"][stGame][1][0] == player) {
+            if (listOfPlayers["!gamesData!"][game][4] && listOfPlayers["!gamesData!"][game][1][0] == player) {
                 kkk.innerHTML = kkk.innerHTML + "*";
             }
             // kkk.setAttribute("onclick", 'gameData("' + stGame + '")');
             kkk.classList.add("word_" + stGame);
-            console.log(pointsList[player], parseInt(points[nameOne.indexOf(player)]))
-            if (points[nameOne.indexOf(player)] !== "") { pointsList[player] = pointsList[player] + parseInt(points[nameOne.indexOf(player)]) }
-            console.log(pointsList[player])
+
+            if (playerPoints !== "") { pointsList[player] = pointsList[player] + parseInt(playerPoints) }
+
             kkk.addEventListener("click", function () {
-                gameData(event.target.getAttribute("class").slice(5), stGame);
+                if (kkk.innerHTML !== "&bbsp;")
+                    gameData(event.target.getAttribute("class").slice(5), stGame);
             });
+
+            if (playerPoints == "") {
+                kkk.innerHTML = "&nbsp;"
+            }
         }
         for (const key in listOfPlayers) {
 
@@ -981,17 +979,51 @@ function count(animate) {
     names.forEach(name => {
         name.style.height = maxHeight + "px";
     });
-    var subDiv = document.querySelectorAll(".chl");
 
-    for (let i = 0; i < subDiv.length; i++) {
-        const element = subDiv[i];
-        element.addEventListener("scroll", function () {
-            for (const key in subDiv) {
-                subDiv[key].scrollTop = event.target.scrollTop;
-            }
-        });
+    let chls = document.getElementsByClassName("chl");
+    let heightToChange = document.querySelector(".namePlayers").getBoundingClientRect().height;
+    for (let chlsek of chls) {
 
-    }
+        console.log(chlsek.getBoundingClientRect().height)
+        chlsek.style.height = (chlsek.getBoundingClientRect().height - heightToChange + 115) + "px";
+        console.log(chlsek.getBoundingClientRect().height);
+    };
+
+
+
+    var subCatContainer = $(".chl");
+    document.getElementsByClassName("chl")[0].scrollTop = 1
+    document.getElementsByClassName("chl")[0].scrollTop = 0
+    subCatContainer.scroll(function () {
+
+        let boxShadow = ""; // Initialize an empty string for the box shadow
+        if (Math.round(subCatContainer.scrollTop()) !== 0) {
+            // Add the top shadow
+
+            boxShadow += "15px 15px ";
+        } else {
+            boxShadow += "30px 30px ";
+        }
+        if (Math.round(subCatContainer.scrollTop()) !== (subCatContainer.prop('scrollHeight') - subCatContainer.prop('offsetHeight'))) {
+
+            // Add the bottom shadow
+            boxShadow += "15px 15px";
+        } else {
+
+            // Add the bottom shadow
+            boxShadow += "30px 30px";
+        }
+
+
+        // Set the final box shadow
+        console.log(boxShadow);
+        subCatContainer.css("border-radius", boxShadow);
+    });
+    subCatContainer.scroll(function () {
+        subCatContainer.scrollTop($(this).scrollTop());
+
+    });
+
     rezultLine.setAttribute("class", "crezultLine");
     document.getElementById("bottomBar").insertBefore(rezultLine, document.getElementById("actionBar"));
 
@@ -1149,10 +1181,25 @@ function gameData(infom, number) {
     newElement.appendChild(izbrisiIgro);
     izbrisiIgro.addEventListener("click", function (e) {
         delete listOfPlayers["!gamesData!"][infom]
+        const keys = Object.keys(listOfPlayers["!gamesData!"]);
+        keys.sort((a, b) => a - b);
+
+        const newObj = {};
+        for (let i = 0; i < keys.length; i++) {
+            newObj[i + 1] = listOfPlayers["!gamesData!"][keys[i]];
+        }
+        listOfPlayers["!gamesData!"] = newObj
+
+        const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
+        gamesObject[JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")] = listOfPlayers
+        localStorage.setItem("games", JSON.stringify(gamesObject));
+
         document.querySelector(".cntScreen").style.filter = document.getElementById("bottomBar").style.filter = "brightness(1)";
         removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
+        updateUserData()
         hideElement(newElement);
-        count(false);
+        count(true);
+
     })
     var iks = document.createElement("button");
     iks.innerHTML = "Končano";
@@ -1188,7 +1235,11 @@ function deleteGame() {
     newElement.appendChild(copyButton);
     newElement.appendChild(shareButton);
     shareButton.addEventListener("click", function () {
-        localStorage.removeItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "),);
+        const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
+        delete gamesObject[JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")]
+        localStorage.setItem("games", JSON.stringify(gamesObject));
+        // localStorage.removeItem(JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", "),);
+        updateUserData()
         location.reload();
         hideElement(newElement);
     });
@@ -1207,9 +1258,12 @@ async function resolveAfter(s) {
 var transitionDUr = 0
 async function createRipple(event) {
     console.log(event.target.className)
+    if (!event.target.className.includes("whlScreen") && !event.target.closest('.whlScreen') && document.getElementsByClassName("whlScreen")[0] !== undefined) {
+        hideElement(document.getElementsByClassName("whlScreen")[0])
+    }
     if (event.target.tagName == "BUTTON" || event.target.className.includes("chl")) {
 
-        if (event.target.getAttribute("disabled") == null) {
+        if (event.target.getAttribute("disabled") == null && !event.target.className.includes("signIn")) {
             const button = event.target;
             if (event.target.className.includes("chl")) { button.style.overflow = "hidden" }
             const circle = document.createElement("span");
@@ -1275,4 +1329,53 @@ function removeElement() {
         console.log(element)
         element.remove()
     }
+}
+
+function privacy() {
+    var newElement = document.createElement("div");
+    newElement.setAttribute("class", "whlScreen");
+    newElement.setAttribute("style", "width:100vw; height:100svh;max-height:100vh; border-radius:0;overflow-x:hidden;")
+    var iks = addElement("div", newElement, "iks");
+    iks.innerHTML = showIks;
+    iks.addEventListener("click", function (e) {
+        hideElement(newElement);
+        document.getElementById("homescreen").style.filter = document.getElementById("signInMessage").style.filter = "brightness(1)";
+
+    });
+    dodajOpis(newElement, "Politika zasebnosti");
+    var policy = addElement("p", newElement, null);
+    policy.setAttribute("style", "white-space: pre;text-wrap: wrap;width: 80%;margin: 20px;color: var(--colorTxtDialog);")
+    jQuery.get('./assets/policies.txt', function (data) {
+        policy.innerHTML = data
+    });
+    document.body.appendChild(newElement)
+}
+
+function feedback() {
+
+    var newElement = addElement("div", document.body, "whlScreen");
+    var iks = addElement("div", newElement, "iks");
+    iks.innerHTML = showIks;
+    iks.addEventListener("click", function (e) {
+        document.getElementById("game").style.animation = "none";
+        hideElement(newElement);
+    });
+    dodajOpis(newElement, "Povratne informacije");
+    var emailContentInput = document.createElement("textarea"); emailContentInput.setAttribute("style", "height: 25vh;width: 90%;border-radius: 30px;background-color: var(--colorBtn);padding: 10px;color: var(--colorTxt);    outline: var(--colorTxt) solid 3px;")
+    emailContentInput.type = "text";
+
+
+
+    emailContentInput.placeholder = "Vpišite kaj bi radi izboljšali...";
+
+    newElement.appendChild(emailContentInput);
+    emailContentInput.focus();
+    var shareButton = document.createElement("button");
+    shareButton.innerHTML = "Pošlji";
+    addElement("div", newElement, "break");
+    newElement.appendChild(shareButton);
+
+    shareButton.addEventListener("click", function () {
+        window.open("mailto:stevec.taroka@gmail.com?subject=Imam izbolšavo&body=" + emailContentInput.value, "_blank");
+    });
 }

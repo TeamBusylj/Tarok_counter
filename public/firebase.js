@@ -43,10 +43,11 @@ const userSignIn = async () => {
             console.log(result.user.uid);
             uid = result.user.uid
             localStorage.uid = uid
-            writeUserData(result.user.uid, result.user.displayName, result.user.email, window.listOfPlayers)
+
             loadDataFromWeb()
         }).catch((error) => {
             console.log(error.code, error.message)
+            signInMessage.innerHTML = "Nekaj je šlo narobe pri prijavi.";
         })
 }
 
@@ -75,30 +76,53 @@ onAuthStateChanged(auth, (user) => {
     }
 })
 
-signInButton.addEventListener('click', userSignIn);
+
+
+signInButton.addEventListener('click', userSignInPopup);
 signOutButton.addEventListener('click', userSignOut);
 
+function userSignInPopup() {
+    let anima = document.createElement("div")
+    anima.classList.add("signInAnim")
 
+    const rect = signInButton.getBoundingClientRect();
+    signInButton.style.transform = "scale(4)"
+
+    document.getElementById("signInText").style.opacity = "0"
+    document.getElementById("Capa_1").style.opacity = "0"
+    signInButton.appendChild(anima)
+
+
+
+    setTimeout(() => {
+        document.getElementById("signInText").style.opacity = "1"
+        document.getElementById("Capa_1").style.opacity = "1"
+        userSignIn()
+
+    }, 450);
+
+
+}
 // Initialize Realtime Database and get a reference to the service
 const database = getDatabase(app);
 console.log(database);
-function writeUserData(userId, name, email, gameData) {
+function writeUserData(userId) {
     if (localStorage.uid !== null) {
         const db = getDatabase();
 
         const updates = {};
-        updates['users/' + userId + '/email'] = email;
-        updates['users/' + userId + '/username'] = name;
+        updates['users/' + userId + '/games/'] = "{}";
+
 
         return update(ref(db), updates);
     }
 }
-export function updateUserData(key, value) {
+export function updateUserData() {
     if (localStorage.uid !== null) {
         const db = getDatabase();
 
         const updates = {};
-        updates['/users/' + localStorage.uid + "/games/" + key] = value;
+        updates['/users/' + localStorage.uid + "/games/"] = localStorage.games;
 
 
         return update(ref(db), updates);
@@ -106,12 +130,24 @@ export function updateUserData(key, value) {
 }
 window.updateUserData = updateUserData
 export function loadDataFromWeb() {
+    var user = auth.currentUser;
+    console.log(user);
+    if (user) {
+        signOutButton.style.display = "flex";
+        signInButton.style.display = "none"
 
+        signInMessage.innerHTML = "Pozdravljeni, " + user.displayName + ".";
+    } else {
+        signInButton.style.display = "flex"
+        signOutButton.style.display = "none";
+
+        signInMessage.innerHTML = "Za shranjevanje podatkov se prijavite.";
+    }
     const dbRef = ref(getDatabase());
     get(child(dbRef, `users/${localStorage.uid}`)).then((snapshot) => {
         if (snapshot.exists()) {
             console.log(snapshot.val()["games"]);
-            let data = snapshot.val()["games"]
+            let data = JSON.parse(snapshot.val()["games"])
             console.log(data);
             for (const [key, value] of Object.entries(data)) {
                 const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
@@ -122,6 +158,7 @@ export function loadDataFromWeb() {
             return true
         } else {
             console.log("No data available");
+            writeUserData(localStorage.uid)
             return false
         }
     }).catch((error) => {
