@@ -1,0 +1,8 @@
+si/tarok/stevec/Application.java
+ si.tarok.stevec.Application
+si/tarok/stevec/DelegationService.java
+ si.tarok.stevec.DelegationService
+si/tarok/stevec/LauncherActivity.java
+ si.tarok.stevec.LauncherActivity
+si/tarok/stevec/BuildConfig.java
+ si.tarok.stevec.BuildConfig

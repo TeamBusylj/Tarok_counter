@@ -1,16 +1,21 @@
 {
-    "lang": "en-us",
+    "lang": "sl",
     "name": "Števec taroka",
     "short_name": "Števec taroka",
     "start_url": "/",
     "background_color": "#000000",
     "theme_color": "#000000",
     "orientation": "any",
-    "display": "standalone",
+    "display": "minimal-ui",
     "icons": [
         {
             "src": "/assets/favicon.ico",
+            "sizes": "256x256"
+        },
+        {
+            "src": "/assets/icon.png",
             "sizes": "512x512"
         }
-    ]
+    ],
+    "dir": "ltr"
 }
