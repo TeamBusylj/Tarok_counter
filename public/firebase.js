@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"
 import { getDatabase, ref, set, child, get, update } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+import { getAuth, signInWithRedirect, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -36,14 +36,15 @@ signOutButton.style.display = "none"
 
 
 const userSignIn = async () => {
-    signInWithPopup(auth, provider)
+    signInWithRedirect(auth, provider)
         .then((result) => {
             const user = result.user
             console.log(result);
             console.log(result.user.uid);
             uid = result.user.uid
             localStorage.uid = uid
-
+            userk = user
+            console.log(uid);
             loadDataFromWeb()
         }).catch((error) => {
             console.log(error.code, error.message)
@@ -128,15 +129,16 @@ export function updateUserData() {
         return update(ref(db), updates);
     }
 }
+var userk = auth.currentUser;
 window.updateUserData = updateUserData
 export function loadDataFromWeb() {
-    var user = auth.currentUser;
-    console.log(user);
-    if (user) {
+
+    console.log(userk);
+    if (userk) {
         signOutButton.style.display = "flex";
         signInButton.style.display = "none"
 
-        signInMessage.innerHTML = "Pozdravljeni, " + user.displayName + ".";
+        signInMessage.innerHTML = "Pozdravljeni, " + userk.displayName + ".";
     } else {
         signInButton.style.display = "flex"
         signOutButton.style.display = "none";

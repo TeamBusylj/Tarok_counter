@@ -1,4 +1,0 @@
-#Sat Oct 14 12:22:29 CEST 2023
-base.0=C\:\\Users\\timbi\\OneDrive\\Documents\\GitHub\\Tarok\\Tarok_counter\\app\\build\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
-renamed.0=classes.dex
-path.0=classes.dex

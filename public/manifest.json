@@ -17,5 +17,6 @@
             "sizes": "512x512"
         }
     ],
-    "dir": "ltr"
+    "dir": "ltr",
+    "scope": "https://tarock-counter.web.app/"
 }
