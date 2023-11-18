@@ -9,63 +9,97 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Števec taroka</title>
     <link rel="stylesheet" href="tarok.css">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8750867310629408"
-        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="./color_theme/theme.css">
+    <script type="importmap">
+        {
+          "imports": {
+            "lit": "https://cdn.jsdelivr.net/npm/lit@2/index.js",
+            "lit/": "https://cdn.jsdelivr.net/npm/lit@2/",
+            "@material/web/": "https://cdn.jsdelivr.net/npm/@material/web@1/",
+            "@lit/localize": "https://cdn.jsdelivr.net/npm/@lit/localize/lit-localize.js",
+            "@lit/reactive-element": "https://cdn.jsdelivr.net/npm/@lit/reactive-element@1/reactive-element.js",
+            "@lit/reactive-element/": "https://cdn.jsdelivr.net/npm/@lit/reactive-element@1/",
+            "lit-element/lit-element.js": "https://cdn.jsdelivr.net/npm/lit-element@3/lit-element.js",
+            "lit-html": "https://cdn.jsdelivr.net/npm/lit-html@2/lit-html.js",
+            "lit-html/": "https://cdn.jsdelivr.net/npm/lit-html@2/",
+            "tslib": "https://cdn.jsdelivr.net/npm/tslib@2/tslib.es6.mjs"
+          }
+        }
+        </script>
 </head>
 <script src="tarok.js"></script>
+<script type="module">
+    import '@material/web/icon/icon.js';
+    import '@material/web/menu/menu-item.js';
+    import '@material/web/menu/menu.js';
+    import '@material/web/dialog/dialog.js'
+    import '@material/web/ripple/ripple.js';
+    import '@material/web/button/outlined-button.js'
+    import '@material/web/iconbutton/filled-icon-button.js'
+    import '@material/web/button/filled-button.js'
+    import '@material/web/slider/slider.js';
+    import '@material/web/list/list-item.js';
+    import '@material/web/list/list.js';
+    import '@material/web/button/text-button.js'
+    import '@material/web/textfield/outlined-text-field.js'
+    import '@material/web/textfield/filled-text-field.js'
+    import '@material/web/button/filled-tonal-button.js'
+</script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
-<body
-    onload="   if (location.hash !== '') {upload(location.hash.slice(1)); localStorage.removeItem(undefined)} window.loadDataFromWeb()">
-
+<body onload="   if (location.hash !== '') {upload(location.hash.slice(1)); localStorage.removeItem(undefined)} window.loadDataFromWeb()">
     <p id="signInMessage">Za shranjevanje podatkov se prijavite.<br></p>
     <div id="homescreen">
-
-        <button id="newgame" onclick="newGame()"><i translate="no" class="material-icons">add</i> Nova igra</button>
-        <button id="game" onclick="Game()"><i translate="no" class="material-icons">list</i> Izberi igro</button>
-        <button id="linkadd" onclick="uploadLink()"><i translate="no" class="material-icons">link</i> Povezava
-            igre</button>
-        <button class="signInGoogle" id="signInGoogle"><img id="Capa_1" src="assets/btn_google_light_normal_ios.svg">
+        <md-filled-tonal-button id="newgame" onclick="newGame()">Nova igra <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
+            </svg></md-filled-tonal-button>
+        <md-filled-tonal-button id="game" onclick="Game()">Izberi igro <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                <path d="M280-600v-80h560v80H280Zm0 160v-80h560v80H280Zm0 160v-80h560v80H280ZM160-600q-17 0-28.5-11.5T120-640q0-17 11.5-28.5T160-680q17 0 28.5 11.5T200-640q0 17-11.5 28.5T160-600Zm0 160q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440Zm0 160q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360q17 0 28.5 11.5T200-320q0 17-11.5 28.5T160-280Z" />
+            </svg></md-filled-tonal-button>
+        <md-filled-tonal-button id="linkadd" onclick="uploadLink()"> Povezava igre <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                <path d="M440-280H280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h160v80H280q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h320v80H320Zm200 160v-80h160q50 0 85-35t35-85q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H520Z" />
+            </svg></md-filled-tonal-button>
+        <md-filled-tonal-button id="signInGoogle"><img slot="icon" id="Capa_1" src="assets/btn_google_light_normal_ios.svg">
             <p id="signInText">Google prijava</p>
-        </button>
-
-
-        <button class="signOutGoogle" id="signOutGoogle" style="display: none;"><img id="Capa_1"
-                src="assets/btn_google_light_normal_ios.svg">
-
-            Odjava</button>
+        </md-filled-tonal-button>
+        <md-filled-tonal-button id="signOutGoogle"><img slot="icon" id="Capa_1" src="assets/btn_google_light_normal_ios.svg">
+            <p id="signInText">Odjava</p>
+        </md-filled-tonal-button>
     </div>
-
     <div id="bottomBar" role="footer">
-
         <div id="actionBarStart">
-            <p id="newapp">Aplikacija je še čisto nova, zato prosimo, da nam vsako napako ali priporočilo pošljete s
-                klikom na gumb
-                <i translate="no" class="material-icons">chat</i>
-            </p>
-            <button id="privacyPolicy" onclick="privacy()"><i translate="no" class="material-icons">policy</i></button>
-            <button id="privacyPolicy" onclick="feedback()"><i translate="no" class="material-icons">chat</i></button>
+            <p id="newapp">Ker nam pomeni, da ste z aplikacijo zadovoljni, bomo veseli vsake povratne informacije v zgornjem meniju </p>
         </div>
-
         <div id="actionBar">
-            <button class="bottomBtn" id="bottomBtn" onclick="location.reload()"> <i translate="no"
-                    class="material-icons">home</i> Domov</button>
-            <button class="bottomBtn" id="bottomBtn" onclick="undo()"> <i translate="no" class="material-icons">undo</i>
-                Nazaj</button>
-            <button class="bottomBtn" id="bottomBtn" onclick="download()"> <i translate="no"
-                    class="material-icons">share</i> Deli</button>
-            <button class="bottomBtn" id="bottomBtn" onclick="deleteGame()"> <i translate="no"
-                    class="material-icons">delete</i> Izbriši</button>
+            <md-outlined-button class="bottomBtn" id="bottomBtn" onclick="location.reload()"> <i slot="icon" translate="no" class="material-icons">home</i> Domov</md-outlined-button>
+            <md-outlined-button class="bottomBtn" id="bottomBtn" onclick="undo()"> <i slot="icon" translate="no" class="material-icons">undo</i> Nazaj</md-outlined-button>
+            <md-outlined-button class="bottomBtn" id="bottomBtn" onclick="download()"> <i slot="icon" translate="no" class="material-icons">share</i> Deli</md-outlined-button>
+            <md-outlined-button class="bottomBtn" id="bottomBtn" onclick="deleteGame()"> <i slot="icon" translate="no" class="material-icons">delete</i> Izbriši</md-outlined-button>
         </div>
-
     </div>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <span class="menu-container">
+        <md-icon-button onclick="document.body.querySelector('#usage-menu').open = !document.body.querySelector('#usage-menu').open" id="usage-anchor">
+            <svg style="fill: var(--md-sys-color-on-surface);" slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                <path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
+            </svg></md-icon-button>
+        <md-menu id="usage-menu" anchor="usage-anchor">
+            <md-menu-item id="privacyPolicy" onclick="privacy()">
+                <div class="menu-head" slot="headline">
+                    <svg style="fill: var(--md-sys-color-on-surface);" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                        <path d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 85-29 163.5T688-214L560-342q-18 11-38.5 16.5T480-320q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 22-5.5 42.5T618-398l60 60q20-41 31-86t11-92v-189l-240-90-240 90v189q0 121 68 220t172 132q26-8 49.5-20.5T576-214l56 56q-33 27-71.5 47T480-80Zm0-320q33 0 56.5-23.5T560-480q0-33-23.5-56.5T480-560q-33 0-56.5 23.5T400-480q0 33 23.5 56.5T480-400Zm8-77Z" />
+                    </svg>Politika
+                </div>
+            </md-menu-item>
+            <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Povratne informacije" onclick="feedback()" style="margin-left: 20px;">
+                <div class="menu-head" slot="headline">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                        <path d="M480-680q17 0 28.5-11.5T520-720q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720q0 17 11.5 28.5T480-680Zm-40 320h80v-240h-80v240ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z" />
+                    </svg>Povratne informacije
+                </div>
+            </md-menu-item>
+        </md-menu>
+    </span>
     <script src="firebase.js" type="module"></script>
 </body>
-
-
-
-
-
 
 </html>

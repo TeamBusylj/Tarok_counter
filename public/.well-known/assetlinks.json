@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "si.stevec.taroka",
+      "sha256_cert_fingerprints": [
+        "C3:8B:82:4A:7D:4A:2C:02:68:8C:07:49:47:B2:A4:84:8E:B0:9B:87:44:18:72:8E:E1:24:4A:07:58:FE:01:D0"
+      ]
+    }
+  }
+]

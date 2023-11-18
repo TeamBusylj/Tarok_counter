@@ -14,27 +14,32 @@ div#bottomBar {
 }
 
 #homescreen {
+
     display: flex;
     flex-direction: column;
-    height: 80vh;
-    width: 40vw;
+    height: 65vh;
+    width: 70vw;
     transition: all .2s;
     margin: auto;
 
 }
+
 
 #signInMessage {
     margin-left: auto;
     margin-right: auto;
     color: var(--colorTxtDialog);
     display: block;
-    width: 90%;
+    width: calc(100vw - 120px);
     padding: 10px;
     text-align: center;
-    background-color: var(--colorDialog);
+    border: 2px var(--md-sys-color-primary) solid;
     border-radius: 20px;
 
 }
+
+
+
 
 .signInAnim {
     display: block;
@@ -46,15 +51,22 @@ div#bottomBar {
     border-radius: 50px;
     z-index: 42;
     scale: 1;
+    opacity: 1;
 }
 
 #newapp {
     position: absolute;
-    bottom: 120%;
+    bottom: 50%;
     text-align: center;
     color: var(--colorTxtDialog);
     scale: .8;
+    display: block;
+}
 
+@media (max-height:530px) {
+    #newapp {
+        display: none !important;
+    }
 }
 
 a {
@@ -90,6 +102,63 @@ a {
 
 }
 
+.menu-container {
+    position: absolute;
+    top: 30px;
+    right: 10px;
+}
+
+md-outlined-button {
+    margin: 7px
+}
+
+md-menu-item,
+md-menu {
+    width: 240px;
+}
+
+.menu-head {
+    width: 205px;
+}
+
+md-dialog,
+md-menu {
+    --md-menu-container-color: var();
+    --_container-color: var(--md-sys-color-surface-container-high)
+}
+
+
+md-filled-button,
+md-filled-tonal-button {
+    transition: all .2s;
+    margin: 7px;
+
+    animation: showScreen .3s forwards;
+}
+
+
+#homescreen md-outlined-button,
+#homescreen md-filled-tonal-button {
+    flex-basis: 15%;
+}
+
+.iksRight {
+    right: 15px;
+    position: absolute;
+}
+
+#signInGoogle {
+    --md-filled-button-container-color: #fff
+}
+
+:root {
+    --md-sys-color-primary: #A4C9FF;
+    --md-sys-color-on-primary: #003060;
+    --md-sys-color-secondary: #000;
+    --md-ref-typeface-brand: 'Open Sans';
+    --md-ref-typeface-plain: system-ui;
+}
+
 .signInGoogle,
 .signOutGoogle {
     transition: all .2s ease-in;
@@ -99,18 +168,23 @@ a {
     align-items: center;
     justify-content: center;
     background-color: white;
-    border: solid 3px black;
+    border: solid 3px var(--bgColor);
     color: black;
 
 }
 
+form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
 #Capa_1 {
     transition: all .1s;
-
-    height: 80%;
-    margin-right: 10px;
-
-
+    margin: 8px;
+    border-radius: 300px;
+    background-color: white;
+    padding: 15px;
 }
 
 #signInText {
@@ -146,7 +220,7 @@ i {
 .bottomBtn {
     flex-basis: auto;
 
-    height: 70%;
+
 
     display: flex;
     align-items: center;
@@ -251,9 +325,10 @@ html {
 }
 
 
+
 .iks {
-    color: var(--colorTxtDialog);
-    fill: var(--colorTxtDialog);
+    color: var(--md-sys-color-on-primary);
+    fill: var(--md-sys-color-on-primary);
     position: fixed;
     right: 10px;
     top: 10px;
@@ -376,7 +451,7 @@ button {
     transition: all .05s;
     overflow: hidden;
     position: relative;
-    flex-basis: 60px;
+    flex-basis: 90px;
     display: flex;
     border-radius: 30px;
     flex-direction: row;

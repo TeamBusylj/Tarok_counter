@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"
 import { getDatabase, ref, set, child, get, update } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
-import { getAuth, signInWithRedirect, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -36,7 +36,7 @@ signOutButton.style.display = "none"
 
 
 const userSignIn = async () => {
-    signInWithRedirect(auth, provider)
+    signInWithPopup(auth, provider)
         .then((result) => {
             const user = result.user
             console.log(result);
@@ -67,19 +67,20 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         signOutButton.style.display = "flex";
         signInButton.style.display = "none"
-
+        localStorage.uid = user.uid
+        userk = user
         signInMessage.innerHTML = "Pozdravljeni, " + user.displayName + ".";
     } else {
         signInButton.style.display = "flex"
         signOutButton.style.display = "none";
-
+        localStorage.uid = null
         signInMessage.innerHTML = "Za shranjevanje podatkov se prijavite.";
     }
 })
 
 
 
-signInButton.addEventListener('click', userSignInPopup);
+signInButton.addEventListener('click', userSignIn);
 signOutButton.addEventListener('click', userSignOut);
 
 function userSignInPopup() {
@@ -99,7 +100,9 @@ function userSignInPopup() {
         document.getElementById("signInText").style.opacity = "1"
         document.getElementById("Capa_1").style.opacity = "1"
         userSignIn()
-
+        setTimeout(() => {
+            anima.remove()
+        }, 50);
     }, 450);
 
 
@@ -112,18 +115,19 @@ function writeUserData(userId) {
         const db = getDatabase();
 
         const updates = {};
-        updates['users/' + userId + '/games/'] = "{}";
+        updates['users/' + userId + '/games/'] = {};
 
 
         return update(ref(db), updates);
     }
 }
 export function updateUserData() {
-    if (localStorage.uid !== null) {
+    if (localStorage.uid !== null && localStorage.uid !== undefined && localStorage.uid !== "null" && localStorage.uid !== "undefined") {
+
         const db = getDatabase();
 
         const updates = {};
-        updates['/users/' + localStorage.uid + "/games/"] = localStorage.games;
+        updates['/users/' + localStorage.uid + "/games/"] = JSON.parse(localStorage.getItem('games'));
 
 
         return update(ref(db), updates);
@@ -147,9 +151,10 @@ export function loadDataFromWeb() {
     }
     const dbRef = ref(getDatabase());
     get(child(dbRef, `users/${localStorage.uid}`)).then((snapshot) => {
+        console.log(`users/${localStorage.uid}`);
         if (snapshot.exists()) {
             console.log(snapshot.val()["games"]);
-            let data = JSON.parse(snapshot.val()["games"])
+            let data = snapshot.val()["games"]
             console.log(data);
             for (const [key, value] of Object.entries(data)) {
                 const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
@@ -160,7 +165,7 @@ export function loadDataFromWeb() {
             return true
         } else {
             console.log("No data available");
-            writeUserData(localStorage.uid)
+
             return false
         }
     }).catch((error) => {

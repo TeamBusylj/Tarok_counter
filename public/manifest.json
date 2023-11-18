@@ -3,14 +3,20 @@
     "name": "Števec taroka",
     "short_name": "Števec taroka",
     "start_url": "/",
-    "background_color": "#000000",
-    "theme_color": "#000000",
+    "background_color": {
+        "dark": "#1b1b1b",
+        "light": "#ffffff"
+    },
+    "theme_color": {
+        "dark": "#1b1b1b",
+        "light": "#ffffff"
+    },
     "orientation": "any",
-    "display": "minimal-ui",
+    "display": "standalone",
     "icons": [
         {
             "src": "/assets/favicon.ico",
-            "sizes": "256x256"
+            "sizes": "32x32"
         },
         {
             "src": "/assets/icon.png",
@@ -18,5 +24,10 @@
         }
     ],
     "dir": "ltr",
-    "scope": "https://tarock-counter.web.app/"
+    "scope": "https://tarock-counter.web.app/",
+    "id": "tarok_stevec",
+    "description": "Aplikacija za štetje točk pri igri tarok.",
+    "share_target": {
+        "method": "GET"
+    }
 }
