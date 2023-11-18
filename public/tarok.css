@@ -13,6 +13,10 @@ div#bottomBar {
 
 }
 
+md-dialog [slot="headline"] {
+    font-family: var(--md-ref-typeface-plain)
+}
+
 #homescreen {
 
     display: flex;
@@ -157,6 +161,7 @@ md-filled-tonal-button {
     --md-sys-color-secondary: #000;
     --md-ref-typeface-brand: 'Open Sans';
     --md-ref-typeface-plain: system-ui;
+    font-family: system-ui;
 }
 
 .signInGoogle,

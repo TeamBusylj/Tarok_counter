@@ -845,6 +845,7 @@ function count(animate) {
         chl.innerHTML += '<p style = "" class="noText" ></p>';
         chl.innerHTML += ' <p style = "" class="noText" ></p>';
         chl.setAttribute("class", "chl chlName_" + name);
+        chl.innerHTML += '<md-ripple class="unbounded"></md-ripple>'
         chl.style.display = "inline-block;";
         var pointView = addElement("p", rezultLine, null)
         pointView.setAttribute("class", "rezult_" + name);
@@ -1214,7 +1215,7 @@ async function resolveAfter(s) {
         }, s);
     });
 }
-var transitionDUr = 0
+/*
 async function createRipple(event) {
     if (!event.target.className.includes("whlScreen") && !event.target.closest('.whlScreen') && document.getElementsByClassName("whlScreen")[0] !== undefined) {
         hideElement(document.getElementsByClassName("whlScreen")[0])
@@ -1279,7 +1280,7 @@ async function createRipple(event) {
     }
 }
 document.addEventListener("touchstart", createRipple);
-
+*/
 function removeElement() {
     for (const element of arguments) {
         element.remove()
