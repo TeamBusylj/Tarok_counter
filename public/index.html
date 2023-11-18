@@ -15,6 +15,7 @@
           "imports": {
             "lit": "https://cdn.jsdelivr.net/npm/lit@2/index.js",
             "lit/": "https://cdn.jsdelivr.net/npm/lit@2/",
+            "@material/material-color-utilities/": "https://unpkg.com/@w3h/material-color-utilities@0.2.8/",
             "@material/web/": "https://cdn.jsdelivr.net/npm/@material/web@1/",
             "@lit/localize": "https://cdn.jsdelivr.net/npm/@lit/localize/lit-localize.js",
             "@lit/reactive-element": "https://cdn.jsdelivr.net/npm/@lit/reactive-element@1/reactive-element.js",
@@ -39,15 +40,40 @@
     import '@material/web/button/filled-button.js'
     import '@material/web/slider/slider.js';
     import '@material/web/list/list-item.js';
+    import '@material/web/progress/circular-progress.js';
     import '@material/web/list/list.js';
     import '@material/web/button/text-button.js'
     import '@material/web/textfield/outlined-text-field.js'
     import '@material/web/textfield/filled-text-field.js'
     import '@material/web/button/filled-tonal-button.js'
+    import { argbFromHex, themeFromSourceColor, applyTheme } from "@material/material-color-utilities/index.js";
+    function changeTheme(colorHex) {
+
+
+        const theme = themeFromSourceColor(argbFromHex(colorHex), [
+            {
+                name: "custom-1",
+                value: argbFromHex("#ff0000"),
+                blend: true,
+            },
+        ]);
+
+        // Print out the theme as JSON
+        console.log(JSON.stringify(theme, null, 2));
+
+        // Check if the user has dark mode turned on
+        const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+        // Apply the theme to the body by updating custom properties for material tokens
+        applyTheme(theme, { target: document.body, dark: systemDark });
+    }
+    window.changeTheme = changeTheme
+
+
 </script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
-<body onload="   if (location.hash !== '') {upload(location.hash.slice(1)); localStorage.removeItem(undefined)} window.loadDataFromWeb()">
+<body onload="   if (location.hash !== '') {upload(location.hash.slice(1)); localStorage.removeItem(undefined)} window.loadDataFromWeb(); if(localStorage.themeColor !== null) window.changeTheme(localStorage.themeColor)">
     <p id="signInMessage">Za shranjevanje podatkov se prijavite.<br></p>
     <div id="homescreen">
         <md-filled-tonal-button id="newgame" onclick="newGame()">Nova igra <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
@@ -83,6 +109,14 @@
                 <path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
             </svg></md-icon-button>
         <md-menu id="usage-menu" anchor="usage-anchor">
+            <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Tema aplikacije" onclick="changeColor()" style="margin-left: 20px;">
+                <div class="menu-head" slot="headline">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                        <path
+                            d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-83 32.5-156t88-127Q256-817 330-848.5T488-880q80 0 151 27.5t124.5 76q53.5 48.5 85 115T880-518q0 115-70 176.5T640-280h-74q-9 0-12.5 5t-3.5 11q0 12 15 34.5t15 51.5q0 50-27.5 74T480-80Zm0-400Zm-220 40q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm120-160q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm200 0q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm120 160q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17ZM480-160q9 0 14.5-5t5.5-13q0-14-15-33t-15-57q0-42 29-67t71-25h70q66 0 113-38.5T800-518q0-121-92.5-201.5T488-800q-136 0-232 93t-96 227q0 133 93.5 226.5T480-160Z" />
+                    </svg>Tema aplikacije
+                </div>
+            </md-menu-item>
             <md-menu-item id="privacyPolicy" onclick="privacy()">
                 <div class="menu-head" slot="headline">
                     <svg style="fill: var(--md-sys-color-on-surface);" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
@@ -100,6 +134,9 @@
         </md-menu>
     </span>
     <script src="firebase.js" type="module"></script>
+    <div class="loader"><md-circular-progress style="top: 50%;" indeterminate></md-circular-progress>
+        <p style="top: 50%;color:var(--md-sys-color-on-surface);">Nalaganja...</p>
+    </div>
 </body>
 
 </html>

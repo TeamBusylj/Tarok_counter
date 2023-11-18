@@ -284,7 +284,8 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
         await waitForButtonClick(dv);
     }
     var btn22 = addElement("md-filled-button", null, null);
-    var btn23 = addElement("md-outlined-button", null, null);
+    var btn23 = addElement("md-filled-tonal-button", null, null);
+    btn22.style.height = btn23.style.height = "50px";
     btn22.style.flexBasis = btn23.style.flexBasis = "100%"
     addElement("div", newElement, "break");
     addElement("div", newElement, "break");
@@ -311,11 +312,11 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
     }
     if (properties[1]) {
         for (const key in bonusi) {
-            let btn = document.createElement("md-filled-tonal-button");
+            let btn = document.createElement("md-outlined-button");
 
             btn.innerHTML = key;
             btn.style.transition = " all .2s";
-            btn.style.height = "50px";
+            btn.style.height = "45px";
             btn.setAttribute("type", "reset")
             btn.addEventListener("click", function () {
                 var iks = document.createElement("md-icon-button")
@@ -686,31 +687,24 @@ function Game() {
     });
 
 
-    var slct = document.createElement("select");
-    slct.innerHTML += "<option>Izberi</option>";
+    var slct = document.createElement("md-list");
+
     document.body.appendChild(dialog.parentNode);
     const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
     for (var i = 0; i < Object.keys(gamesObject).length; i++) {
         let user = Object.keys(gamesObject)[i];
         if (user !== "!gamesData!") {
-            slct.innerHTML += "<option>" + user + "</option>";
+            if (i > 1) {
+                slct.innerHTML += '<md-list-item type="button" onclick=" clickedUser(\'' + user + '\');" interactive>' + user + "</md-list-item> <md-divider></md-divider>";
+
+            } else {
+                slct.innerHTML += '<md-list-item type="button" onclick=" clickedUser(\'' + user + '\');" interactive>' + user + "</md-list-item> ";
+
+            }
         }
     }
     dialog.appendChild(slct);
-    slct.addEventListener("change", function () {
-        if (slct.value !== "Select") {
-            listOfPlayers = gamesObject[slct.value];
-            console.log(listOfPlayers);
-            hideDialog(dialog);
-            listOfPlayersCopy = JSON.parse(JSON.stringify(listOfPlayers));
-            if (listOfPlayers["!gamesData!"] == null) {
-                listOfPlayers["!gamesData!"] = {};
-            }
-            document.getElementById("homescreen").style.filter = document.getElementById("newapp").style.filter = document.getElementById("bottomBar").style.filter = document.getElementById("signInMessage").style.filter = "brightness(.3)";
 
-            count(true);
-        }
-    });
 }
 
 function hideDialog(dlg) {
@@ -718,6 +712,19 @@ function hideDialog(dlg) {
     setTimeout(() => {
         dlg.parentNode.remove()
     }, 1000);
+}
+function clickedUser(slcta, gamesObject) {
+    const gamesObject2 = JSON.parse(localStorage.getItem('games')) || {};
+    listOfPlayers = gamesObject2[slcta];
+    console.log(listOfPlayers);
+    hideDialog(document.querySelector("body > md-dialog > span"))
+    listOfPlayersCopy = JSON.parse(JSON.stringify(listOfPlayers));
+    if (listOfPlayers["!gamesData!"] == null) {
+        listOfPlayers["!gamesData!"] = {};
+    }
+    document.getElementById("homescreen").style.filter = document.getElementById("newapp").style.filter = document.getElementById("bottomBar").style.filter = document.getElementById("signInMessage").style.filter = "brightness(.3)";
+
+    count(true);
 }
 
 
@@ -1335,4 +1342,41 @@ function feedback() {
     shareButton.addEventListener("click", function () {
         window.open("mailto:stevec.taroka@gmail.com?subject=Imam izbolšavo&body=" + emailContentInput.value, "_blank");
     });
+}
+
+window.addEventListener("load", function () {
+    console.log("lll");
+    if (localStorage.uid == null) {
+        hideElement(document.querySelector(".loader"))
+    }
+})
+
+function changeColor() {
+    var iks = document.createElement("md-icon-button")
+    iks.setAttribute("value", "close")
+    iks.classList.add("iksRight")
+    iks.innerHTML = showIks;
+    var dialog = dialogBuilder(iks, "Izberite barvo")
+    iks.addEventListener("click", function (e) {
+        document.getElementById("game").style.animation = "none";
+        hideDialog(dialog);
+        document.getElementById("homescreen").style.filter = document.getElementById("signInMessage").style.filter = document.getElementById("bottomBar").style.filter = "brightness(1)";
+    });
+    document.body.appendChild(dialog.parentNode)
+    var colPick = document.createElement("input")
+    colPick.setAttribute("type", "color")
+    dialog.appendChild(colPick)
+    var endHolder = addElement("div", dialog.parentNode, null)
+    endHolder.setAttribute("slot", "actions")
+    var okButton = addElement("md-filled-button", endHolder, null)
+    okButton.innerHTML = "Končano"
+    okButton.addEventListener("click", function () {
+        window.changeTheme(colPick.value)
+        localStorage.themeColor = colPick.value
+        hideDialog(dialog)
+    })
+    setTimeout(() => {
+        colPick.click()
+    }, 200);
+
 }

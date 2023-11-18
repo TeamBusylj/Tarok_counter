@@ -63,7 +63,10 @@ const userSignOut = async () => {
         })
 }
 
+
+
 onAuthStateChanged(auth, (user) => {
+    hideElement(document.querySelector(".loader"))
     if (user) {
         signOutButton.style.display = "flex";
         signInButton.style.display = "none"
@@ -175,3 +178,5 @@ export function loadDataFromWeb() {
 
 }
 window.loadDataFromWeb = loadDataFromWeb
+
+
