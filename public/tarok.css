@@ -14,7 +14,8 @@ div#bottomBar {
 }
 
 md-dialog [slot="headline"] {
-    font-family: var(--md-ref-typeface-plain)
+    font-family: var(--md-ref-typeface-plain);
+    font-size: 1.1rem;
 }
 
 #homescreen {
@@ -239,13 +240,11 @@ i {
 
 .bottomBtn {
     flex-basis: auto;
-
-
-
     display: flex;
-    align-items: center;
 
-    text-align: center;
+    width: 22%;
+
+    margin: 10px;
 }
 
 .opis {
@@ -578,6 +577,22 @@ md-outlined-button:active {
     text-align: center;
 }
 
+span.dialog-headline {
+    font-size: 1.2rem;
+}
+
+span.btnIcon {
+    border: 2px var(--md-sys-color-on-surface) solid;
+    text-align: center;
+    padding: 3px;
+    font-size: 90%;
+    color: var(--md-sys-color-on-surface);
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .child {
     width: 30vw;
     flex: 1 1 100%;
@@ -592,7 +607,7 @@ md-outlined-button:active {
         --colorDialog: var(--md-sys-color-secondary-container);
         --colorTxtDialog: #D8E3F8;
         --colorTxt: #003060;
-        --colorBtn: #A4C9FF;
+        --colorBtn: var(--md-sys-color-primary);
         color: var(--colorTxt);
         margin: 0;
         overflow: hidden;

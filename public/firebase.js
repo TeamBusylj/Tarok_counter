@@ -66,7 +66,8 @@ const userSignOut = async () => {
 
 
 onAuthStateChanged(auth, (user) => {
-    hideElement(document.querySelector(".loader"))
+    try { hideElement(document.querySelector(".loader")) } catch { }
+
     if (user) {
         signOutButton.style.display = "flex";
         signInButton.style.display = "none"

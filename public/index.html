@@ -3,7 +3,7 @@
 
 <head>
     <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
     <link rel="icon" href="assets/favicon.ico" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -36,7 +36,9 @@
     import '@material/web/dialog/dialog.js'
     import '@material/web/ripple/ripple.js';
     import '@material/web/button/outlined-button.js'
-    import '@material/web/iconbutton/filled-icon-button.js'
+
+
+    import '@material/web/iconbutton/filled-tonal-icon-button.js'
     import '@material/web/button/filled-button.js'
     import '@material/web/slider/slider.js';
     import '@material/web/list/list-item.js';
@@ -97,10 +99,10 @@
             <p id="newapp">Ker nam pomeni, da ste z aplikacijo zadovoljni, bomo veseli vsake povratne informacije v zgornjem meniju </p>
         </div>
         <div id="actionBar">
-            <md-outlined-button class="bottomBtn" id="bottomBtn" onclick="location.reload()"> <i slot="icon" translate="no" class="material-icons">home</i> Domov</md-outlined-button>
-            <md-outlined-button class="bottomBtn" id="bottomBtn" onclick="undo()"> <i slot="icon" translate="no" class="material-icons">undo</i> Nazaj</md-outlined-button>
-            <md-outlined-button class="bottomBtn" id="bottomBtn" onclick="download()"> <i slot="icon" translate="no" class="material-icons">share</i> Pošlji</md-outlined-button>
-            <md-outlined-button class="bottomBtn" id="bottomBtn" onclick="deleteGame()"> <i slot="icon" translate="no" class="material-icons">delete</i> Izbriši</md-outlined-button>
+            <md-filled-tonal-icon-button class="bottomBtn" id="bottomBtn" onclick="location.reload()"> <md-icon>home</md-icon></md-filled-tonal-icon-button>
+            <md-filled-tonal-icon-button class="bottomBtn" id="bottomBtn" onclick="undo()"> <md-icon>undo</md-icon></md-filled-tonal-icon-button>
+            <md-filled-tonal-icon-button class="bottomBtn" id="bottomBtn" onclick="download()"> <md-icon>share</md-icon></md-filled-tonal-icon-button>
+            <md-filled-tonal-icon-button class="bottomBtn" id="bottomBtn" onclick="deleteGame()"> <md-icon>delete</md-icon></md-filled-tonal-icon-button>
         </div>
     </div>
     <span class="menu-container">
