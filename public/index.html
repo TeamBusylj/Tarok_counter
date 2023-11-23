@@ -13,10 +13,11 @@
     <script type="importmap">
         {
           "imports": {
+            "@material/web/": "https://cdn.jsdelivr.net/npm/@material/web@1/",
             "lit": "https://cdn.jsdelivr.net/npm/lit@2/index.js",
             "lit/": "https://cdn.jsdelivr.net/npm/lit@2/",
             "@material/material-color-utilities/": "https://unpkg.com/@w3h/material-color-utilities@0.2.8/",
-            "@material/web/": "https://cdn.jsdelivr.net/npm/@material/web@1/",
+         
             "@lit/localize": "https://cdn.jsdelivr.net/npm/@lit/localize/lit-localize.js",
             "@lit/reactive-element": "https://cdn.jsdelivr.net/npm/@lit/reactive-element@1/reactive-element.js",
             "@lit/reactive-element/": "https://cdn.jsdelivr.net/npm/@lit/reactive-element@1/",
@@ -30,6 +31,7 @@
 </head>
 <script src="tarok.js"></script>
 <script type="module">
+    import './assets/progress/circular-progress.js';
     import '@material/web/icon/icon.js';
     import '@material/web/menu/menu-item.js';
     import '@material/web/menu/menu.js';
@@ -42,12 +44,13 @@
     import '@material/web/button/filled-button.js'
     import '@material/web/slider/slider.js';
     import '@material/web/list/list-item.js';
-    import '@material/web/progress/circular-progress.js';
+
     import '@material/web/list/list.js';
     import '@material/web/button/text-button.js'
     import '@material/web/textfield/outlined-text-field.js'
     import '@material/web/textfield/filled-text-field.js'
     import '@material/web/button/filled-tonal-button.js'
+
     import { argbFromHex, themeFromSourceColor, applyTheme } from "@material/material-color-utilities/index.js";
     function changeTheme(colorHex) {
 

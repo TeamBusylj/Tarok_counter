@@ -327,7 +327,7 @@ html {
 
 .gameDataTdBottom {
     text-align: center;
-    background-color: var(--colorBtn);
+    background-color: var(--md-sys-color-secondary-container);
     padding: 8px;
     margin: 3px;
     border-top-right-radius: 15px;
@@ -336,7 +336,7 @@ html {
 
 .gameDataTd {
     text-align: center;
-    background-color: var(--colorBtn);
+    background-color: var(--md-sys-color-secondary-container);
     padding: 8px;
     margin: 3px;
     border-top-left-radius: 15px;
@@ -616,16 +616,22 @@ span.btnIcon {
     }
 }
 
+md-outlined-text-field {
+    transition: all .2s;
+    animation: showScreen .3s forwards;
+    margin: 10px;
+}
+
 @media (prefers-color-scheme: light) {
     body {
-        overflow: hidden;
-        --bgColor: #FCFCFC;
-        --colorDialog: #D8E3F8;
-        --colorTxtDialog: #121C2B;
-        --colorTxt: #FFFFFF;
-        --colorBtn: #355F97;
+        --bgColor: var(--md-sys-color-surface);
+        --colorDialog: var(--md-sys-color-secondary-container);
+        --colorTxtDialog: #D8E3F8;
+        --colorTxt: #003060;
+        --colorBtn: var(--md-sys-color-primary);
         color: var(--colorTxt);
         margin: 0;
+        overflow: hidden;
         background-attachment: fixed;
         background-color: var(--bgColor);
     }

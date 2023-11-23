@@ -658,11 +658,14 @@ function hideElement(newElement) {
 function dialogBuilder(xButt, desc) {
     var newElement = document.createElement("md-dialog");
     newElement.setAttribute("open", "");
+
     var xHolder = addElement("span", newElement, null);
     xHolder.setAttribute("slot", "headline")
     xHolder.setAttribute("class", "dialog-headline")
     xHolder.innerHTML = '<span style="flex: 1;">' + desc + '</span>'
-    xHolder.appendChild(xButt)
+    if (xButt !== null) {
+        xHolder.appendChild(xButt)
+    }
     var content = addElement("form", newElement, null);
     content.setAttribute("slot", "content")
     content.setAttribute("method", "dialog")
@@ -697,8 +700,8 @@ function Game() {
     for (var i = 0; i < Object.keys(gamesObject).length; i++) {
         let user = Object.keys(gamesObject)[i];
         if (user !== "!gamesData!") {
-            if (i > 1) {
-                slct.innerHTML += '<md-list-item type="button" onclick=" clickedUser(\'' + user + '\');" interactive>' + user + "</md-list-item> <md-divider></md-divider>";
+            if (i > 0) {
+                slct.innerHTML += '<md-divider></md-divider><md-list-item type="button" onclick=" clickedUser(\'' + user + '\');" interactive>' + user + "</md-list-item> ";
 
             } else {
                 slct.innerHTML += '<md-list-item type="button" onclick=" clickedUser(\'' + user + '\');" interactive>' + user + "</md-list-item> ";
@@ -1042,15 +1045,15 @@ function gameData(infom, number) {
     var info = listOfPlayers["!gamesData!"][parseInt(infom)];
     console.log(info);
     console.log(infom);
-    var newElement = addElement("div", document.body, "whlScreen");
-    document.querySelector(".cntScreen").style.filter = document.getElementById("bottomBar").style.filter = "brightness(.3)";
-    dodajOpis(newElement, "Tukaj lahko vidite podatke o igri in jih spremenite.",);
+    var newElement = dialogBuilder(null, "Tukaj lahko vidite podatke o igri in jih spremenite");
+    document.body.appendChild(newElement.parentNode)
+
     if (info[0] !== "Po meri" && info[0] !== "Klop") {
-        var changeValue = document.createElement("input");
+        var changeValue = document.createElement("md-outlined-text-field");
         changeValue.type = "number";
 
         if (info[4]) { changeValue.value = info[3] * 2 } else { changeValue.value = info[3]; }
-        changeValue.placeholder = "Točke...";
+        changeValue.label = "Točke";
 
         newElement.appendChild(changeValue);
     }
@@ -1148,9 +1151,12 @@ function gameData(infom, number) {
     }
     newElement.appendChild(table);
     addElement("div", newElement, "break");
+    var actionsHold = addElement("span", newElement.parentNode, null)
+    actionsHold.setAttribute("slot", "actions")
     var izbrisiIgro = document.createElement("md-outlined-button");
     izbrisiIgro.innerHTML = ' <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg> Izbriši';
-    newElement.appendChild(izbrisiIgro);
+    actionsHold.appendChild(izbrisiIgro);
+    izbrisiIgro.style.margin = "0"
     izbrisiIgro.addEventListener("click", function (e) {
         ;  // Index of the element to be removed
 
@@ -1172,13 +1178,14 @@ function gameData(infom, number) {
         document.querySelector(".cntScreen").style.filter = document.getElementById("bottomBar").style.filter = "brightness(1)";
         removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
         updateUserData()
-        hideElement(newElement);
+        hideDialog(newElement);
         count(true);
 
     })
     var iks = document.createElement("md-filled-button");
     iks.innerHTML = "Končano";
-    newElement.appendChild(iks);
+    iks.style.margin = "0"
+    actionsHold.appendChild(iks);
     iks.addEventListener("click", function (e) {
         if (info[0] !== "Po meri" && info[0] !== "Klop" && listOfPlayers["!gamesData!"][infom][3] !== changeValue.value) {
             if (info[4]) { listOfPlayers["!gamesData!"][infom][3] = changeValue.value / 2 } else { listOfPlayers["!gamesData!"][infom][3] = changeValue.value; }
@@ -1191,7 +1198,7 @@ function gameData(infom, number) {
         }
         hideElement(newElement);
     });
-    document.body.appendChild(newElement);
+
 }
 
 function deleteGame() {
