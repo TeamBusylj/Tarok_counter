@@ -11,18 +11,18 @@ function adaptColor(bg, txt, btn, dialog, txtDialog) {
 var games = {
     /* "Ime igre": ["Koliko šteje igra","razlika","dobil true, ni dobil false", "s partnerjem, brez"]*/
     "Tri": [10, true, "", true, "3"],
-    Dve: [20, true, "", true, "2"],
-    Ena: [30, true, "", true, "1"],
+    "Dve": [20, true, "", true, "2"],
+    "Ena": [30, true, "", true, "1"],
     "Solo brez": [80, false, "", false, "SB"],
     "Solo tri": [40, true, "", false, "S3"],
     "Solo dve": [50, true, "", false, "S2"],
     "Solo ena": [60, true, "", false, "S1"],
-    Klop: ["", false, "", true, "K"],
-    Valat: [250, false, "", true, "V"],
+    "Klop": ["", false, "", true, "K"],
+    "Valat": [250, false, "", true, "V"],
     "Barvni Valat": [125, false, "", true, "BV"],
-    Berač: [70, false, "", false, "B"],
+    "Berač": [70, false, "", false, "B"],
     "Odprti Berač": [90, false, "", false, "OB"],
-    "Po meri": ["", false, "", true, "+"],
+    "Po meri": [0, false, "", true, "+"],
     "Dodaj radlce": ["", false, "", true, "*"],
 };
 
@@ -52,8 +52,11 @@ async function addScore(firstPlayer) {
 
             newElement.innerHTML = "";
 
-            if (key == "Klop" || key == "Po meri") {
+            if (key == "Klop") {
                 klop(newElement, key);
+            }
+            if (key == "Po meri") {
+                poMeri(newElement, key);
             }
             else {
                 if (key == "Dodaj radlce") {
@@ -97,14 +100,132 @@ function radlciDodaj(remove) {
 var showIks = '<svg xmlns="http://www.w3.org/2000/svg" height="48" width="48"><path d="M24.05 26.55 13.7 36.9q-.6.6-1.325.6t-1.275-.6q-.6-.55-.6-1.275 0-.725.6-1.275l10.4-10.4-10.45-10.4q-.55-.55-.55-1.275 0-.725.55-1.275.55-.55 1.275-.55.725 0 1.325.55L24 21.35 34.35 11q.55-.55 1.275-.55.725 0 1.325.55.55.6.55 1.35 0 .75-.55 1.3L26.6 24l10.35 10.4q.55.55.55 1.275 0 .725-.55 1.275-.55.55-1.275.55-.725 0-1.225-.55Z"/></svg>';
 window.addEventListener("load", (event) => {
 
-    if (navigator.onLine) showIks = '<md-icon>close</md-icon>'
+    if (navigator.onLine) showIks = '<md-icon>close</md-icon><md-ripple for="touch" class="unbounded"></md-ripple>'
 });
 
+function poMeri(newElement2) {
+    hideDialog(newElement2)
+    var iks = document.createElement("md-icon-button")
 
-function klop(newElement2, gamename) {
-    var newElement = addElement("div", document.body, "whlScreen");
-    document.querySelector(".cntScreen").style.filter = document.getElementById("bottomBar").style.filter = "brightness(.3)";
-    dodajOpis(newElement, "Tukaj vpišite koliko točk je dobil posamezen igralec. Pišite brez predznaka minus.",);
+    iks.setAttribute("value", "close")
+    iks.classList.add("iksRight")
+    iks.innerHTML = showIks;
+    var newElement = dialogBuilder(iks, "Vpišite toče")
+    iks.addEventListener("click", function (e) {
+        document.getElementById("game").style.animation = "none";
+        hideDialog(newElement);
+
+    });
+    document.body.appendChild(newElement.parentNode)
+
+    var vls = []
+    for (const user in listOfPlayers) {
+        if (user == "!gamesData!") {
+            continue;
+        }
+
+        let player = addElement("md-filled-text-field", newElement, null);
+        addElement("div", newElement, "break");
+        player.classList.add("poMeri")
+        player.type = "number"
+        player.innerHTML = user
+        player.value = 0
+        player.name = 0
+        player.label = user
+        player.id = "meri_" + user
+        vls.push(player)
+        player.addEventListener("change", function () { player.name = player.value })
+    }
+    var konc = addElement("md-filled-button", newElement, null);
+    konc.innerHTML = "Končano"
+    konc.setAttribute("type", "reset")
+    konc.addEventListener("click", function () {
+
+        var nmbs = []
+        var nmbs2 = []
+        for (const iterator of vls) {
+            nmbs.push(iterator.label)
+            console.log(document.getElementById("meri_" + iterator.label).name);
+
+            nmbs2.push(document.getElementById("meri_" + iterator.label).name)
+        }
+        console.log(nmbs2);
+        /* gamename, prvi igralc, drug igralc, tocke, ima radlc, razlika, dobil zgubil, bonusi, bonusi Tocke*/
+        listOfPlayers["!gamesData!"].push(["Po Meri", nmbs, null, nmbs2, false, null, true, [], 0])
+        hideDialog(newElement)
+        removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
+        count(true);
+    })
+}
+
+var zaokrožuj = true
+async function klop(newElement2, gamename) {
+    var iks = document.createElement("md-icon-button")
+    hideDialog(newElement2);
+    iks.setAttribute("value", "close")
+    iks.classList.add("iksRight")
+    iks.innerHTML = showIks;
+    var newElement = dialogBuilder(iks, "Ali je bil kdo poln oz. prazen?")
+    iks.addEventListener("click", function (e) {
+        document.getElementById("game").style.animation = "none";
+        hideDialog(newElement);
+
+    });
+    var poln = addElement("md-outlined-button", newElement, null);
+    poln.innerHTML = "Poln"
+    var prazn = addElement("md-outlined-button", newElement, null);
+    prazn.innerHTML = "Prazen"
+    var nibil = addElement("md-filled-button", newElement, null);
+    nibil.innerHTML = "Ne"
+    prazn.setAttribute("type", "reset")
+    poln.setAttribute("type", "reset")
+    nibil.setAttribute("type", "reset")
+    nibil.style.flexBasis = "100%"
+    document.body.appendChild(newElement.parentNode);
+    poln.addEventListener("click", function () {
+        newElement.innerHTML = ""
+
+        for (const user in listOfPlayers) {
+            if (user == "!gamesData!") {
+                continue;
+            }
+            let player = addElement("md-outlined-button", newElement, null);
+            player.innerHTML = user
+
+            player.setAttribute("type", "reset")
+            player.addEventListener("click", function () {
+                console.log(player);
+                /* gamename, prvi igralc, drug igralc, tocke, ima radlc, razlika, dobil zgubil, bonusi, bonusi Tocke*/
+                listOfPlayers["!gamesData!"].push(["Klop", player.innerHTML, null, 70, listOfPlayers[player.innerHTML][0].length > 0, null, true, [], 0])
+                hideDialog(newElement)
+                removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
+                count(true);
+            })
+        }
+    })
+    prazn.addEventListener("click", function () {
+        newElement.innerHTML = ""
+
+        for (const user in listOfPlayers) {
+            if (user == "!gamesData!") {
+                continue;
+            }
+            let player = addElement("md-outlined-button", newElement, null);
+            player.innerHTML = user
+
+            player.setAttribute("type", "reset")
+            player.addEventListener("click", function () {
+                console.log(player);
+                /* gamename, prvi igralc, drug igralc, tocke, ima radlc, razlika, dobil zgubil, bonusi, bonusi Tocke*/
+                listOfPlayers["!gamesData!"].push(["Klop", player.innerHTML, null, -70, listOfPlayers[player.innerHTML][0].length > 0, null, true, [], 0])
+                hideDialog(newElement)
+                removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
+                count(true);
+            })
+        }
+    })
+    await waitForButtonClick([nibil]);
+    newElement.innerHTML = ""
     var iks = addElement("div", newElement, "iks");
     iks.innerHTML = showIks;
     iks.addEventListener("click", function (e) {
@@ -116,12 +237,16 @@ function klop(newElement2, gamename) {
         if (user == "!gamesData!") {
             continue;
         }
-        let klopPlayer = addElement("input", newElement, "klopPlayer");
-        klopPlayer.type = "number";
-        klopPlayer.min = 0;
-        klopPlayer.name = user;
-        klopPlayer.placeholder = "Tocke osebe " + user + "...";
+        let labelname = addElement("label", newElement, null);
+        labelname.innerHTML = user
+        let klopPlayer = addElement("md-slider", labelname, "klopPlayer");
+        klopPlayer.setAttribute("max", "35")
+        klopPlayer.setAttribute("min", "0")
+        klopPlayer.setAttribute("labeled", "")
+        if (zaokrožuj) klopPlayer.setAttribute("step", "5"); klopPlayer.setAttribute("ticks", "")
+        klopPlayer.label = "Tocke osebe " + user;
         igralci.push(user)
+        addElement("div", newElement, "break");
     }
     addElement("div", newElement, "break");
     var btn = addElement("md-filled-button", newElement, null);
@@ -136,19 +261,16 @@ function klop(newElement2, gamename) {
             tockice.push("-" + pl.value)
         }
 
-        if (gamename == "Klop") {
-            if (Array.from(document.querySelectorAll(".klopPlayer")).every((input) => input.type === "submit" || input.value.trim() !== "",)) {
-                listOfPlayers["!gamesData!"].push(["Klop", igralci, null, tockice, null, null, null, null])
-                radlciDodaj(false)
-            }
-        }
-        else {
-            listOfPlayers["!gamesData!"].push(["Po meri", igralci, null, tockice, null, null, null, null])
-        }
+
+
+        listOfPlayers["!gamesData!"].push(["Klop", igralci, null, tockice, null, null, null, null])
+        radlciDodaj(false)
+
+
         if (isfull) {
             hideElement(newElement)
-            removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"), newElement2)
-            count(false);
+            removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
+            count(true);
         }
     });
 }
@@ -240,51 +362,53 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
     if (teamWork && secondPlayer !== null) {
         slct2 = secondPlayer
     }
-
-    var razlika = 0;
     var difNu = document.createElement("md-slider");
-    difNu.setAttribute("labeled", "")
+    var razlika = 0;
+    if (!zaokrožuj) {
+        console.log("zokro");
 
-    if (properties[1]) {
+        difNu.setAttribute("labeled", "")
 
-
-        difNu.min = 0;
-
-        difNu.label = "Razlika";
-        difNu.max = 35;
-        newElement.appendChild(difNu);
+        if (properties[1]) {
 
 
-        var razlika;
-        difNu.addEventListener("change", function () {
-            let nearestMultipleOf5 = Math.round(difNu.value / 5) * 5;
-            difNu.value = nearestMultipleOf5;
-            razlika = difNu.value;
-            difNu.style.border = "none"
-        });
-        var razlike = [0, 5, 10, 15, 20, 25, 30]
-        var dv = [];
-        addElement("div", newElement, "break");
-        for (const element in razlike) {
+            difNu.min = 0;
 
-            let player = addElement("md-outlined-button", newElement, null);
-            player.innerHTML = razlike[element]
-            dv.push(player)
-            player.setAttribute("type", "reset")
-            player.addEventListener("click", function () {
-                difNu.value = player.innerHTML
-                razlika = player.innerHTML
-                player.remove();
-                for (let i = 0; i < dv.length; i++) {
-                    dv[i].remove()
-                }
-                difNu.remove()
+            difNu.label = "Razlika";
+            difNu.max = 35;
+            newElement.appendChild(difNu);
+            let endButton = addElement("md-filled-button", newElement, null);
+            endButton.innerHTML = "Končano"
 
-            })
+            var razlika;
+
+            await waitForButtonClick([endButton]);
+            var razlika = difNu.value
         }
+    } else {
+        if (properties[1]) {
+            var razlike = [0, 5, 10, 15, 20, 25, 30]
+            var dv = [];
+            addElement("div", newElement, "break");
+            for (const element in razlike) {
+
+                let player = addElement("md-outlined-button", newElement, null);
+                player.innerHTML = razlike[element]
+                dv.push(player)
+                player.setAttribute("type", "reset")
+                player.addEventListener("click", function () {
+                    difNu.value = player.innerHTML
+                    razlika = player.innerHTML
+                    player.remove();
+                    newElement.innerHTML = ""
 
 
-        await waitForButtonClick(dv);
+                })
+            }
+
+
+            await waitForButtonClick(dv);
+        }
     }
     var btn22 = addElement("md-filled-button", null, null);
     var btn23 = addElement("md-filled-tonal-button", null, null);
@@ -414,40 +538,41 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
                 }
             }
         }
-        if (difNu.value !== "" || properties[1] == false) {
-            if (slct2 !== "" || teamWork) {
-                let nearestMultipleOf5 = Math.round(razlika / 5) * 5;
-                razlika = nearestMultipleOf5;
-                this.remove();
-                if (properties[1]) {
-                    if (teamWork) {
-                        listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, parseInt(properties[0]) + parseInt(razlika) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), true, bnsi, bonusTocke])
-                    }
-                    else {
-                        listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, parseInt(properties[0]) + parseInt(razlika) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), true, bnsi, bonusTocke])
-                    }
+
+
+        if (slct2 !== "" || teamWork) {
+
+            this.remove();
+            if (properties[1]) {
+                if (teamWork) {
+                    listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, parseInt(properties[0]) + parseInt(razlika) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), true, bnsi, bonusTocke])
                 }
                 else {
-                    if (teamWork) {
-                        listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, parseInt(properties[0] + bonusTocke), listOfPlayers[firstPlayer][0].length > 0, null, true, bnsi, bonusTocke])
-                    }
-                    else {
-                        listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, parseInt(properties[0] + bonusTocke), listOfPlayers[firstPlayer][0].length > 0, null, true, bnsi, bonusTocke])
-                    }
+                    listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, parseInt(properties[0]) + parseInt(razlika) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), true, bnsi, bonusTocke])
                 }
             }
-            if (listOfPlayers["!gamesData!"].slice(-1)[3] > 0 && listOfPlayers[firstPlayer][0].length > 0) {
-                listOfPlayers[firstPlayer][0] = listOfPlayers[firstPlayer][0].replace("*", "",);
+            else {
+                if (teamWork) {
+                    listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, parseInt(properties[0] + bonusTocke), listOfPlayers[firstPlayer][0].length > 0, null, true, bnsi, bonusTocke])
+                }
+                else {
+                    listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, parseInt(properties[0] + bonusTocke), listOfPlayers[firstPlayer][0].length > 0, null, true, bnsi, bonusTocke])
+                }
             }
-            document.querySelector(".cntScreen").style.filter = document.getElementById("bottomBar").style.filter = "brightness(1)";
-            removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
-
-            hideElement(newElement);
-            if (gameName.includes('Valat') || gameName.includes('Berač')) {
-                radlciDodaj(false)
-            }
-            count(true);
         }
+        if (listOfPlayers["!gamesData!"].slice(-1)[0][3] > 0 && listOfPlayers[firstPlayer][0].length > 0) {
+
+            listOfPlayers[firstPlayer][0] = listOfPlayers[firstPlayer][0].replace("*", ""); console.log(razlika);
+        }
+        document.querySelector(".cntScreen").style.filter = document.getElementById("bottomBar").style.filter = "brightness(1)";
+        removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
+
+        hideDialog(newElement);
+        if (gameName.includes('Valat') || gameName.includes('Berač')) {
+            radlciDodaj(false)
+        }
+        count(true);
+
     });
     btn23.addEventListener("click", function () {
         let bnsi = {} /*  "ime bonus": [tocke, napovedan, doblen]  */
@@ -492,12 +617,12 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
                 listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, -Math.abs(parseInt(properties[0])) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, null, false, bnsi, bonusTocke])
             }
         }
-        if (listOfPlayers["!gamesData!"][listOfPlayers["!gamesData!"].length - 1][3] > 0 && listOfPlayers[firstPlayer][0].length > 0) {
-            listOfPlayers[firstPlayer][0] = listOfPlayers[firstPlayer][0].replace("*", "",);
+        if (listOfPlayers["!gamesData!"].slice(-1)[0][3] > 0 && listOfPlayers[firstPlayer][0].length > 0) {
+
+            listOfPlayers[firstPlayer][0] = listOfPlayers[firstPlayer][0].replace("*", ""); console.log(razlika);
         }
-        document.querySelector(".cntScreen").style.filter = document.getElementById("bottomBar").style.filter = "brightness(1)";
         removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
-        hideElement(newElement);
+        hideDialog(newElement);
         if (gameName.includes('Valat') || gameName.includes('Berač')) {
             radlciDodaj(false)
         }
@@ -585,6 +710,7 @@ function upload(encrypted) {
         newElement.appendChild(shareButton);
         shareButton.addEventListener("click", function () {
             const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
+
             gamesObject[JSON.stringify(Object.keys(text).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")] = JSON.stringify(text);
             localStorage.setItem("games", JSON.stringify(gamesObject));
             updateUserData()
@@ -748,7 +874,7 @@ function newGame() {
 
     var iks = addElement("md-icon-button", null, "iksColor");
     iks.setAttribute("value", "close")
-    iks.innerHTML = showIks + '<md-ripple for="touch" class="unbounded"></md-ripple>';
+    iks.innerHTML = showIks;
     iks.classList.add("iksRight")
     var content = dialogBuilder(iks, "Vpišite igralce")
     iks.addEventListener("click", function (e) {
@@ -797,10 +923,7 @@ function newGame() {
             listOfPlayers[input] = [""];
         }
 
-        const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
-        gamesObject[JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")] = JSON.stringify(listOfPlayers);
-        localStorage.setItem("games", JSON.stringify(gamesObject));
-        updateUserData()
+
         listOfPlayersCopy = JSON.parse(JSON.stringify(listOfPlayers));
         removeElement(document.getElementById("newgame"), document.getElementById("game"))
         count(true);
@@ -823,7 +946,7 @@ function loclStrg() {
 
 function count(animate) {
     if (listOfPlayers["!gamesData!"] == null) {
-        listOfPlayers["!gamesData!"] = {};
+        listOfPlayers["!gamesData!"] = [];
     }
     document.getElementById("actionBar").style.pointerEvents = "auto";
     document.getElementById("actionBar").style.display = "flex"
@@ -832,8 +955,9 @@ function count(animate) {
     document.getElementById("homescreen").style.display = document.getElementById("signInMessage").style.display = "none"
 
     const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
-    gamesObject[JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")] = listOfPlayers;
-    console.log(gamesObject[JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")]);
+
+    gamesObject[JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").split(",").sort().toString().replace(/,/g, ", ")] = listOfPlayers;
+    console.log(gamesObject[JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").split(",").sort().toString().replace(/,/g, ", ")]);
     console.log(listOfPlayers);
     localStorage.setItem("games", JSON.stringify(gamesObject));
     updateUserData()
@@ -888,7 +1012,7 @@ function count(animate) {
     for (var ia = 0; ia < listOfPlayers["!gamesData!"].length; ia++) {
         let game = ia
         console.log(ia + "aaaa");
-
+        if (listOfPlayers["!gamesData!"][game] == null) continue
         let nameOne = listOfPlayers["!gamesData!"][game][1]
         let points = listOfPlayers["!gamesData!"][game][3]
 
@@ -908,7 +1032,7 @@ function count(animate) {
         for (const player of nameOne) {
 
             let playerPoints = points[nameOne.indexOf(player)]
-            var kkk = document.createElement("p");
+            var kkk = document.createElement("md-text-button");
             if (playerPoints !== "") {
 
                 if (listOfPlayers["!gamesData!"][game][4]) { playerPoints = parseInt(playerPoints) * 2; kkk.innerHTML = parseInt(playerPoints); }
@@ -936,6 +1060,7 @@ function count(animate) {
             if (playerPoints == "") {
                 kkk.innerHTML = "&nbsp;"
             }
+            addElement("div", document.querySelector(".chlName_" + player), "break");
         }
         for (const key in listOfPlayers) {
 
@@ -950,7 +1075,7 @@ function count(animate) {
 
 
                 kkk.classList.add("noText");
-
+                addElement("div", chl, "break");
             }
 
 
@@ -1063,13 +1188,14 @@ function gameData(infom, number) {
     for (let i = 0; i < podatki.length; i++) {
         var key = podatki[i];
         let value = info[i];
-        if (i == 0) {
-            completePodatki[key] = [i, value, games[value][0]]
+        if (i == 0 && value !== "Po Meri") {
+            console.log("lll" + key);
+            completePodatki[key] = [i, value, games[value.toString()][0]]
         }
         else {
-
-            completePodatki[key] = [i, value]
-
+            if (value == "Po Meri") { completePodatki[key] = [i, value], "Različno" } else {
+                completePodatki[key] = [i, value]
+            }
         }
     }
     var vrstniRed = [0, 5, 8, 4, 3]
@@ -1158,21 +1284,18 @@ function gameData(infom, number) {
     actionsHold.appendChild(izbrisiIgro);
     izbrisiIgro.style.margin = "0"
     izbrisiIgro.addEventListener("click", function (e) {
-        ;  // Index of the element to be removed
 
-        myArray.splice(infom, 1);
+        console.log("akkaka" + infom);
+        listOfPlayers["!gamesData!"].splice(infom, 1);
 
         const keys = Object.keys(listOfPlayers["!gamesData!"]);
         keys.sort((a, b) => a - b);
 
-        const newObj = {};
-        for (let i = 0; i < keys.length; i++) {
-            newObj[i + 1] = listOfPlayers["!gamesData!"][keys[i]];
-        }
-        listOfPlayers["!gamesData!"] = newObj
+
 
         const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
-        gamesObject[JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")] = listOfPlayers
+
+        gamesObject[JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").split(",").sort().toString().replace(/,/g, ", ")] = listOfPlayers
         localStorage.setItem("games", JSON.stringify(gamesObject));
 
         document.querySelector(".cntScreen").style.filter = document.getElementById("bottomBar").style.filter = "brightness(1)";
@@ -1187,7 +1310,7 @@ function gameData(infom, number) {
     iks.style.margin = "0"
     actionsHold.appendChild(iks);
     iks.addEventListener("click", function (e) {
-        if (info[0] !== "Po meri" && info[0] !== "Klop" && listOfPlayers["!gamesData!"][infom][3] !== changeValue.value) {
+        if (info[0] !== "Po Meri" && info[0] !== "Klop" && listOfPlayers["!gamesData!"][infom][3] !== changeValue.value) {
             if (info[4]) { listOfPlayers["!gamesData!"][infom][3] = changeValue.value / 2 } else { listOfPlayers["!gamesData!"][infom][3] = changeValue.value; }
 
             removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
@@ -1196,7 +1319,7 @@ function gameData(infom, number) {
             }, 200);
 
         }
-        hideElement(newElement);
+        hideDialog(newElement);
     });
 
 }
@@ -1219,7 +1342,8 @@ function deleteGame() {
     newElement.appendChild(shareButton);
     shareButton.addEventListener("click", function () {
         const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
-        delete gamesObject[JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ")]
+
+        delete gamesObject[JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").split(",").sort().toString().replace(/,/g, ", ")]
         localStorage.setItem("games", JSON.stringify(gamesObject));
         updateUserData()
         location.reload();
