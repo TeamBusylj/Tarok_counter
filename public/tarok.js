@@ -33,12 +33,15 @@ async function addScore(firstPlayer) {
     var iks = addElement("md-icon-button", null, "iksRight");
     iks.innerHTML = showIks;
     var newElement = dialogBuilder(iks, "Tukaj izberite katero igro je oseba <b>" + firstPlayer + "</b> igrala.")
+
     iks.addEventListener("click", function (e) {
         hideDialog(newElement);
 
     });
-
+    let i = 0
     for (const key in games) {
+        if (i == 3 || i == 6) addElement("div", newElement, "break").style.height = "10px";
+        i++
         let btn = document.createElement("md-outlined-button");
         btn.innerHTML = key;
         //btn.style.flexBasis = "40%"
@@ -158,7 +161,8 @@ function poMeri(newElement2) {
     })
 }
 
-var zaokrožuj = true
+var zaokrožuj = JSON.parse(localStorage.getItem("razlikaOkrozi"))
+if (zaokrožuj == null || zaokrožuj == undefined) zaokrožuj = true
 async function klop(newElement2, gamename) {
     var iks = document.createElement("md-icon-button")
     hideDialog(newElement2);
@@ -184,6 +188,7 @@ async function klop(newElement2, gamename) {
     document.body.appendChild(newElement.parentNode);
     poln.addEventListener("click", function () {
         newElement.innerHTML = ""
+        changeOpis(newElement, "Izberite kdo je bil poln.")
 
         for (const user in listOfPlayers) {
             if (user == "!gamesData!") {
@@ -205,7 +210,7 @@ async function klop(newElement2, gamename) {
     })
     prazn.addEventListener("click", function () {
         newElement.innerHTML = ""
-
+        changeOpis(newElement, "Izberite kdo je bil prazn.")
         for (const user in listOfPlayers) {
             if (user == "!gamesData!") {
                 continue;
@@ -362,6 +367,8 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
     if (teamWork && secondPlayer !== null) {
         slct2 = secondPlayer
     }
+    changeOpis(newElement, "Izberite razliko")
+
     var difNu = document.createElement("md-slider");
     var razlika = 0;
     if (!zaokrožuj) {
@@ -373,17 +380,19 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 
 
             difNu.min = 0;
-
+            difNu.value = 0
             difNu.label = "Razlika";
             difNu.max = 35;
+            difNu.style.marginTop = "10px"
             newElement.appendChild(difNu);
+            addElement("div", newElement, "break");
             let endButton = addElement("md-filled-button", newElement, null);
             endButton.innerHTML = "Končano"
+            endButton.setAttribute("type", "reset")
 
-            var razlika;
-
+            difNu.addEventListener("change", function () { razlika = difNu.value; console.log(razlika); })
             await waitForButtonClick([endButton]);
-            var razlika = difNu.value
+            newElement.innerHTML = ""
         }
     } else {
         if (properties[1]) {
@@ -410,6 +419,8 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
             await waitForButtonClick(dv);
         }
     }
+
+
     var btn22 = addElement("md-filled-button", null, null);
     var btn23 = addElement("md-filled-tonal-button", null, null);
     btn22.style.height = btn23.style.height = "50px";
@@ -432,10 +443,11 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 
     if (!teamWork) {
         slct2 = "partnerigralcakimuniimenic"
-        // opisek.innerHTML = "Tukaj izberite morebitne bonuse in pritisnite 'Zmaga' ali 'Poraz'. Igrala je oseba " + firstPlayer + ", z razliko " + razlika + "."
+        changeOpis(newElement, "Izberite morebitne bonuse in pritisnite 'Zmaga' ali 'Poraz'. Igrala je oseba " + firstPlayer + ", z razliko " + razlika + ".")
     }
     else {
-        // opisek.innerHTML = "Tukaj izberite morebitne bonuse in pritisnite 'Zmaga' ali 'Poraz'. Igrali sta osebi " + firstPlayer + " in " + slct2 + ", z razliko " + razlika + "."
+        changeOpis(newElement, "Izberite morebitne bonuse in pritisnite 'Zmaga' ali 'Poraz'. Igrali sta osebi " + firstPlayer + " in " + slct2 + ", z razliko " + razlika + ".")
+
     }
     if (properties[1]) {
         for (const key in bonusi) {
@@ -446,6 +458,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
             btn.style.height = "45px";
             btn.setAttribute("type", "reset")
             btn.addEventListener("click", function () {
+                newElement.parentNode.removeAttribute("open")
                 var iks = document.createElement("md-icon-button")
                 iks.setAttribute("value", "close")
                 iks.classList.add("iksRight")
@@ -455,8 +468,8 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
                 iks.addEventListener("click", function (e) {
                     hideDialog(bonusDialog)
                 });
-                let lnbrk = addElement("div", bonusDialog, "break");
-                lnbrk.style.height = "50px";
+                addElement("div", bonusDialog, "break");
+
                 bonusDialog.style.filter = "brightness(1)";
 
                 var napovedanboolean = true;
@@ -501,7 +514,8 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 
                         bonusDialog.style.animation = "hideScreen .2s forwards";
                         setTimeout(() => {
-                            bonusDialog.remove();
+                            hideDialog(bonusDialog)
+                            newElement.parentNode.setAttribute("open", "")
                         }, 200);
                     });
                 });
@@ -780,7 +794,9 @@ function hideElement(newElement) {
         newElement.remove();
     }, 200);
 }
-
+function changeOpis(dlg, desc) {
+    dlg.parentNode.querySelector('[slot="headline"]').getElementsByTagName("span")[0].innerHTML = desc;
+}
 function dialogBuilder(xButt, desc) {
     var newElement = document.createElement("md-dialog");
     newElement.setAttribute("open", "");
@@ -788,7 +804,7 @@ function dialogBuilder(xButt, desc) {
     var xHolder = addElement("span", newElement, null);
     xHolder.setAttribute("slot", "headline")
     xHolder.setAttribute("class", "dialog-headline")
-    xHolder.innerHTML = '<span style="flex: 1;">' + desc + '</span>'
+    xHolder.innerHTML = '<span style="flex: .9;">' + desc + '</span>'
     if (xButt !== null) {
         xHolder.appendChild(xButt)
     }
@@ -1325,15 +1341,17 @@ function gameData(infom, number) {
 }
 
 function deleteGame() {
-    var newElement = addElement("div", document.body, "whlScreen");
-    var iks = addElement("div", newElement, "iks");
+    var iks = document.createElement("md-icon-button")
+    iks.setAttribute("value", "close")
+    iks.classList.add("iksRight")
     iks.innerHTML = showIks;
+    var newElement = dialogBuilder(iks, "Ali želite izbrisati to igro?")
+
     iks.addEventListener("click", function (e) {
         document.getElementById("game").style.animation = "none";
         hideElement(newElement);
     });
-    document.querySelector(".cntScreen").style.filter = document.getElementById("bottomBar").style.filter = "brightness(.3)";
-    dodajOpis(newElement, "Ali želite izbrisati to igro?",);
+    document.body.appendChild(newElement.parentNode)
     var shareButton = document.createElement("md-filled-button");
     shareButton.innerHTML = "Da";
     var copyButton = document.createElement("md-filled-button");
@@ -1434,42 +1452,49 @@ function removeElement() {
 }
 
 function privacy() {
-    var newElement = document.createElement("div");
-    newElement.setAttribute("class", "whlScreen");
-    newElement.setAttribute("style", "width:100vw; height:100svh;max-height:100vh; border-radius:0;overflow-x:hidden;")
-    var iks = addElement("div", newElement, "iks");
-    iks.style.position = "sticky"
+    var iks = document.createElement("md-icon-button")
+    iks.setAttribute("value", "close")
+    iks.classList.add("iksRight")
     iks.innerHTML = showIks;
+    var newElement = dialogBuilder(iks, "Politika zasebnosti")
+    newElement.parentNode.classList.add("fullscreen")
     iks.addEventListener("click", function (e) {
-        hideElement(newElement);
-        document.getElementById("homescreen").style.filter = document.getElementById("signInMessage").style.filter = "brightness(1)";
+        hideDialog(newElement);
+
 
     });
-    dodajOpis(newElement, "Politika zasebnosti");
+    document.body.appendChild(newElement.parentNode)
     var policy = addElement("p", newElement, null);
     policy.setAttribute("style", "white-space: pre;text-wrap: wrap;width: 80%;margin: 20px;color: var(--colorTxtDialog);")
     jQuery.get('./assets/policies.txt', function (data) {
         policy.innerHTML = data
     });
-    document.body.appendChild(newElement)
+
 }
 
 function feedback() {
-
-    var newElement = addElement("div", document.body, "whlScreen");
-    var iks = addElement("div", newElement, "iks");
+    var iks = document.createElement("md-icon-button")
+    iks.setAttribute("value", "close")
+    iks.classList.add("iksRight")
     iks.innerHTML = showIks;
+    var newElement = dialogBuilder(iks, "Povratne informacije")
+
+
+    document.body.appendChild(newElement.parentNode)
     iks.addEventListener("click", function (e) {
         document.getElementById("game").style.animation = "none";
-        hideElement(newElement);
+        hideDialog(newElement);
     });
-    dodajOpis(newElement, "Povratne informacije");
-    var emailContentInput = document.createElement("textarea"); emailContentInput.setAttribute("style", "height: 25vh;width: 90%;border-radius: 30px;background-color: var(--colorBtn);padding: 10px;color: var(--colorTxt);    outline: var(--colorTxt) solid 3px;")
-    emailContentInput.type = "text";
+
+    var emailContentInput = document.createElement("md-outlined-text-field");
+    emailContentInput.setAttribute("type", "textarea")
+    emailContentInput.setAttribute("rows", "10")
+
+    emailContentInput.setAttribute("style", "height: 25vh;width: 90%; resize: vertical;word-wrap: break-word;")
 
 
 
-    emailContentInput.placeholder = "Vpišite kaj bi radi izboljšali...";
+    emailContentInput.label = "Vpišite kaj bi radi izboljšali...";
 
     newElement.appendChild(emailContentInput);
     emailContentInput.focus();
@@ -1490,32 +1515,40 @@ window.addEventListener("load", function () {
     }
 })
 
-function changeColor() {
+
+
+function settings() {
     var iks = document.createElement("md-icon-button")
     iks.setAttribute("value", "close")
     iks.classList.add("iksRight")
     iks.innerHTML = showIks;
-    var dialog = dialogBuilder(iks, "Izberite barvo")
+    var dialog = dialogBuilder(iks, "Nastavitve")
+    dialog.parentNode.classList.add("fullscreen")
     iks.addEventListener("click", function (e) {
         document.getElementById("game").style.animation = "none";
         hideDialog(dialog);
         document.getElementById("homescreen").style.filter = document.getElementById("signInMessage").style.filter = document.getElementById("bottomBar").style.filter = "brightness(1)";
     });
     document.body.appendChild(dialog.parentNode)
+    var tema = addElement("md-text-button", dialog, null)
+    tema.setAttribute("type", "reset")
+    tema.addEventListener("click", function () { colPick.click() })
+    tema.innerHTML = 'Tema aplikacije:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
     var colPick = document.createElement("input")
     colPick.setAttribute("type", "color")
-    dialog.appendChild(colPick)
-    var endHolder = addElement("div", dialog.parentNode, null)
-    endHolder.setAttribute("slot", "actions")
-    var okButton = addElement("md-filled-button", endHolder, null)
-    okButton.innerHTML = "Končano"
-    okButton.addEventListener("click", function () {
-        window.changeTheme(colPick.value)
-        localStorage.themeColor = colPick.value
-        hideDialog(dialog)
-    })
-    setTimeout(() => {
-        colPick.click()
-    }, 200);
+    colPick.value = localStorage.getItem("themeColor")
+    colPick.addEventListener("change", function () { localStorage.themeColor = colPick.value; changeTheme(event.target.value) });
+    tema.appendChild(colPick)
+    addElement("div", dialog, "break").style.height = "50px"
+    var razlikaOkroz = addElement("md-text-button", dialog, null)
+    razlikaOkroz.setAttribute("style", "display: flex;align-items: center;")
+    razlikaOkroz.innerHTML = "Zaokroževanje razlike:&nbsp;&nbsp;&nbsp;&nbsp;"
+
+    var switchRaz = addElement("md-switch", razlikaOkroz, null)
+    if (JSON.parse(localStorage.getItem("razlikaOkrozi"))) { switchRaz.setAttribute("selected", ""); console.log("iiii"); }
+    razlikaOkroz.addEventListener("click", function () { switchRaz.selected = !switchRaz.selected })
+    razlikaOkroz.setAttribute("type", "reset")
+    razlikaOkroz.addEventListener("change", function () { if (localStorage.getItem("razlikaOkrozi") == "true") { localStorage.setItem("razlikaOkrozi", "false") } else { localStorage.setItem("razlikaOkrozi", "true"); } zaokrožuj = JSON.parse(localStorage.getItem("razlikaOkrozi")) }
+    );
 
 }

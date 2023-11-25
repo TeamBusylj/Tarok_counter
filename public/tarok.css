@@ -35,12 +35,20 @@ md-dialog [slot="headline"] {
     margin-right: auto;
     color: var(--colorTxtDialog);
     display: block;
-    width: calc(100vw - 120px);
+    width: calc(100vw - 150px);
     padding: 10px;
     text-align: center;
     border: 2px var(--md-sys-color-primary) solid;
     border-radius: 20px;
 
+}
+
+.fullscreen {
+    width: 100vw;
+    height: 100vh;
+    max-width: 101vw;
+    border-radius: 0;
+    max-height: 101vh;
 }
 
 
@@ -109,12 +117,12 @@ a {
 
 .menu-container {
     position: absolute;
-    top: 30px;
+    top: 25px;
     right: 10px;
 }
 
 md-outlined-button {
-    margin: 7px
+    margin: 5px
 }
 
 md-menu-item,
@@ -146,10 +154,14 @@ md-filled-tonal-button {
     animation: showScreen .3s forwards;
 }
 
+md-outlined-button {
+    animation: showScreen .3s forwards;
+}
 
 #homescreen md-outlined-button,
 #homescreen md-filled-tonal-button {
     flex-basis: 15%;
+
 }
 
 .iksRight {
@@ -605,8 +617,8 @@ span.btnIcon {
     body {
         --bgColor: var(--md-sys-color-surface);
         --colorDialog: var(--md-sys-color-secondary-container);
-        --colorTxtDialog: #D8E3F8;
-        --colorTxt: #003060;
+        --colorTxtDialog: var(--_label-text-color);
+        --colorTxt: var(--md-sys-color-on-surface);
         --colorBtn: var(--md-sys-color-primary);
         color: var(--colorTxt);
         margin: 0;
@@ -626,8 +638,8 @@ md-outlined-text-field {
     body {
         --bgColor: var(--md-sys-color-surface);
         --colorDialog: var(--md-sys-color-secondary-container);
-        --colorTxtDialog: #D8E3F8;
-        --colorTxt: #003060;
+        --colorTxtDialog: var(--_label-text-color);
+        --colorTxt: var(--md-sys-color-on-surface);
         --colorBtn: var(--md-sys-color-primary);
         color: var(--colorTxt);
         margin: 0;
