@@ -64,7 +64,6 @@
         ]);
 
         // Print out the theme as JSON
-        console.log(JSON.stringify(theme, null, 2));
 
         // Check if the user has dark mode turned on
         const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -133,6 +132,25 @@
     <script src="firebase.js" type="module"></script>
     <div class="loader"><md-circular-progress style="top: 50%;" indeterminate></md-circular-progress>
         <p style="top: 50%;color:var(--md-sys-color-on-surface);">Nalaganje...</p>
+    </div>
+    <div id="pomoc" class="fullscreen">
+        <md-list>
+            <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako ustvariti igro z novimi igralci?</b> <md-icon slot="end">expand_more</md-icon>
+                <p style="font-size: 0px;margin:0px;transition: all .2s ease;max-height: 0;"><br>Za ustvarjanje nove igre na domačem zaslonu in kliknite na gumb 'Nova igra'. Po kliku se bo odprlo okno, kjer lahko vnesete imena igralcev, ki sodelujejo v igri. Za dodajanje več igralcev uporabite gumb 'Dodaj igralca'.</p>
+            </md-list-item>
+            <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako dodati novo igro?</b> <md-icon slot="end">expand_more</md-icon>
+                <p style="font-size: 0px;margin:0px;transition: all .2s ease;max-height: 0;"><br>Za dodajanje nove igre na zaslonu za štetje kliknite na igralca, ki jo je igral. Nato sledite navodilom na zaslonu, da uspešno dodate novo igro na seznam.</p>
+            </md-list-item>
+            <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako spremeniti barvno temo?</b> <md-icon slot="end">expand_more</md-icon>
+                <p style="font-size: 0px;margin:0px;transition: all .2s ease;max-height: 0;"><br>Za spreminjanje barvne teme aplikacije kliknite na gumb za nastavitve na domačem zaslonu. Tako lahko kliknete gumb 'Tema aplikacije' in izberete barvo, ki vam je všeč.</p>
+            </md-list-item>
+            <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Zakaj Google prijava?</b> <md-icon slot="end">expand_more</md-icon>
+                <p style="font-size: 0px;margin:0px;transition: all .2s ease;max-height: 0;"><br>Prijava s storitvijo Google vam omogoča enostavno shranjevanje podatkov v oblaku. To pomeni, da lahko na katerikoli napravi, kjer se prijavite s svojim računom Google, dostopate do svojih iger in jih urejate.</p>
+            </md-list-item>
+            <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kaj pomenijo gumbi v spodnjem delu zaslona za štetje?</b> <md-icon slot="end">expand_more</md-icon>
+                <p style="font-size: 0px;margin:0px;transition: all .2s ease;max-height: 0;"><br>● Prvi gumb vam omogoča, da se vrnete na domači zaslon<br><br>● Drugi gumb vam omogoča, da razveljavite zadnje dejanje na seznamu<br><br>● Tretji gumb vam omogoča deljenje igre s prijatelji v obliki povezave<br><br>● Četrti gumb vam omogoča, da izbrišete celotno igro s temi igralci</p>
+            </md-list-item>
+        </md-list>
     </div>
 </body>
 

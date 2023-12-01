@@ -425,26 +425,50 @@ html {
     display: none;
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
+
 .chl {
     -ms-overflow-style: none;
-    /* IE and Edge */
+
     scrollbar-width: none;
-    /* Firefox */
+
+}
+
+slot[name="content"]::slotted(*) {
+    padding: 15px;
+}
+
+#pomoc {
+    background: var(--md-sys-color-surface);
+    background: var(--md-sys-color-surface);
+    z-index: 4;
+    position: absolute;
+    top: 0;
+    display: none;
+    overflow-y: scroll;
+}
+
+#pomoc md-list-item {
+    border-radius: 15px;
+    background-color: var(--md-sys-color-secondary-container);
+    width: 90%;
+    transition: all .2s ease-in-out;
+
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
 }
 
 .prnt {
-
     overflow-y: auto;
     color: var(--colorTxtDialog);
     padding: 0px 10px 10px 10px;
-    min-height: 100vh;
-    height: auto;
+    min-height: calc(100vh - 60px);
+    height: calc(100vh - 60px);
     position: relative;
     flex: 1;
     overflow-x: hidden;
     text-align: center;
-    border-radius: 0px 0px 30px 30px;
+
     background: transparent;
 }
 
@@ -542,13 +566,13 @@ input:focus-visible {
 }
 
 .cntScreen {
-    background-color: var(--bgColor);
 
     color: var(--colorTxt);
     display: flex;
     flex-direction: row;
     width: 100%;
-    top: 0;
+    z-index: 2;
+    position: relative;
     transition: all .2s;
     justify-content: center;
     align-items: top;

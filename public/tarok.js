@@ -13,15 +13,17 @@ var games = {
     "Tri": [10, true, "", true, "3"],
     "Dve": [20, true, "", true, "2"],
     "Ena": [30, true, "", true, "1"],
-    "Solo brez": [80, false, "", false, "SB"],
+
     "Solo tri": [40, true, "", false, "S3"],
     "Solo dve": [50, true, "", false, "S2"],
     "Solo ena": [60, true, "", false, "S1"],
-    "Klop": ["", false, "", true, "K"],
+    "Solo brez": [80, false, "", false, "SB"],
+
     "Valat": [250, false, "", true, "V"],
     "Barvni Valat": [125, false, "", true, "BV"],
     "Berač": [70, false, "", false, "B"],
     "Odprti Berač": [90, false, "", false, "OB"],
+    "Klop": ["", false, "", true, "K"],
     "Po meri": [0, false, "", true, "+"],
     "Dodaj radlce": ["", false, "", true, "*"],
 };
@@ -32,7 +34,7 @@ async function addScore(firstPlayer) {
 
     var iks = addElement("md-icon-button", null, "iksRight");
     iks.innerHTML = showIks;
-    var newElement = dialogBuilder(iks, "Tukaj izberite katero igro je oseba <b>" + firstPlayer + "</b> igrala.")
+    var newElement = dialogBuilder(iks, "Oseba <b>" + firstPlayer + "</b> je igrala...")
 
     iks.addEventListener("click", function (e) {
         hideDialog(newElement);
@@ -40,15 +42,15 @@ async function addScore(firstPlayer) {
     });
     let i = 0
     for (const key in games) {
-        if (i == 3 || i == 6) addElement("div", newElement, "break").style.height = "10px";
+        if (i == 3 || i == 7 || i == 11) addElement("md-divider", newElement, null).style.margin = "5px"
         i++
         let btn = document.createElement("md-outlined-button");
         btn.innerHTML = key;
         //btn.style.flexBasis = "40%"
-        btn.style.height = "50px"
+        btn.style.height = "45px"
         btn.classList.add("gameChose")
         btn.setAttribute("type", "reset")
-        var icon = addElement("span", btn, "btnIcon")
+        var icon = addElement("span", null, "btnIcon")
         icon.setAttribute("slot", "icon")
         icon.innerHTML = games[key][4]
         btn.addEventListener("click", function () {
@@ -466,6 +468,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
                 var bonusDialog = dialogBuilder(iks, "Izberite")
                 document.body.appendChild(bonusDialog.parentNode)
                 iks.addEventListener("click", function (e) {
+                    newElement.parentNode.setAttribute("open", "")
                     hideDialog(bonusDialog)
                 });
                 addElement("div", bonusDialog, "break");
@@ -998,7 +1001,7 @@ function count(animate) {
         chl.innerHTML += '<p style = "" class="noText" ></p>';
         chl.innerHTML += ' <p style = "" class="noText" ></p>';
         chl.setAttribute("class", "chl chlName_" + name);
-        chl.innerHTML += '<md-ripple class="unbounded"></md-ripple>'
+        prnt.innerHTML += '<md-ripple style="z-index:303030; position:absolute;"></md-ripple>'
         chl.style.display = "inline-block;";
         var pointView = addElement("p", rezultLine, null)
         pointView.setAttribute("class", "rezult_" + name);
@@ -1106,14 +1109,6 @@ function count(animate) {
         name.style.height = maxHeight + "px";
     });
     try {
-
-        let chls = document.getElementsByClassName("chl");
-        let heightToChange = document.querySelector(".namePlayers").getBoundingClientRect().height;
-        for (let chlsek of chls) {
-
-            chlsek.style.height = "calc(100svh - 210px)";
-            chlsek.style.height = (chlsek.getBoundingClientRect().height - heightToChange + 115) + "px";
-        };
 
 
 
@@ -1552,3 +1547,28 @@ function settings() {
     );
 
 }
+
+window.addEventListener("load", function () {
+    console.log("load");
+    document.querySelector("#game").addEventListener("click", function () {
+        event.target.setAttribute("clicked", "")
+        console.log("kakakaaaaaaaaaaaaaaaa");
+    })
+    var lst = document.getElementById("pomoc").getElementsByTagName("md-list-item")
+    for (const item of lst) {
+
+        item.addEventListener("click", function () {
+            console.log(item.getElementsByTagName('p')[0].style.fontSize);
+            if (item.getElementsByTagName('p')[0].style.fontSize == '0px') {
+                item.getElementsByTagName('p')[0].style.fontSize = '1rem'
+                item.getElementsByTagName('p')[0].style.maxHeight = '100vh'
+                item.getElementsByTagName('md-icon')[0].innerHTML = "expand_less"
+            } else {
+                item.getElementsByTagName('p')[0].style.fontSize = '0'
+                item.getElementsByTagName('p')[0].style.maxHeight = '0'
+                item.getElementsByTagName('md-icon')[0].innerHTML = "expand_more"
+
+            }
+        })
+    }
+})
