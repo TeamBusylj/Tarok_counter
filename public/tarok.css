@@ -49,6 +49,7 @@ md-dialog [slot="headline"] {
     max-width: 101vw;
     border-radius: 0;
     max-height: 101vh;
+    --_container-color: var(--md-sys-color-surface);
 }
 
 
@@ -141,9 +142,19 @@ md-menu {
 }
 
 md-list {
+    margin-right: auto;
+    margin-left: auto;
     width: 90%;
     border-radius: 25px;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
     -webkit-tap-highlight-color: transparent;
+}
+
+md-list::-webkit-scrollbar {
+    display: none;
 }
 
 md-filled-button,
@@ -166,6 +177,7 @@ md-outlined-button {
 
 .iksRight {
     right: 15px;
+    top: 15px;
     position: absolute;
 }
 
@@ -248,6 +260,46 @@ i {
     .bottomBtn {
         font-size: .9rem;
     }
+}
+
+@keyframes animate-stroke {
+    0% {
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+        stroke: var(--md-sys-color-primary);
+    }
+
+    50% {
+
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -35;
+        stroke: var(--md-sys-color-primary);
+    }
+
+    100% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -124;
+        stroke: var(--md-sys-color-primary);
+    }
+}
+
+.loaderInner {
+    stroke-width: 5px;
+    width: 51px;
+    margin-left: auto;
+    animation: animate-stroke 1.5s ease-in-out infinite;
+    margin-right: auto;
+    position: relative;
+}
+
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.circular-loader {
+    animation: rotate 2s linear infinite;
 }
 
 .bottomBtn {
@@ -441,9 +493,8 @@ slot[name="content"]::slotted(*) {
     background: var(--md-sys-color-surface);
     background: var(--md-sys-color-surface);
     z-index: 4;
-    position: absolute;
-    top: 0;
-    display: none;
+
+    overflow: scroll;
     overflow-y: scroll;
 }
 

@@ -31,7 +31,7 @@
 </head>
 <script src="tarok.js"></script>
 <script type="module">
-    import './assets/progress/circular-progress.js';
+
     import '@material/web/icon/icon.js';
     import '@material/web/menu/menu-item.js';
     import '@material/web/menu/menu.js';
@@ -115,42 +115,33 @@
         <md-menu id="usage-menu" anchor="usage-anchor">
             <md-menu-item id="privacyPolicy" onclick="privacy()">
                 <div class="menu-head" slot="headline">
-                    <svg style="fill: var(--md-sys-color-on-surface);" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                    <svg slot="icon" style="fill: var(--md-sys-color-on-surface);" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
                         <path d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 85-29 163.5T688-214L560-342q-18 11-38.5 16.5T480-320q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 22-5.5 42.5T618-398l60 60q20-41 31-86t11-92v-189l-240-90-240 90v189q0 121 68 220t172 132q26-8 49.5-20.5T576-214l56 56q-33 27-71.5 47T480-80Zm0-320q33 0 56.5-23.5T560-480q0-33-23.5-56.5T480-560q-33 0-56.5 23.5T400-480q0 33 23.5 56.5T480-400Zm8-77Z" />
                     </svg>Politika
                 </div>
             </md-menu-item>
             <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Povratne informacije" onclick="feedback()" style="margin-left: 20px;">
                 <div class="menu-head" slot="headline">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                    <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
                         <path d="M480-680q17 0 28.5-11.5T520-720q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720q0 17 11.5 28.5T480-680Zm-40 320h80v-240h-80v240ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z" />
                     </svg>Povratne informacije
+                </div>
+            </md-menu-item>
+            <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Povratne informacije" onclick="help()" style="margin-left: 20px;">
+                <div class="menu-head" slot="headline">
+                    <md-icon slot="ico">help</md-icon>Pomoč
                 </div>
             </md-menu-item>
         </md-menu>
     </span>
     <script src="firebase.js" type="module"></script>
-    <div class="loader"><md-circular-progress style="top: 50%;" indeterminate></md-circular-progress>
-        <p style="top: 50%;color:var(--md-sys-color-on-surface);">Nalaganje...</p>
+    <div class="loader">
+        <div class="loaderInner" style="top: 50%;">
+            <p style="position: relative;left: -20px;  top: -30px;">Nalaganje...</p> <svg class="circular-loader" viewBox="25 25 50 50">
+                <circle class="loader-path" cx="50" cy="50" r="20" fill="none"></circle>
+            </svg>
+        </div>
     </div>
-    <div id="pomoc" class="fullscreen">
-        <md-list>
-            <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako ustvariti igro z novimi igralci?</b> <md-icon slot="end">expand_more</md-icon>
-                <p style="font-size: 0px;margin:0px;transition: all .2s ease;max-height: 0;"><br>Za ustvarjanje nove igre na domačem zaslonu in kliknite na gumb 'Nova igra'. Po kliku se bo odprlo okno, kjer lahko vnesete imena igralcev, ki sodelujejo v igri. Za dodajanje več igralcev uporabite gumb 'Dodaj igralca'.</p>
-            </md-list-item>
-            <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako dodati novo igro?</b> <md-icon slot="end">expand_more</md-icon>
-                <p style="font-size: 0px;margin:0px;transition: all .2s ease;max-height: 0;"><br>Za dodajanje nove igre na zaslonu za štetje kliknite na igralca, ki jo je igral. Nato sledite navodilom na zaslonu, da uspešno dodate novo igro na seznam.</p>
-            </md-list-item>
-            <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako spremeniti barvno temo?</b> <md-icon slot="end">expand_more</md-icon>
-                <p style="font-size: 0px;margin:0px;transition: all .2s ease;max-height: 0;"><br>Za spreminjanje barvne teme aplikacije kliknite na gumb za nastavitve na domačem zaslonu. Tako lahko kliknete gumb 'Tema aplikacije' in izberete barvo, ki vam je všeč.</p>
-            </md-list-item>
-            <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Zakaj Google prijava?</b> <md-icon slot="end">expand_more</md-icon>
-                <p style="font-size: 0px;margin:0px;transition: all .2s ease;max-height: 0;"><br>Prijava s storitvijo Google vam omogoča enostavno shranjevanje podatkov v oblaku. To pomeni, da lahko na katerikoli napravi, kjer se prijavite s svojim računom Google, dostopate do svojih iger in jih urejate.</p>
-            </md-list-item>
-            <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kaj pomenijo gumbi v spodnjem delu zaslona za štetje?</b> <md-icon slot="end">expand_more</md-icon>
-                <p style="font-size: 0px;margin:0px;transition: all .2s ease;max-height: 0;"><br>● Prvi gumb vam omogoča, da se vrnete na domači zaslon<br><br>● Drugi gumb vam omogoča, da razveljavite zadnje dejanje na seznamu<br><br>● Tretji gumb vam omogoča deljenje igre s prijatelji v obliki povezave<br><br>● Četrti gumb vam omogoča, da izbrišete celotno igro s temi igralci</p>
-            </md-list-item>
-        </md-list>
     </div>
 </body>
 

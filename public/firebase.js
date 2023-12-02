@@ -166,6 +166,7 @@ export function loadDataFromWeb() {
                 localStorage.setItem("games", JSON.stringify(gamesObject));
 
             };
+            updateUserData()
             return true
         } else {
             console.log("No data available");
