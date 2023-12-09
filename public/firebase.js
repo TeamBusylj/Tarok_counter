@@ -126,12 +126,24 @@ function writeUserData(userId) {
     }
 }
 export function updateUserData() {
+
     if (localStorage.uid !== null && localStorage.uid !== undefined && localStorage.uid !== "null" && localStorage.uid !== "undefined") {
 
         const db = getDatabase();
 
         const updates = {};
-        updates['/users/' + localStorage.uid + "/games/"] = JSON.parse(localStorage.getItem('games'));
+        const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
+        for (const key in gamesObject) {
+            console.log(encodeURIComponent(key), gamesObject[key]);
+            if (gamesObject.hasOwnProperty(key) && key.includes("/users/")) {
+                gamesObject[encodeURIComponent(key)] = ""
+                updateSharedGame(encodeURIComponent(key), gamesObject[key])
+                delete gamesObject[key]
+
+            }
+        }
+        console.log(gamesObject);
+        updates['/users/' + localStorage.uid + "/games/"] = gamesObject;
 
 
         return update(ref(db), updates);
@@ -139,6 +151,18 @@ export function updateUserData() {
 }
 var userk = auth.currentUser;
 window.updateUserData = updateUserData
+
+function updateSharedGame(key, value) {
+    if (value !== "") {
+        const db = getDatabase();
+        console.log(key, value);
+        value["!gameName!"] = value["!gameName!"].slice(value["!gameName!"].lastIndexOf("/") + 1)
+        const updates = {};
+        updates[decodeURIComponent(key)] = value;
+        return update(ref(db), updates);
+    }
+}
+
 export function loadDataFromWeb() {
 
     console.log(userk);
@@ -162,7 +186,7 @@ export function loadDataFromWeb() {
             console.log(data);
             for (const [key, value] of Object.entries(data)) {
                 const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
-                gamesObject[key] = value;
+                gamesObject[decodeURIComponent(key)] = value;
                 localStorage.setItem("games", JSON.stringify(gamesObject));
 
             };
@@ -179,6 +203,28 @@ export function loadDataFromWeb() {
 
 
 }
-window.loadDataFromWeb = loadDataFromWeb
+export async function loadDataPath(path) {
+    const dbRef = ref(getDatabase());
+    var result
+    console.log(path);
+    await get(child(dbRef, path)).then((snapshot) => {
 
+        if (snapshot.exists()) {
+
+            result = snapshot.val()
+
+            localStorage.uploadedGame = result
+
+        } else {
+            console.log("No data available");
+
+            return ""
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+    return result
+}
+window.loadDataFromWeb = loadDataFromWeb
+window.loadDataPath = loadDataPath
 

@@ -44,7 +44,7 @@
     import '@material/web/button/filled-button.js'
     import '@material/web/slider/slider.js';
     import '@material/web/list/list-item.js';
-
+    import '@material/web/fab/fab.js';
     import '@material/web/list/list.js';
     import '@material/web/button/text-button.js'
     import '@material/web/textfield/outlined-text-field.js'
@@ -77,66 +77,94 @@
 </script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
-<body onload="   if (location.hash !== '') {upload(location.hash.slice(1)); localStorage.removeItem(undefined)} window.loadDataFromWeb(); if(localStorage.themeColor !== null) window.changeTheme(localStorage.themeColor)">
-    <p id="signInMessage">Za shranjevanje podatkov se prijavite.<br></p>
-    <div id="homescreen">
-        <md-filled-tonal-button id="newgame" onclick="newGame()">Nova igra <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
-            </svg></md-filled-tonal-button>
-        <md-filled-tonal-button id="game" onclick="Game()">Izberi igro <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                <path d="M280-600v-80h560v80H280Zm0 160v-80h560v80H280Zm0 160v-80h560v80H280ZM160-600q-17 0-28.5-11.5T120-640q0-17 11.5-28.5T160-680q17 0 28.5 11.5T200-640q0 17-11.5 28.5T160-600Zm0 160q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440Zm0 160q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360q17 0 28.5 11.5T200-320q0 17-11.5 28.5T160-280Z" />
-            </svg></md-filled-tonal-button>
-        <md-filled-tonal-button id="linkadd" onclick="uploadLink()"> Povezava igre <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                <path d="M440-280H280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h160v80H280q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h320v80H320Zm200 160v-80h160q50 0 85-35t35-85q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H520Z" />
-            </svg></md-filled-tonal-button>
-        <md-filled-tonal-button id="signInGoogle"><img slot="icon" id="Capa_1" src="assets/btn_google_light_normal_ios.svg">
-            <p id="signInText">Google prijava</p>
-        </md-filled-tonal-button>
-        <md-filled-tonal-button id="signOutGoogle"><img slot="icon" id="Capa_1" src="assets/btn_google_light_normal_ios.svg">
-            <p id="signInText">Odjava</p>
-        </md-filled-tonal-button>
+<body onload="if (location.hash !== '') {upload()} if(localStorage.offlineChanges == undefined){window.loadDataFromWeb()} else{if(navigator.onLine){console.log('update');updateUserData();localStorage.offlineChanges = undefined}}; if(localStorage.themeColor !== null) window.changeTheme(localStorage.themeColor);">
+    <div id="homeContainer">
+        <p id="signInMessage">Za shranjevanje podatkov se prijavite.<br></p>
+        <md-fab id="newgame" onclick="newGame()" label="Nova igra" variant="primary" aria-label="Nova igra">
+            <md-icon slot="icon">add</md-icon>
+        </md-fab>
+        <div id="homescreen">
+            <md-outlined-button id="game" onclick="Game()">Izberi igro <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                    <path d="M280-600v-80h560v80H280Zm0 160v-80h560v80H280Zm0 160v-80h560v80H280ZM160-600q-17 0-28.5-11.5T120-640q0-17 11.5-28.5T160-680q17 0 28.5 11.5T200-640q0 17-11.5 28.5T160-600Zm0 160q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440Zm0 160q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360q17 0 28.5 11.5T200-320q0 17-11.5 28.5T160-280Z" />
+                </svg></md-outlined-button>
+            <md-outlined-button id="linkadd" onclick="uploadLink()"> Povezava igre <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                    <path d="M440-280H280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h160v80H280q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h320v80H320Zm200 160v-80h160q50 0 85-35t35-85q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H520Z" />
+                </svg></md-outlined-button>
+            <button class="gsi-material-button" id="signOutGoogle">
+                <md-ripple></md-ripple>
+                <div class="gsi-material-button-state"></div>
+                <div class="gsi-material-button-content-wrapper">
+                    <div class="gsi-material-button-icon">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" xmlns:xlink="http://www.w3.org/1999/xlink" style="display: block;">
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                            <path fill="none" d="M0 0h48v48H0z"></path>
+                        </svg>
+                    </div>
+                    <span class="gsi-material-button-contents">Odjava</span>
+                    <span style="display: none;">Sign in with Google</span>
+                </div>
+            </button>
+            <button class="gsi-material-button" id="signInGoogle">
+                <md-ripple></md-ripple>
+                <div class="gsi-material-button-state"></div>
+                <div class="gsi-material-button-content-wrapper">
+                    <div class="gsi-material-button-icon">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" xmlns:xlink="http://www.w3.org/1999/xlink" style="display: block;">
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                            <path fill="none" d="M0 0h48v48H0z"></path>
+                        </svg>
+                    </div>
+                    <span class="gsi-material-button-contents">Google prijava</span>
+                    <span style="display: none;">Sign in with Google</span>
+                </div>
+            </button>
+        </div>
+        <md-icon-button style="left: 10px;z-index: 5;" onclick="settings()" class="menu-container">
+            <md-icon><span class="material-symbols-outlined"> settings </span></md-icon></md-icon-button>
+        <p class="menu-container" style="left: 0; width: 100%; text-align: center;top:-3px;margin: 0;">Števec taroka</p>
+        <span class="menu-container">
+            <md-icon-button onclick="document.body.querySelector('#usage-menu').open = !document.body.querySelector('#usage-menu').open" id="usage-anchor">
+                <md-icon><span class="material-symbols-outlined"> more_vert </span></md-icon></md-icon-button>
+            <md-menu id="usage-menu" anchor="usage-anchor">
+                <md-menu-item id="privacyPolicy" onclick="privacy()">
+                    <div slot="headline">Politika</div>
+                    <svg slot="start" style="fill: var(--md-sys-color-on-surface);" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                        <path d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 85-29 163.5T688-214L560-342q-18 11-38.5 16.5T480-320q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 22-5.5 42.5T618-398l60 60q20-41 31-86t11-92v-189l-240-90-240 90v189q0 121 68 220t172 132q26-8 49.5-20.5T576-214l56 56q-33 27-71.5 47T480-80Zm0-320q33 0 56.5-23.5T560-480q0-33-23.5-56.5T480-560q-33 0-56.5 23.5T400-480q0 33 23.5 56.5T480-400Zm8-77Z" />
+                    </svg>
+                </md-menu-item>
+                <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Povratne informacije" onclick="feedback()" style="margin-left: 20px;">
+                    <div slot="headline">Povratne informacije</div>
+                    <svg slot="start" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                        <path d="M480-680q17 0 28.5-11.5T520-720q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720q0 17 11.5 28.5T480-680Zm-40 320h80v-240h-80v240ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z" />
+                    </svg>
+                </md-menu-item>
+                <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Povratne informacije" onclick="help()" style="margin-left: 20px;">
+                    <div slot="headline">Pomoč</div>
+                    <md-icon slot="start">help</md-icon>
+                </md-menu-item>
+            </md-menu>
+        </span>
+        <div id="actionBarStart">
+            <p id="newapp">Ker nam pomeni, da ste z aplikacijo zadovoljni, bomo veseli vsake povratne informacije v meniju treh pikic. </p>
+        </div>
     </div>
     <div id="bottomBar" role="footer">
-        <div id="actionBarStart">
-            <p id="newapp">Ker nam pomeni, da ste z aplikacijo zadovoljni, bomo veseli vsake povratne informacije v zgornjem meniju </p>
-        </div>
         <div id="actionBar">
-            <md-filled-tonal-icon-button class="bottomBtn" id="bottomBtn" onclick="location.reload()"> <md-icon>home</md-icon></md-filled-tonal-icon-button>
-            <md-filled-tonal-icon-button class="bottomBtn" id="bottomBtn" onclick="undo()"> <md-icon>undo</md-icon></md-filled-tonal-icon-button>
+            <md-filled-tonal-icon-button class="bottomBtn" id="bottomBtn" onclick="document.getElementById('homeContainer').style.display = 'block';removeElement(document.getElementById('cntScreen'), document.getElementById('crezultLine'));document.getElementById('actionBar').style.display = 'none';listOfPlayersCopy=[];loadDataFromWeb()"> <md-icon>home</md-icon></md-filled-tonal-icon-button>
+            <md-filled-tonal-icon-button class="bottomBtn undoBtn" disabled id="bottomBtn" onclick="undo()"> <md-icon>undo</md-icon></md-filled-tonal-icon-button>
             <md-filled-tonal-icon-button class="bottomBtn" id="bottomBtn" onclick="download()"> <md-icon>share</md-icon></md-filled-tonal-icon-button>
             <md-filled-tonal-icon-button class="bottomBtn" id="bottomBtn" onclick="deleteGame()"> <md-icon>delete</md-icon></md-filled-tonal-icon-button>
         </div>
     </div>
-    <md-icon-button style="left: 10px;" onclick="settings()" class="menu-container">
-        <md-icon><span class="material-symbols-outlined"> settings </span></md-icon></md-icon-button>
-    <span class="menu-container">
-        <md-icon-button onclick="document.body.querySelector('#usage-menu').open = !document.body.querySelector('#usage-menu').open" id="usage-anchor">
-            <md-icon><span class="material-symbols-outlined"> more_vert </span></md-icon></md-icon-button>
-        <md-menu id="usage-menu" anchor="usage-anchor">
-            <md-menu-item id="privacyPolicy" onclick="privacy()">
-                <div class="menu-head" slot="headline">
-                    <svg slot="icon" style="fill: var(--md-sys-color-on-surface);" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                        <path d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 85-29 163.5T688-214L560-342q-18 11-38.5 16.5T480-320q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 22-5.5 42.5T618-398l60 60q20-41 31-86t11-92v-189l-240-90-240 90v189q0 121 68 220t172 132q26-8 49.5-20.5T576-214l56 56q-33 27-71.5 47T480-80Zm0-320q33 0 56.5-23.5T560-480q0-33-23.5-56.5T480-560q-33 0-56.5 23.5T400-480q0 33 23.5 56.5T480-400Zm8-77Z" />
-                    </svg>Politika
-                </div>
-            </md-menu-item>
-            <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Povratne informacije" onclick="feedback()" style="margin-left: 20px;">
-                <div class="menu-head" slot="headline">
-                    <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                        <path d="M480-680q17 0 28.5-11.5T520-720q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720q0 17 11.5 28.5T480-680Zm-40 320h80v-240h-80v240ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z" />
-                    </svg>Povratne informacije
-                </div>
-            </md-menu-item>
-            <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Povratne informacije" onclick="help()" style="margin-left: 20px;">
-                <div class="menu-head" slot="headline">
-                    <md-icon slot="ico">help</md-icon>Pomoč
-                </div>
-            </md-menu-item>
-        </md-menu>
-    </span>
     <script src="firebase.js" type="module"></script>
     <div class="loader">
-        <div class="loaderInner" style="top: 50%;">
+        <div class="loaderInner" style="top: 40%;">
             <p style="position: relative;left: -20px;  top: -30px;">Nalaganje...</p> <svg class="circular-loader" viewBox="25 25 50 50">
                 <circle class="loader-path" cx="50" cy="50" r="20" fill="none"></circle>
             </svg>

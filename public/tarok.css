@@ -8,7 +8,7 @@ div#bottomBar {
     z-index: 1;
     position: fixed;
     width: 100%;
-    transition: all .2s;
+    transition: all var(--transDur);
     bottom: 0;
 
 }
@@ -23,8 +23,10 @@ md-dialog [slot="headline"] {
     display: flex;
     flex-direction: column;
     height: 65vh;
+    top: 70px;
     width: 70vw;
-    transition: all .2s;
+    position: relative;
+    transition: all var(--transDur);
     margin: auto;
 
 }
@@ -35,11 +37,14 @@ md-dialog [slot="headline"] {
     margin-right: auto;
     color: var(--colorTxtDialog);
     display: block;
-    width: calc(100vw - 150px);
+    top: 70px;
+    position: relative;
+    width: 72vw;
     padding: 10px;
     text-align: center;
-    border: 2px var(--md-sys-color-primary) solid;
-    border-radius: 20px;
+    border-top: 1px var(--md-sys-color-primary) solid;
+    border-bottom: 1px var(--md-sys-color-primary) solid;
+
 
 }
 
@@ -60,7 +65,7 @@ md-dialog [slot="headline"] {
     height: 8vh;
     width: 35vw;
     position: absolute;
-    animation: signInAnimation 3s ease-out forwards;
+    animation: signInAnimation var(--transDur) ease-out forwards;
     background-color: white;
     border-radius: 50px;
     z-index: 42;
@@ -69,11 +74,13 @@ md-dialog [slot="headline"] {
 }
 
 #newapp {
-    position: absolute;
-    bottom: 50%;
+    position: relative;
+    bottom: 135%;
     text-align: center;
     color: var(--colorTxtDialog);
     scale: .8;
+    padding: 5px;
+
     display: block;
 }
 
@@ -90,7 +97,7 @@ a {
 #actionBarStart {
     display: flex;
 
-    transition: all .2s;
+    transition: all var(--transDur);
 
     justify-content: center;
     height: 50px;
@@ -118,7 +125,7 @@ a {
 
 .menu-container {
     position: absolute;
-    top: 25px;
+    top: -10px;
     right: 10px;
 }
 
@@ -159,14 +166,14 @@ md-list::-webkit-scrollbar {
 
 md-filled-button,
 md-filled-tonal-button {
-    transition: all .2s;
+    transition: all var(--transDur);
     margin: 7px;
 
-    animation: showScreen .3s forwards;
+    animation: showScreen var(--transDur) forwards;
 }
 
 md-outlined-button {
-    animation: showScreen .3s forwards;
+    animation: showScreen var(--transDur) forwards;
 }
 
 #homescreen md-outlined-button,
@@ -196,7 +203,7 @@ md-outlined-button {
 
 .signInGoogle,
 .signOutGoogle {
-    transition: all .2s ease-in;
+    transition: all var(--transDur) ease-in;
     display: flex;
     overflow: visible;
     flex-direction: row;
@@ -213,6 +220,7 @@ md-outlined-button {
     position: absolute;
     width: 100vw;
     height: 100vh;
+
     background-color: var(--md-sys-color-surface);
     top: 0;
     text-align: center;
@@ -237,11 +245,14 @@ form {
 }
 
 #actionBar {
+    -webkit-transform: translate3d(0, 0, 20px);
     display: none;
     background-color: var(--bgColor);
-    transition: all .2s;
+    transition: all var(--transDur);
     align-items: center;
     justify-content: center;
+    z-index: 66;
+    position: relative;
     height: 50px;
     pointer-events: auto;
 }
@@ -332,7 +343,7 @@ span.ripple {
 }
 
 .fadeOutIt {
-    animation: fadeOut .2s linear forwards !important;
+    animation: fadeOut var(--transDur) linear forwards !important;
 }
 
 @keyframes fadeOut {
@@ -430,8 +441,6 @@ html {
     border-bottom-left-radius: 30px;
     border-bottom-right-radius: 30px;
     z-index: 50;
-
-    overflow: hidden;
     filter: saturate(.6);
     position: sticky;
     top: 0px;
@@ -457,7 +466,7 @@ html {
 
 .chl {
     filter: saturate(.6);
-    transition: all .2s;
+    transition: all var(--transDur);
     overscroll-behavior: none;
     box-shadow: none, none;
     height: calc(100svh - 210px);
@@ -502,7 +511,7 @@ slot[name="content"]::slotted(*) {
     border-radius: 15px;
     background-color: var(--md-sys-color-secondary-container);
     width: 90%;
-    transition: all .2s ease-in-out;
+    transition: all var(--transDur) ease-in-out;
 
     margin-left: auto;
     margin-right: auto;
@@ -510,6 +519,7 @@ slot[name="content"]::slotted(*) {
 }
 
 .prnt {
+    -webkit-transform: translate3d(0, 0, 0px);
     overflow-y: auto;
     color: var(--colorTxtDialog);
     padding: 0px 10px 10px 10px;
@@ -519,7 +529,7 @@ slot[name="content"]::slotted(*) {
     flex: 1;
     overflow-x: hidden;
     text-align: center;
-
+    z-index: 1;
     background: transparent;
 }
 
@@ -533,7 +543,7 @@ slot[name="content"]::slotted(*) {
 }
 
 .whlScreen {
-    animation: showScreen .3s forwards;
+    animation: showScreen var(--transDur) forwards;
     color: var(--colorTxt);
     z-index: 500000;
     display: flex;
@@ -544,7 +554,7 @@ slot[name="content"]::slotted(*) {
     flex-wrap: wrap;
     max-height: 90vh;
     overflow-y: scroll;
-    transition: all .2s;
+    transition: all var(--transDur);
     position: fixed;
     justify-content: center;
     width: 80%;
@@ -554,11 +564,12 @@ slot[name="content"]::slotted(*) {
     background: var(--colorDialog) 30%
 }
 
-button {
+button:not(.gsi-material-button) {
     color: var(--colorTxt);
     transition: all .05s;
     overflow: hidden;
     position: relative;
+    min-width: min-content;
     flex-basis: 90px;
     display: flex;
     border-radius: 30px;
@@ -572,7 +583,7 @@ button {
     background-color: var(--colorBtn);
     /* box-shadow: 5px 5px #888888; */
     margin: 10px;
-    animation: showScreen .3s forwards;
+    animation: showScreen var(--transDur) forwards;
 }
 
 .tockeLabel {
@@ -598,7 +609,7 @@ select {
     border-width: 0;
     border-radius: 20px;
     padding: 7px;
-    animation: showScreen .3s forwards;
+    animation: showScreen var(--transDur) forwards;
 }
 
 input:not([type="color"]) {
@@ -609,7 +620,7 @@ input:not([type="color"]) {
     padding: 7px;
     transition: all .1s;
     outline: var(--colorBtn) solid 0px;
-    animation: showScreen .3s forwards;
+    animation: showScreen var(--transDur) forwards;
 }
 
 input:focus-visible {
@@ -622,9 +633,9 @@ input:focus-visible {
     display: flex;
     flex-direction: row;
     width: 100%;
-    z-index: 2;
+    z-index: 0;
     position: relative;
-    transition: all .2s;
+    transition: all var(--transDur);
     justify-content: center;
     align-items: top;
     height: 100%;
@@ -648,7 +659,7 @@ md-outlined-button:active {
 }
 
 .crezultLine {
-    transition: all .2s;
+    transition: all var(--transDur);
     color: var(--colorTxt);
     z-index: 40;
     overflow: hidden;
@@ -690,6 +701,7 @@ span.btnIcon {
 
 @media (prefers-color-scheme: dark) {
     body {
+        --transDur: .3s;
         --bgColor: var(--md-sys-color-surface);
         --colorDialog: var(--md-sys-color-secondary-container);
         --colorTxtDialog: var(--_label-text-color);
@@ -699,18 +711,32 @@ span.btnIcon {
         margin: 0;
         overflow: hidden;
         background-attachment: fixed;
+
         background-color: var(--bgColor);
+    }
+
+    .gsi-material-button {
+        background-color: #131314;
+        border: 1px solid #747775;
+        color: #e3e3e3;
     }
 }
 
 md-outlined-text-field {
-    transition: all .2s;
-    animation: showScreen .3s forwards;
+    transition: all var(--transDur);
+    animation: showScreen var(--transDur) forwards;
     margin: 10px;
+}
+
+@media (prefers-reduced-motion) {
+    body {
+        --transDur: 0s !important;
+    }
 }
 
 @media (prefers-color-scheme: light) {
     body {
+        --transDur: .3s;
         --bgColor: var(--md-sys-color-surface);
         --colorDialog: var(--md-sys-color-secondary-container);
         --colorTxtDialog: var(--_label-text-color);
@@ -722,10 +748,18 @@ md-outlined-text-field {
         background-attachment: fixed;
         background-color: var(--bgColor);
     }
+
+    .gsi-material-button {
+        background-color: WHITE;
+        background-image: none;
+        border: 1px solid #747775;
+        color: #1f1f1f;
+    }
+
 }
 
 p {
-    transition: all .2s;
+    transition: all var(--transDur);
 }
 
 @keyframes showScreen {
@@ -752,15 +786,123 @@ p {
     }
 }
 
-.chl>p:hover:not(".noText") {
-    border-radius: 30px;
-    margin-left: 3px;
-    margin-right: 3px;
-    cursor: pointer;
-    background-color: rgba(0, 0, 0, .2);
-}
+
 
 .poMeri {
     margin: 10px;
     width: 60%;
+}
+
+md-fab {
+    z-index: 1;
+    position: absolute;
+    right: 20px;
+    bottom: 40px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.gsi-material-button {
+
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -webkit-appearance: none;
+
+    background-image: none;
+
+    -webkit-border-radius: 20px;
+    border-radius: 20px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 7px;
+    cursor: pointer;
+    font-family: 'Roboto', arial, sans-serif;
+    font-size: 14px;
+    height: 40px;
+    letter-spacing: 0.25px;
+    outline: none;
+    overflow: hidden;
+    padding: 0 12px;
+    position: relative;
+    text-align: center;
+    -webkit-transition: background-color .218s, border-color .218s, box-shadow .218s;
+    transition: background-color .218s, border-color .218s, box-shadow .218s;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: auto;
+
+    min-width: min-content;
+}
+
+#homeContainer {
+    animation: showScreen var(--transDur) forwards cubic-bezier(.3, .5, 0, 1.3);
+    height: 100vh;
+}
+
+.gsi-material-button .gsi-material-button-icon {
+    height: 20px;
+    margin-right: 12px;
+    min-width: 20px;
+    width: 20px;
+}
+
+.gsi-material-button .gsi-material-button-content-wrapper {
+    -webkit-align-items: center;
+    align-items: center;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    -webkit-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+    height: 100%;
+    justify-content: space-between;
+    position: relative;
+    width: 100%;
+}
+
+.gsi-material-button .gsi-material-button-contents {
+    -webkit-flex-grow: 1;
+    flex-grow: 1;
+    font-family: 'Roboto', arial, sans-serif;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+}
+
+.gsi-material-button .gsi-material-button-state {
+    -webkit-transition: opacity .218s;
+    transition: opacity .218s;
+    bottom: 0;
+    left: 0;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+
+
+.gsi-material-button:disabled .gsi-material-button-contents {
+    opacity: 38%;
+}
+
+.gsi-material-button:disabled .gsi-material-button-icon {
+    opacity: 38%;
+}
+
+.gsi-material-button:not(:disabled):active .gsi-material-button-state,
+.gsi-material-button:not(:disabled):focus .gsi-material-button-state {
+    background-color: #001d35;
+    opacity: 12%;
+}
+
+.gsi-material-button:not(:disabled):hover {
+    -webkit-box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
+}
+
+.gsi-material-button:not(:disabled):hover .gsi-material-button-state {
+    background-color: #001d35;
+    opacity: 8%;
 }
