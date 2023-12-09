@@ -80,7 +80,7 @@
 <body onload="if (location.hash !== '') {upload()} if(localStorage.offlineChanges == undefined){window.loadDataFromWeb()} else{if(navigator.onLine){console.log('update');updateUserData();localStorage.offlineChanges = undefined}}; if(localStorage.themeColor !== null) window.changeTheme(localStorage.themeColor);">
     <div id="homeContainer">
         <p id="signInMessage">Za shranjevanje podatkov se prijavite.<br></p>
-        <md-fab id="newgame" onclick="newGame()" label="Nova igra" variant="primary" aria-label="Nova igra">
+        <md-fab id="newgame" onclick="newGame()" label="Nova igra" variant="primary" aria-label="Nova skupina">
             <md-icon slot="icon">add</md-icon>
         </md-fab>
         <div id="homescreen">
@@ -144,7 +144,7 @@
                         <path d="M480-680q17 0 28.5-11.5T520-720q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720q0 17 11.5 28.5T480-680Zm-40 320h80v-240h-80v240ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z" />
                     </svg>
                 </md-menu-item>
-                <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Povratne informacije" onclick="help()" style="margin-left: 20px;">
+                <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Povratne informacije" onclick="helpMe()" style="margin-left: 20px;">
                     <div slot="headline">Pomoč</div>
                     <md-icon slot="start">help</md-icon>
                 </md-menu-item>
@@ -156,10 +156,10 @@
     </div>
     <div id="bottomBar" role="footer">
         <div id="actionBar">
-            <md-filled-tonal-icon-button class="bottomBtn" id="bottomBtn" onclick="document.getElementById('homeContainer').style.display = 'block';removeElement(document.getElementById('cntScreen'), document.getElementById('crezultLine'));document.getElementById('actionBar').style.display = 'none';listOfPlayersCopy=[];loadDataFromWeb()"> <md-icon>home</md-icon></md-filled-tonal-icon-button>
+            <md-filled-tonal-icon-button class="bottomBtn" id="bottomBtn" onclick="document.getElementById('homeContainer').style.display = 'block';removeElement(document.getElementById('cntScreen'), document.getElementById('crezultLine'));document.getElementById('actionBar').style.display = 'none';listOfPlayersCopy=[];listOfPlayers=[];loadDataFromWeb()"> <md-icon>home</md-icon></md-filled-tonal-icon-button>
             <md-filled-tonal-icon-button class="bottomBtn undoBtn" disabled id="bottomBtn" onclick="undo()"> <md-icon>undo</md-icon></md-filled-tonal-icon-button>
-            <md-filled-tonal-icon-button class="bottomBtn" id="bottomBtn" onclick="download()"> <md-icon>share</md-icon></md-filled-tonal-icon-button>
-            <md-filled-tonal-icon-button class="bottomBtn" id="bottomBtn" onclick="deleteGame()"> <md-icon>delete</md-icon></md-filled-tonal-icon-button>
+            <md-filled-tonal-icon-button class="bottomBtn shrBtn" id="bottomBtn" onclick="download()"> <md-icon>person_add</md-icon></md-filled-tonal-icon-button>
+            <md-filled-tonal-icon-button class="bottomBtn dltBtn" id="bottomBtn" onclick="deleteGame()"> <md-icon>delete</md-icon></md-filled-tonal-icon-button>
         </div>
     </div>
     <script src="firebase.js" type="module"></script>

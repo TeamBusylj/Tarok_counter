@@ -144,7 +144,7 @@ md-menu {
 
 md-dialog,
 md-menu {
-    --md-menu-container-color: var();
+
     --_container-color: var(--md-sys-color-surface-container-high)
 }
 
@@ -658,6 +658,24 @@ md-outlined-button:active {
     --md-elevation-level: 0;
 }
 
+.shareToolTip {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.shrBtn:hover .shareToolTip {
+    visibility: visible;
+}
+
 .crezultLine {
     transition: all var(--transDur);
     color: var(--colorTxt);
@@ -701,6 +719,7 @@ span.btnIcon {
 
 @media (prefers-color-scheme: dark) {
     body {
+        height: 100vh;
         --transDur: .3s;
         --bgColor: var(--md-sys-color-surface);
         --colorDialog: var(--md-sys-color-secondary-container);
@@ -736,6 +755,7 @@ md-outlined-text-field {
 
 @media (prefers-color-scheme: light) {
     body {
+        height: 100vh;
         --transDur: .3s;
         --bgColor: var(--md-sys-color-surface);
         --colorDialog: var(--md-sys-color-secondary-container);
@@ -836,7 +856,8 @@ md-fab {
 
 #homeContainer {
     animation: showScreen var(--transDur) forwards cubic-bezier(.3, .5, 0, 1.3);
-    height: 100vh;
+    height: 100%;
+
 }
 
 .gsi-material-button .gsi-material-button-icon {

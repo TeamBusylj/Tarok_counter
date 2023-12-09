@@ -566,7 +566,7 @@ function download() {
     iks.setAttribute("value", "close")
     iks.classList.add("iksRight")
     iks.innerHTML = showIks;
-    var newElement = dialogBuilder(iks, "Nastavitve")
+    var newElement = dialogBuilder(iks, "Povabi v skupino")
 
 
     document.body.appendChild(newElement.parentNode)
@@ -823,7 +823,11 @@ function dialogBuilder(xButt, desc) {
     var xHolder = addElement("span", newElement, null);
     xHolder.setAttribute("slot", "headline")
     xHolder.setAttribute("class", "dialog-headline")
-    xHolder.innerHTML = '<span style="flex: .9;">' + desc + '</span>'
+    xHolder.innerHTML = '<span style="flex: .83;">' + desc + '</span>'
+    var help = addElement("md-icon-button", xHolder, "iksRight")
+    help.innerHTML = "<md-icon>help</md-icon>"
+    help.style.right = "50px"
+    help.addEventListener("click", function () { helpMe() })
     if (xButt !== null) {
         xHolder.appendChild(xButt)
     }
@@ -859,7 +863,7 @@ function Game() {
         if (user.includes("/users/")) {
             user = user.slice(user.lastIndexOf("/") + 1)
             if (user !== "!gamesData!" || user !== "!gameName!") {
-                console.log(slct.getElementsByTagName("md-list-item").length);
+                console.log(slct.getElementsByTagName("md-list-item").length > 0);
                 if (slct.getElementsByTagName("md-list-item").length > 0) {
                     slct2.innerHTML += '<md-divider style="--_color: var(--md-sys-color-surface-container-high);height: 5px;"></md-divider><md-list-item type="button" onclick=" clickedUser(\'' + user + '\',\'' + full + '\');" interactive>' + user + "</md-list-item> ";
                 } else {
@@ -870,7 +874,7 @@ function Game() {
         } else {
 
             if (user !== "!gamesData!" || user !== "!gameName!") {
-                if (i > 0) {
+                if (slct.getElementsByTagName("md-list-item").length > 0) {
                     slct.innerHTML += '<md-divider style="--_color: var(--md-sys-color-surface-container-high);height: 5px;"></md-divider><md-list-item type="button" onclick=" clickedUser(\'' + user + '\',\'' + full + '\');" interactive>' + user + "</md-list-item> ";
                 } else {
                     slct.innerHTML += '<md-list-item type="button" onclick=" clickedUser(\'' + user + '\',\'' + full + '\');" interactive>' + user + "</md-list-item>";
@@ -880,7 +884,8 @@ function Game() {
         }
     }
     var pTxt = document.createElement("p")
-    if (slct.getElementsByTagName("md-list-item").length !== 0) { pTxt.innerHTML = "Zasebne igre"; dialog.appendChild(pTxt); dialog.appendChild(slct); }
+    var pTxt2 = document.createElement("p")
+    if (slct.getElementsByTagName("md-list-item").length !== 0) { pTxt2.innerHTML = "Zasebne igre"; dialog.appendChild(pTxt2); dialog.appendChild(slct); }
 
     if (slct2.getElementsByTagName("md-list-item").length !== 0) { pTxt.innerHTML = "Deljene igre"; dialog.appendChild(pTxt); dialog.appendChild(slct2); }
 
@@ -1028,6 +1033,18 @@ function count(animate, undoed) {
 
     if (listOfPlayersCopy.length > 0) {
         document.querySelector(".undoBtn").disabled = false
+    }
+    if (listOfPlayers["!gameName!"].includes("/users/")) {
+        document.querySelector(".shrBtn").disabled = true
+        document.querySelector(".shrBtn").innerHTML += '<span class="shareToolTip">Da povabite nekoga v igro morate biti prijavljeni in imeti internetno povezavo.</span>'
+        document.querySelector(".dltBtn").innerHTML = "<md-icon>close</md-icon>"
+    } else {
+        document.querySelector(".shrBtn").disabled = false
+        document.querySelector(".dltBtn").innerHTML = "<md-icon>delete</md-icon>"
+    }
+    if (localStorage.uid == null || localStorage.uid == undefined || localStorage.uid == "null" || localStorage.uid == "undefined" || !navigator.onLine) {
+        document.querySelector(".shrBtn").innerHTML += '<span class="shareToolTip">Da povabite nekoga v igro morate biti prijavljeni in imeti internetno povezavo.</span>'
+        document.querySelector(".shrBtn").disabled = true
     }
     document.getElementById("actionBar").style.display = "flex"
     document.getElementById("homeContainer").style.display = "none"
@@ -1354,7 +1371,13 @@ function deleteGame() {
     iks.setAttribute("value", "close")
     iks.classList.add("iksRight")
     iks.innerHTML = showIks;
-    var newElement = dialogBuilder(iks, "Ali želite izbrisati to igro?")
+    var newElement
+    if (listOfPlayers["!gameName!"].includes("/users/")) {
+        newElement = dialogBuilder(iks, "Ali želite zapustiti to skupno igro?")
+    } else {
+        newElement = dialogBuilder(iks, "Ali želite izbrisati to igro?")
+    }
+
     iks.addEventListener("click", function (e) {
         document.getElementById("game").style.animation = "none";
         hideDialog(newElement);
@@ -1589,32 +1612,35 @@ window.addEventListener("load", function () {
 
 })
 
-function help() {
+function helpMe() {
     var iks = document.createElement("md-icon-button")
     iks.setAttribute("value", "close")
     iks.classList.add("iksRight")
     iks.innerHTML = showIks;
-    var dialog = dialogBuilder(iks, "Nastavitve")
+    var dialog = dialogBuilder(iks, "Pomoč")
     dialog.parentNode.classList.add("fullscreen")
     iks.addEventListener("click", function (e) {
         hideDialog(dialog);
     });
     document.body.appendChild(dialog.parentNode)
     dialog.innerHTML = `<div id="pomoc"> <md-list>
-    <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako ustvariti igro z novimi igralci?</b> <md-icon slot="end">expand_more</md-icon>
-        <p style="font-size:1rem;margin:0px;transition: all .4s ease-in-out;height:0px;"><br>Za ustvarjanje nove igre na domačem zaslonu in kliknite na gumb 'Nova igra'. Po kliku se bo odprlo okno, kjer lahko vnesete imena igralcev, ki sodelujejo v igri. Za dodajanje več igralcev uporabite gumb 'Dodaj igralca'. Po kliku gumba končano vnesite še ime igre in kliknite končano.</p>
+    <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako ustvariti skupino z novimi igralci?</b> <md-icon slot="end">expand_more</md-icon>
+        <p style="font-size:1rem;margin:0px;transition: all .4s ease-in-out;height:0px;"><br>Za ustvarjanje nove igre na domačem zaslonu kliknite na gumb 'Nova igra'.<br><br>Po kliku se bo odprlo okno, v katerem lahko vnesete imena igralcev, ki sodelujejo v igri. Za dodajanje večih igralcev uporabite gumb 'Dodaj igralca'. Po kliku gumba 'Naprej' vnesite še ime igre in kliknite  'Končano'.</p>
     </md-list-item>
-    <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako dodati novo igro?</b> <md-icon slot="end">expand_more</md-icon>
-        <p style="font-size: 1rem;margin:0px;transition: all .4s ease-in-out;height:0px;"><br>Za dodajanje nove igre na zaslonu za štetje kliknite na igralca, ki jo je igral. Nato sledite navodilom na zaslonu, da uspešno dodate novo igro na seznam.</p>
+    <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako dodati novo igro na seznam?</b> <md-icon slot="end">expand_more</md-icon>
+        <p style="font-size: 1rem;margin:0px;transition: all .4s ease-in-out;height:0px;"><br>Če želite dodati novo igro, na zaslonu za štetje kliknite na igralca, ki jo je igral. Nato sledite navodilom, da boste uspešno dodali novo igro na seznam.</p>
     </md-list-item>
     <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako spremeniti barvno temo?</b> <md-icon slot="end">expand_more</md-icon>
-        <p style="font-size: 1rem;margin:0px;transition: all .4s ease-in-out;height:0px;"><br>Za spreminjanje barvne teme aplikacije kliknite na gumb za nastavitve na domačem zaslonu. Tako lahko kliknete gumb 'Tema aplikacije' in izberete barvo, ki vam je všeč.</p>
+        <p style="font-size: 1rem;margin:0px;transition: all .4s ease-in-out;height:0px;"><br>Za spreminjanje barvne teme aplikacije na domačem zaslonu kliknite na gumb 'Nastavitve', zatem pa gumb 'Tema aplikacije' in izberite barvo, ki vam je všeč.</p>
     </md-list-item>
     <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Zakaj Google prijava?</b> <md-icon slot="end">expand_more</md-icon>
-        <p style="font-size:1rem;margin:0px;transition: all .4s ease-in-out;height:0px;"><br>Prijava s storitvijo Google vam omogoča enostavno shranjevanje podatkov v oblaku. To pomeni, da lahko na katerikoli napravi, kjer se prijavite s svojim računom Google, dostopate do svojih iger in jih urejate.</p>
+        <p style="font-size:1rem;margin:0px;transition: all .4s ease-in-out;height:0px;"><br>Prijava s storitvijo Google vam omogoča enostavno shranjevanje podatkov v oblaku. To pomeni, da lahko na katerikoli napravi, kjer se prijavite s svojim Google računom, dostopate do svojih iger in jih urejate. Google prijava vam omogoča tudi deljenje igre s prijatelji.</p>
     </md-list-item>
     <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kaj pomenijo gumbi v spodnjem delu zaslona za štetje?</b> <md-icon slot="end">expand_more</md-icon>
-        <p style="font-size: 1rem;margin:0px;transition: all .4s ease-in-out;height:0px;"><br>● Prvi gumb vam omogoča, da se vrnete na domači zaslon<br><br>● Drugi gumb vam omogoča, da razveljavite zadnje dejanje na seznamu<br><br>● Tretji gumb vam omogoča deljenje igre s prijatelji v obliki povezave<br><br>● Četrti gumb vam omogoča, da izbrišete celotno igro s temi igralci</p>
+        <p style="font-size: 1rem;margin:0px;transition: all .4s ease-in-out;height:0px;"><br>● <md-icon>home</md-icon> vam omogoča, da se vrnete na domači zaslon.<br><br>● <md-icon>undo</md-icon> vam omogoča, da razveljavite zadnje dejanje na seznamu.<br><br>● <md-icon>person_add</md-icon> vam omogoča, da povabite prijatelje v skupino, kjer bodo imeli tudi oni možnost urejanja.<br><br>● <md-icon>delete</md-icon> vam omogoča, da izbrišete celotno igro. </p>
+    </md-list-item>
+    <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako povabiti prijatelje v skupino?</b> <md-icon slot="end">expand_more</md-icon>
+        <p style="font-size: 1rem;margin:0px;transition: all .4s ease-in-out;height:0px;"><br>Če želite povabiti prijatelje v skupino, kliknite na tretji gumb v spodnjem delu zaslona <md-icon>person_add</md-icon>. Odpre se vam okno, kjer lahko kopirate ali delite povezavo do igre.<br><br>Ko prijatelj dobi povezavo, jo mora le odpreti.<br><br>Za dodajanje prijateljev v skupino morate biti prijavljeni in imeti internetno povezavo.</p>
     </md-list-item>
 </md-list></div>`
     var lst = document.getElementById("pomoc").getElementsByTagName("md-list-item")
