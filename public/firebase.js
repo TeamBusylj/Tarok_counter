@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"
-import { getDatabase, ref, set, child, get, update } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+
+import { getDatabase, ref, set, child, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -22,6 +22,7 @@ const firebaseConfig = {
     databaseURL: "https://tarock-counter-default-rtdb.europe-west1.firebasedatabase.app/",
 };
 
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
@@ -39,8 +40,7 @@ const userSignIn = async () => {
     signInWithPopup(auth, provider)
         .then((result) => {
             const user = result.user
-            console.log(result);
-            console.log(result.user.uid);
+
             uid = result.user.uid
             localStorage.uid = uid
             userk = user
@@ -125,6 +125,7 @@ function writeUserData(userId) {
         return update(ref(db), updates);
     }
 }
+
 export function updateUserData() {
 
     if (localStorage.uid !== null && localStorage.uid !== undefined && localStorage.uid !== "null" && localStorage.uid !== "undefined") {
@@ -134,7 +135,7 @@ export function updateUserData() {
         const updates = {};
         const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
         for (const key in gamesObject) {
-            console.log(encodeURIComponent(key), gamesObject[key]);
+
             if (gamesObject.hasOwnProperty(key) && key.includes("/users/")) {
                 gamesObject[encodeURIComponent(key)] = ""
                 updateSharedGame(encodeURIComponent(key), gamesObject[key])
@@ -142,7 +143,7 @@ export function updateUserData() {
 
             }
         }
-        console.log(gamesObject);
+
         updates['/users/' + localStorage.uid + "/games/"] = gamesObject;
 
 
@@ -155,7 +156,7 @@ window.updateUserData = updateUserData
 function updateSharedGame(key, value) {
     if (value !== "") {
         const db = getDatabase();
-        console.log(key, value);
+
         value["!gameName!"] = value["!gameName!"].slice(value["!gameName!"].lastIndexOf("/") + 1)
         const updates = {};
         updates[decodeURIComponent(key)] = value;
@@ -163,9 +164,32 @@ function updateSharedGame(key, value) {
     }
 }
 
+export async function updateSharedRemote() {
+    var starCountRef = ref(database, listOfPlayers["!gameName!"]);
+    onValue(starCountRef, async (snapshot) => {
+
+        let result = await loadDataPath(listOfPlayers["!gameName!"])
+        let name = listOfPlayers["!gameName!"]
+        const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
+        gamesObject[listOfPlayers["!gameName!"]] = result
+        gamesObject[listOfPlayers["!gameName!"]]["!gameName!"] = name
+        localStorage.setItem("games", JSON.stringify(gamesObject));
+        listOfPlayers = gamesObject[listOfPlayers["!gameName!"]]
+
+
+        setTimeout(() => {
+            if (document.getElementsByClassName("cntScreen").length !== 0) {
+                removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
+                count(false)
+            }
+        }, 500);
+
+
+    });
+}
+
 export function loadDataFromWeb() {
 
-    console.log(userk);
     if (userk) {
         signOutButton.style.display = "flex";
         signInButton.style.display = "none"
@@ -179,11 +203,11 @@ export function loadDataFromWeb() {
     }
     const dbRef = ref(getDatabase());
     get(child(dbRef, `users/${localStorage.uid}`)).then((snapshot) => {
-        console.log(`users/${localStorage.uid}`);
+
         if (snapshot.exists()) {
-            console.log(snapshot.val()["games"]);
+
             let data = snapshot.val()["games"]
-            console.log(data);
+
             for (const [key, value] of Object.entries(data)) {
                 const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
                 gamesObject[decodeURIComponent(key)] = value;
@@ -206,7 +230,7 @@ export function loadDataFromWeb() {
 export async function loadDataPath(path) {
     const dbRef = ref(getDatabase());
     var result
-    console.log(path);
+
     await get(child(dbRef, path)).then((snapshot) => {
 
         if (snapshot.exists()) {
@@ -227,4 +251,4 @@ export async function loadDataPath(path) {
 }
 window.loadDataFromWeb = loadDataFromWeb
 window.loadDataPath = loadDataPath
-
+window.updateSharedRemote = updateSharedRemote

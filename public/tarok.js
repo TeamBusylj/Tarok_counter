@@ -1,5 +1,6 @@
 
 
+
 var games = {
     /* "Ime igre": ["Koliko šteje igra","razlika","dobil true, ni dobil false", "s partnerjem, brez"]*/
     "Tri": [10, true, "", true, "3"],
@@ -251,7 +252,6 @@ async function klop(newElement2, gamename) {
 async function calculate(gameName, properties, newElement, firstPlayer) {
     if (Object.keys(listOfPlayers).length == 5) {
         partner(newElement, gameName, properties, false, firstPlayer);
-        console.log("valat");
     } else {
         var btn = addElement("md-filled-button", null, null);
         var teamWork = properties[3];
@@ -557,7 +557,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 function download() {
     var text = JSON.stringify(listOfPlayers);
     // if (localStorage.uid !== null && localStorage.uid !== undefined && localStorage.uid !== 'null') {
-    var result = "https://tarock-counter.web.app#" + encodeURIComponent('/users/' + localStorage.uid + "/games/" + listOfPlayers["!gameName!"]);
+    var result = "https://tarock-counter.web.app/" + encodeURIComponent('users/' + localStorage.uid + "/games/" + listOfPlayers["!gameName!"]);
 
 
     console.log(result);
@@ -617,45 +617,53 @@ function download() {
     // }
 }
 
-async function upload(encrypted) {
+async function upload() {
 
-    try {
-        var text = decodeURIComponent(location.hash.slice(1));
-        console.log(text);
-        var gameContent = await loadDataPath(text)
-        history.pushState("", document.title, window.location.pathname + window.location.search)
-        console.log(gameContent);
-        var iks = document.createElement("md-icon-button")
-        iks.setAttribute("value", "close")
-        iks.classList.add("iksRight")
-        iks.innerHTML = showIks;
-        var newElement = dialogBuilder(iks, "Ali želite uvoziti igro '" + gameContent["!gameName!"] + "' z igralci " + JSON.stringify(Object.keys(gameContent).filter((key) => key !== "!gamesData!" && key !== "!gameName!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ") + "?")
-        gameContent["!gameName!"] = text
-        console.log(gameContent);
-        document.body.appendChild(newElement.parentNode)
-        iks.addEventListener("click", function (e) {
-            document.getElementById("game").style.animation = "none";
-            hideDialog(newElement);
-        });
+    if (localStorage.uid !== null && localStorage.uid !== undefined && localStorage.uid !== 'null' && navigator.onLine) {
+        try {
+            var text = decodeURIComponent(location.pathname.slice(1));
+            var gameContent = await loadDataPath(text)
+            if (text.includes(localStorage.uid)) {
+                dlgNotif("Ta skupina je vaša.")
+                window.history.pushState({}, document.title, "/" + "");
+            } else {
+                // window.location.href = location.host
+                var iks = document.createElement("md-icon-button")
+                iks.setAttribute("value", "close")
+                iks.classList.add("iksRight")
+                iks.innerHTML = showIks;
+                var newElement = dialogBuilder(iks, "Ali želite uvoziti igro '" + gameContent["!gameName!"] + "' z igralci " + JSON.stringify(Object.keys(gameContent).filter((key) => key !== "!gamesData!" && key !== "!gameName!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ") + "?")
+                gameContent["!gameName!"] = text
+                window.history.pushState({}, document.title, "/" + "");
+                document.body.appendChild(newElement.parentNode)
+                iks.addEventListener("click", function (e) {
+                    document.getElementById("game").style.animation = "none";
+                    hideDialog(newElement);
+                });
 
-        var shareButton = document.createElement("md-filled-button");
-        shareButton.innerHTML = "Da";
-        var copyButton = document.createElement("md-filled-button");
-        copyButton.innerHTML = "Ne";
-        newElement.appendChild(copyButton);
-        newElement.appendChild(shareButton);
-        shareButton.addEventListener("click", function () {
-            const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
-            gamesObject[gameContent["!gameName!"]] = gameContent;
-            localStorage.setItem("games", JSON.stringify(gamesObject));
-            updateUserData()
-            hideDialog(newElement);
-        });
-        copyButton.addEventListener("click", function () {
-            hideDialog(newElement);
-        });
-    } catch (error) {
-        console.log("Not right link");
+                var shareButton = document.createElement("md-filled-button");
+                shareButton.innerHTML = "Da";
+                var copyButton = document.createElement("md-filled-button");
+                copyButton.innerHTML = "Ne";
+                newElement.appendChild(copyButton);
+                newElement.appendChild(shareButton);
+                shareButton.addEventListener("click", function () {
+                    const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
+                    gamesObject["/" + gameContent["!gameName!"]] = gameContent;
+                    localStorage.setItem("games", JSON.stringify(gamesObject));
+                    updateUserData()
+                    hideDialog(newElement);
+                });
+                copyButton.addEventListener("click", function () {
+                    hideDialog(newElement);
+                });
+            }
+        } catch (error) {
+            console.log("Not right link");
+        }
+    } else {
+        dlgNotif("Za dostop do skupinske igre morate biti prijavljeni in imeti internetno povezavo.")
+        window.history.pushState({}, document.title, "/" + "");
     }
 }
 
@@ -857,14 +865,12 @@ function Game() {
 
     for (var i = 0; i < Object.keys(gamesObject).length; i++) {
         let user = Object.keys(gamesObject)[i];
-        console.log(user.includes("/users/"));
         let full = user
 
         if (user.includes("/users/")) {
             user = user.slice(user.lastIndexOf("/") + 1)
             if (user !== "!gamesData!" || user !== "!gameName!") {
-                console.log(slct.getElementsByTagName("md-list-item").length > 0);
-                if (slct.getElementsByTagName("md-list-item").length > 0) {
+                if (slct2.getElementsByTagName("md-list-item").length > 0) {
                     slct2.innerHTML += '<md-divider style="--_color: var(--md-sys-color-surface-container-high);height: 5px;"></md-divider><md-list-item type="button" onclick=" clickedUser(\'' + user + '\',\'' + full + '\');" interactive>' + user + "</md-list-item> ";
                 } else {
                     slct2.innerHTML += '<md-list-item type="button" onclick=" clickedUser(\'' + user + '\',\'' + full + '\');" interactive>' + user + "</md-list-item>";
@@ -903,25 +909,26 @@ function hideDialog(dlg) {
 }
 
 
+
 async function clickedUser(slcta, full) {
-    console.log(slcta, full);
     if (slcta !== full) {
         if (navigator.onLine) {
 
+            try {
+                listOfPlayers = await loadDataPath(full)
+                listOfPlayers["!gameName!"] = full
+            } catch {
+                dlgNotif("Zgodila se je napaka. Skupna igra je mogoče bila izbrisana ali pa trenutno ni dostopna.")
 
-            listOfPlayers = await loadDataPath(full)
-            listOfPlayers["!gameName!"] = full
+                const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
+                delete gamesObject[full]
+                localStorage.setItem("games", JSON.stringify(gamesObject));
+                updateUserData()
+                document.body.appendChild(content.parentNode)
+            }
+
         } else {
-            var iks = addElement("md-icon-button", null, "iksColor");
-            iks.setAttribute("value", "close")
-            iks.innerHTML = showIks;
-            iks.classList.add("iksRight")
-            var content = dialogBuilder(iks, "Napaka")
-            iks.addEventListener("click", function (e) {
-                hideDialog(content);
-            });
-            content.innerHTML = "Brez internetne povezave ne morete dostopati do deljene igre."
-            document.body.appendChild(content.parentNode)
+            dlgNotif("Brez internetne povezave ne morete dostopati do skupne igre.")
         }
 
     } else {
@@ -932,7 +939,24 @@ async function clickedUser(slcta, full) {
     if (listOfPlayers["!gamesData!"] == null) {
         listOfPlayers["!gamesData!"] = [];
     }
-    count(true);
+    if (listOfPlayers["!gameName!"].includes("/users/")) {
+        updateSharedRemote()
+        count(true);
+    } else {
+        count(true);
+    }
+}
+function dlgNotif(msg) {
+    var iks = addElement("md-icon-button", null, "iksColor");
+    iks.setAttribute("value", "close")
+    iks.innerHTML = showIks;
+    iks.classList.add("iksRight")
+    var content = dialogBuilder(iks, "Napaka")
+    iks.addEventListener("click", function (e) {
+        hideDialog(content);
+    });
+    content.innerHTML = msg
+    document.body.appendChild(content.parentNode)
 }
 
 function undo() {
@@ -1036,14 +1060,18 @@ function count(animate, undoed) {
     }
     if (listOfPlayers["!gameName!"].includes("/users/")) {
         document.querySelector(".shrBtn").disabled = true
-        document.querySelector(".shrBtn").innerHTML += '<span class="shareToolTip">Da povabite nekoga v igro morate biti prijavljeni in imeti internetno povezavo.</span>'
+        document.querySelector(".shrBtn").getElementsByTagName("md-icon")[0].addEventListener("click", function () {
+            dlgNotif("Da povabite nekoga v igro morate biti lastnik igre.")
+        })
         document.querySelector(".dltBtn").innerHTML = "<md-icon>close</md-icon>"
     } else {
         document.querySelector(".shrBtn").disabled = false
         document.querySelector(".dltBtn").innerHTML = "<md-icon>delete</md-icon>"
     }
     if (localStorage.uid == null || localStorage.uid == undefined || localStorage.uid == "null" || localStorage.uid == "undefined" || !navigator.onLine) {
-        document.querySelector(".shrBtn").innerHTML += '<span class="shareToolTip">Da povabite nekoga v igro morate biti prijavljeni in imeti internetno povezavo.</span>'
+        document.querySelector(".shrBtn").getElementsByTagName("md-icon")[0].addEventListener("click", function () {
+            dlgNotif("Da povabite nekoga v igro morate biti prijavljeni in imeti internetno povezavo.")
+        })
         document.querySelector(".shrBtn").disabled = true
     }
     document.getElementById("actionBar").style.display = "flex"
@@ -1420,17 +1448,17 @@ async function createRipple(event) {
         hideDialog(document.getElementsByClassName("whlScreen")[0])
     }
     if (event.target.tagName == "BUTTON" || event.target.className.includes("chl")) {
-
+ 
         if (event.target.getAttribute("disabled") == null && !event.target.className.includes("Google")) {
             const button = event.target;
             if (event.target.className.includes("chl")) { button.style.overflow = "hidden" }
             const circle = document.createElement("span");
             const diameter = Math.max(button.offsetWidth, button.offsetHeight);
             const radius = diameter / 2;
-
+ 
             circle.classList.add("ripple");
             const rect = button.getBoundingClientRect();
-
+ 
             circle.style.left = (event.touches[0].clientX - rect.left) + "px";
             circle.style.top = (event.touches[0].clientY - rect.top) + "px";
             circle.style.width = circle.style.height = (diameter / 4) + "px";
@@ -1441,19 +1469,19 @@ async function createRipple(event) {
             await resolveAfter(2);
             circle.style.opacity = ".4";
             circle.style.width = circle.style.height = (diameter * 2) + "px";
-
+ 
             let mouse = false;
             let animation = false;
             document.body.addEventListener("touchend", function () {
                 mouse = true;
-
+ 
                 if (animation) {
                     setTimeout(() => {
-
+ 
                         circle.classList.add("fadeOutIt");
                         setTimeout(() => {
                             if (event.target.className.includes("chl")) { button.style.overflow = "scroll" }
-
+ 
                             circle.remove();
                         }, 200);
                     }, 0);
@@ -1462,19 +1490,19 @@ async function createRipple(event) {
             circle.addEventListener("transitionend", function () {
                 animation = true;
                 if (mouse) {
-
+ 
                     setTimeout(() => {
-
+ 
                         circle.classList.add("fadeOutIt");
                         setTimeout(() => {
                             if (event.target.className.includes("chl")) { button.style.overflow = "scroll" }
-
+ 
                             circle.remove();
                         }, 200);
                     }, 0);
                 }
             });
-
+ 
         }
     }
 }
@@ -1548,7 +1576,6 @@ window.addEventListener("load", function () {
             if (ua.platform == "Android") androidV = ua.platformVersion
         });
 
-    console.log(androidV);
     if (androidV !== null && androidV < 10) queryAnim = true
 
     if (queryAnim) document.body.style.setProperty('--transDur', '0s');
@@ -1646,7 +1673,6 @@ function helpMe() {
     var lst = document.getElementById("pomoc").getElementsByTagName("md-list-item")
     for (const item of lst) {
         item.addEventListener("click", function () {
-            console.log(item.getElementsByTagName('p')[0].style.height == '0px');
             if (item.getElementsByTagName('p')[0].style.height == '0px') {
                 expandSection(item.getElementsByTagName('p')[0])
 
