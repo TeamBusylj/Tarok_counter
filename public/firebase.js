@@ -75,7 +75,9 @@ const userSignOut = async () => {
     signOut(auth)
         .then((result) => {
             console.log("signed out");
+            let clr = localStorage.themeColor
             localStorage.clear()
+            localStorage.themeColor = clr
             location.reload()
         }).catch((error) => {
 
@@ -106,44 +108,10 @@ onAuthStateChanged(auth, (user) => {
 signInButton.addEventListener('click', userSignIn);
 signOutButton.addEventListener('click', userSignOut);
 
-function userSignInPopup() {
-    let anima = document.createElement("div")
-    anima.classList.add("signInAnim")
 
-    const rect = signInButton.getBoundingClientRect();
-    signInButton.style.transform = "scale(4)"
-
-    document.getElementById("signInText").style.opacity = "0"
-    document.getElementById("Capa_1").style.opacity = "0"
-    signInButton.appendChild(anima)
-
-
-
-    setTimeout(() => {
-        document.getElementById("signInText").style.opacity = "1"
-        document.getElementById("Capa_1").style.opacity = "1"
-        userSignIn()
-        setTimeout(() => {
-            anima.remove()
-        }, 50);
-    }, 450);
-
-
-}
-// Initialize Realtime Database and get a reference to the service
 const database = getDatabase(app);
 console.log(database);
-function writeUserData(userId) {
-    if (localStorage.uid !== null) {
-        const db = getDatabase();
 
-        const updates = {};
-        updates['users/' + userId + '/games/'] = {};
-
-
-        return update(ref(db), updates);
-    }
-}
 
 export function updateUserData() {
 
@@ -187,10 +155,12 @@ export async function updateSharedRemote() {
     var starCountRef = ref(database, listOfPlayers["!gameName!"]);
     onValue(starCountRef, async (snapshot) => {
 
-        let result = await loadDataPath(listOfPlayers["!gameName!"])
+        let result = snapshot.val()
+        console.log(result);
         let name = listOfPlayers["!gameName!"]
         const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
         gamesObject[listOfPlayers["!gameName!"]] = result
+
         gamesObject[listOfPlayers["!gameName!"]]["!gameName!"] = name
         localStorage.setItem("games", JSON.stringify(gamesObject));
         listOfPlayers = gamesObject[listOfPlayers["!gameName!"]]
@@ -206,6 +176,40 @@ export async function updateSharedRemote() {
 
     });
 }
+
+export async function watchChanges() {
+    var starCountRef = ref(database, "users/" + localStorage.uid);
+    onValue(starCountRef, async (snapshot) => {
+
+        let result = snapshot.val()["games"]
+        console.log(result);
+        var gamesObject = JSON.parse(localStorage.getItem('games')) || {};
+        gamesObject = result
+        for (const key in gamesObject) {
+
+            if (gamesObject.hasOwnProperty(key) && key.includes("%2Fusers%2F")) {
+                gamesObject[decodeURIComponent(key)] = ""
+
+                delete gamesObject[key]
+
+            }
+        }
+        localStorage.setItem("games", JSON.stringify(gamesObject));
+
+
+
+        setTimeout(() => {
+            if (document.getElementsByClassName("cntScreen").length !== 0) {
+                listOfPlayers = gamesObject[listOfPlayers["!gameName!"]]
+                removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
+                count(false)
+            }
+        }, 500);
+
+
+    });
+}
+window.watchChanges = watchChanges
 
 export function loadDataFromWeb() {
 

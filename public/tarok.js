@@ -917,7 +917,8 @@ function hideDialog(dlg) {
 
 
 
-async function clickedUser(slcta, full) {
+async function clickedUser(slcta, fulla) {
+    let full = decodeURIComponent(fulla)
     if (slcta !== full) {
         if (navigator.onLine) {
 
@@ -1620,7 +1621,12 @@ window.addEventListener("load", function () {
     if (androidV !== null && androidV < 10) queryAnim = true
 
     if (queryAnim) document.body.style.setProperty('--transDur', '0s');
-
+    if (location.pathname !== '/') { upload() }
+    if (localStorage.offlineChanges == undefined) { window.loadDataFromWeb() } else { if (navigator.onLine) { console.log('update'); updateUserData(); localStorage.offlineChanges = undefined } };
+    window.changeTheme(localStorage.themeColor);
+    if (localStorage.uid !== null && localStorage.uid !== undefined && localStorage.uid !== 'null' && localStorage.uid !== 'undefined') {
+        watchChanges()
+    }
 })
 
 function settings() {
