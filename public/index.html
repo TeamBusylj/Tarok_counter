@@ -8,6 +8,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Števec taroka</title>
+    <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="stylesheet" href="tarok.css">
     <link rel="stylesheet" href="./color_theme/theme.css">
     <script type="importmap">
@@ -54,7 +56,10 @@
     import { argbFromHex, themeFromSourceColor, applyTheme } from "@material/material-color-utilities/index.js";
     function changeTheme(colorHex) {
 
+        if (localStorage.themeColor == null) {
+            localStorage.themeColor = "#037ffc"
 
+        }
         const theme = themeFromSourceColor(argbFromHex(colorHex), [
             {
                 name: "custom-1",
@@ -70,6 +75,9 @@
 
         // Apply the theme to the body by updating custom properties for material tokens
         applyTheme(theme, { target: document.body, dark: systemDark });
+        var themeColorMetaTag = document.querySelector("meta[name='theme-color']");
+        themeColorMetaTag.setAttribute("content", getComputedStyle(document.documentElement).getPropertyValue('--md-sys-color-surface'));
+
     }
     window.changeTheme = changeTheme
 
@@ -77,7 +85,7 @@
 </script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
-<body onload="if (location.pathname !== '/') {upload()} if(localStorage.offlineChanges == undefined){window.loadDataFromWeb()} else{if(navigator.onLine){console.log('update');updateUserData();localStorage.offlineChanges = undefined}}; if(localStorage.themeColor !== null) window.changeTheme(localStorage.themeColor);">
+<body onload="if (location.pathname !== '/') {upload()} if(localStorage.offlineChanges == undefined){window.loadDataFromWeb()} else{if(navigator.onLine){console.log('update');updateUserData();localStorage.offlineChanges = undefined}};window.changeTheme(localStorage.themeColor);">
     <div id="homeContainer">
         <p id="signInMessage">Za shranjevanje podatkov se prijavite.<br></p>
         <md-fab id="newgame" onclick="newGame()" label="Nova skupina" variant="primary" aria-label="Nova skupina">
@@ -86,9 +94,6 @@
         <div id="homescreen">
             <md-outlined-button id="game" onclick="Game()">Izberi igro <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
                     <path d="M280-600v-80h560v80H280Zm0 160v-80h560v80H280Zm0 160v-80h560v80H280ZM160-600q-17 0-28.5-11.5T120-640q0-17 11.5-28.5T160-680q17 0 28.5 11.5T200-640q0 17-11.5 28.5T160-600Zm0 160q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440Zm0 160q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360q17 0 28.5 11.5T200-320q0 17-11.5 28.5T160-280Z" />
-                </svg></md-outlined-button>
-            <md-outlined-button id="linkadd" onclick="uploadLink()"> Povezava igre <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                    <path d="M440-280H280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h160v80H280q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h320v80H320Zm200 160v-80h160q50 0 85-35t35-85q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H520Z" />
                 </svg></md-outlined-button>
             <button class="gsi-material-button" id="signOutGoogle">
                 <md-ripple></md-ripple>
@@ -148,6 +153,10 @@
                     <div slot="headline">Pomoč</div>
                     <md-icon slot="start">help</md-icon>
                 </md-menu-item>
+                <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Povratne informacije" onclick="deleteAllData()" style="margin-left: 20px;">
+                    <div slot="headline">Izbriši vse moje podatke</div>
+                    <md-icon slot="start">delete</md-icon>
+                </md-menu-item>
             </md-menu>
         </span>
         <div id="actionBarStart">
@@ -158,7 +167,7 @@
         <div id="actionBar">
             <md-filled-tonal-icon-button class="bottomBtn" id="bottomBtn" onclick="document.getElementById('homeContainer').style.display = 'block';removeElement(document.getElementById('cntScreen'), document.getElementById('crezultLine'));document.getElementById('actionBar').style.display = 'none';listOfPlayersCopy=[];listOfPlayers=[];loadDataFromWeb()"> <md-icon>home</md-icon></md-filled-tonal-icon-button>
             <md-filled-tonal-icon-button class="bottomBtn undoBtn" disabled id="bottomBtn" onclick="undo()"> <md-icon>undo</md-icon></md-filled-tonal-icon-button>
-            <md-filled-tonal-icon-button class="bottomBtn shrBtn" id="bottomBtn" onclick="download()"> <md-icon>person_add</md-icon></md-filled-tonal-icon-button>
+            <div id="clck" style="flex-basis: auto;" class="bottomBtn"> <md-filled-tonal-icon-button style="width: 100%;" class="shrBtn" id="bottomBtn" onclick="download()"> <md-icon>person_add</md-icon></md-filled-tonal-icon-button></div>
             <md-filled-tonal-icon-button class="bottomBtn dltBtn" id="bottomBtn" onclick="deleteGame()"> <md-icon>delete</md-icon></md-filled-tonal-icon-button>
         </div>
     </div>

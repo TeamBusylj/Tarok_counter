@@ -35,6 +35,25 @@ var uid = null
 signOutButton.style.display = "none"
 
 
+export function deleteAllDataF() {
+    if (localStorage.uid !== null && navigator.onLine) {
+        userSignOut()
+        setTimeout(() => {
+            localStorage.clear();
+        }, 500);
+
+
+        const db = getDatabase();
+
+        const updates = {};
+        updates['users/' + localStorage.uid] = {};
+
+
+        return update(ref(db), updates);
+    }
+}
+window.deleteAllDataF = deleteAllDataF
+
 
 const userSignIn = async () => {
     signInWithPopup(auth, provider)

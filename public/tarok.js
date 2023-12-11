@@ -617,6 +617,34 @@ function download() {
     // }
 }
 
+function deleteAllData() {
+    var iks = document.createElement("md-icon-button")
+    iks.setAttribute("value", "close")
+    iks.classList.add("iksRight")
+    iks.innerHTML = showIks;
+    var newElement = dialogBuilder(iks, "Izbris")
+    newElement.innerHTML += "Ali res želite izbrisati vse svoje podatke? Tega dejanja ni mogoče razveljaviti."
+    document.body.appendChild(newElement.parentNode)
+    iks.addEventListener("click", function (e) {
+        document.getElementById("game").style.animation = "none";
+        hideDialog(newElement);
+    });
+
+    var shareButton = document.createElement("md-filled-button");
+    shareButton.innerHTML = "Da";
+    var copyButton = document.createElement("md-filled-button");
+    copyButton.innerHTML = "Ne";
+    newElement.appendChild(copyButton);
+    newElement.appendChild(shareButton);
+    shareButton.addEventListener("click", function () {
+        deleteAllDataF()
+        hideDialog(newElement);
+    });
+    copyButton.addEventListener("click", function () {
+        hideDialog(newElement);
+    });
+}
+
 async function upload() {
 
     if (localStorage.uid !== null && localStorage.uid !== undefined && localStorage.uid !== 'null' && navigator.onLine) {
@@ -662,39 +690,16 @@ async function upload() {
             console.log("Not right link");
         }
     } else {
-        dlgNotif("Za dostop do skupinske igre morate biti prijavljeni in imeti internetno povezavo.")
-        window.history.pushState({}, document.title, "/" + "");
+
+        if (!location.pathname.includes("public")) {
+            dlgNotif("Za dostop do skupinske igre morate biti prijavljeni in imeti internetno povezavo.")
+            window.history.pushState({}, document.title, "/" + "");
+        }
+
     }
 }
 
-function uploadLink() {
-    var iks = document.createElement("md-icon-button")
-    iks.setAttribute("value", "close")
-    iks.classList.add("iksRight")
-    iks.innerHTML = showIks;
-    var newElement = dialogBuilder(iks, "Prilepite povezavo igre, ki jo je nekdo delil z vami.")
 
-
-    document.body.appendChild(newElement.parentNode)
-
-    iks.addEventListener("click", function (e) {
-        hideDialog(newElement);
-    });
-    addElement("div", newElement, "break");
-
-    var linkInput = document.createElement("md-outlined-text-field");
-    linkInput.type = "link";
-    linkInput.label = "Povezava";
-    newElement.appendChild(linkInput);
-    linkInput.focus();
-    var shareButton = document.createElement("md-filled-button");
-    shareButton.innerHTML = "Končano";
-    newElement.appendChild(shareButton);
-    shareButton.addEventListener("click", function () {
-        upload(linkInput.value.replace("https://tarock-counter.web.app#", ""))
-        hideDialog(newElement);
-    });
-}
 
 function hideElement(newElement) {
     newElement.style.animation = "hideScreen .2s forwards";
@@ -814,7 +819,7 @@ function dialogBuilder(xButt, desc) {
         }, {
             "opacity": "0"
         }], {
-            "duration": 500,
+            "duration": 400,
             "easing": "linear",
             "fill": "forwards"
         }]]
@@ -893,7 +898,7 @@ function Game() {
     var pTxt2 = document.createElement("p")
     if (slct.getElementsByTagName("md-list-item").length !== 0) { pTxt2.innerHTML = "Zasebne igre"; dialog.appendChild(pTxt2); dialog.appendChild(slct); }
 
-    if (slct2.getElementsByTagName("md-list-item").length !== 0) { pTxt.innerHTML = "Deljene igre"; dialog.appendChild(pTxt); dialog.appendChild(slct2); }
+    if (slct2.getElementsByTagName("md-list-item").length !== 0) { pTxt.innerHTML = "Skupne igre"; dialog.appendChild(pTxt); dialog.appendChild(slct2); }
 
     document.body.appendChild(dialog.parentNode);
 }
@@ -910,11 +915,14 @@ function hideDialog(dlg) {
 
 
 
+
+
 async function clickedUser(slcta, full) {
     if (slcta !== full) {
         if (navigator.onLine) {
 
             try {
+
                 listOfPlayers = await loadDataPath(full)
                 listOfPlayers["!gameName!"] = full
             } catch {
@@ -1024,7 +1032,7 @@ function newGame() {
         endPl.remove()
         listOfPlayers["!gamesData!"] = [];
 
-        changeOpis(content, "Vpišite ime igre")
+        changeOpis(content, "Vpišite vzdevek skupine")
         var imeIgre = document.createElement("md-filled-text-field");
         var koncajIme = document.createElement("md-filled-tonal-button");
         imeIgre.label = "Ime igre"
@@ -1054,24 +1062,33 @@ function count(animate, undoed) {
     if (listOfPlayers["!gamesData!"] == null) {
         listOfPlayers["!gamesData!"] = [];
     }
-
+    console.log("count");
     if (listOfPlayersCopy.length > 0) {
         document.querySelector(".undoBtn").disabled = false
     }
     if (listOfPlayers["!gameName!"].includes("/users/")) {
         document.querySelector(".shrBtn").disabled = true
-        document.querySelector(".shrBtn").getElementsByTagName("md-icon")[0].addEventListener("click", function () {
-            dlgNotif("Da povabite nekoga v igro morate biti lastnik igre.")
-        })
+        if (document.getElementById("clck").label !== "yes") {
+            document.getElementById("clck").addEventListener("click", function () {
+                dlgNotif("Da povabite nekoga v igro morate biti lastnik igre.")
+            })
+            document.getElementById("clck").label = "yes"
+        }
+
+
         document.querySelector(".dltBtn").innerHTML = "<md-icon>close</md-icon>"
     } else {
         document.querySelector(".shrBtn").disabled = false
         document.querySelector(".dltBtn").innerHTML = "<md-icon>delete</md-icon>"
     }
     if (localStorage.uid == null || localStorage.uid == undefined || localStorage.uid == "null" || localStorage.uid == "undefined" || !navigator.onLine) {
-        document.querySelector(".shrBtn").getElementsByTagName("md-icon")[0].addEventListener("click", function () {
-            dlgNotif("Da povabite nekoga v igro morate biti prijavljeni in imeti internetno povezavo.")
-        })
+
+        if (document.getElementById("clck").label !== "yes") {
+            document.getElementById("clck").addEventListener("click", function () {
+                dlgNotif("Da povabite nekoga v igro morate biti prijavljeni in imeti internetno povezavo.")
+            })
+            document.getElementById("clck").label = "yes"
+        }
         document.querySelector(".shrBtn").disabled = true
     }
     document.getElementById("actionBar").style.display = "flex"
@@ -1157,8 +1174,8 @@ function count(animate, undoed) {
                 }
             }
             document.querySelector(".chlName_" + player).appendChild(kkk);
-            kkk.style.marginTop = "-15px";
-
+            kkk.style.marginTop = "-10px";
+            kkk.style.fontSize = "1rem";
 
 
 
@@ -1186,7 +1203,7 @@ function count(animate, undoed) {
                 continue
             } else {
                 var kkk = document.createElement("md-text-button");
-                kkk.style.marginTop = "-15px";
+                kkk.style.marginTop = "-10px";
                 kkk.innerHTML = "&nbsp;";
                 document.querySelector(".chlName_" + key).appendChild(kkk);
                 kkk.disabled = true
@@ -1276,6 +1293,7 @@ function gameData(infom, number) {
 
             completePodatki[key] = [i, value, games[value.toString()][0]]
         } else {
+
             if (value == "Po Meri") {
                 completePodatki[key] = [i, value], "Različno"
             } else {
@@ -1283,10 +1301,12 @@ function gameData(infom, number) {
             }
         }
     }
+    console.log(completePodatki);
     var vrstniRed = [0, 5, 8, 4, 3]
 
     function createTableData(element, element1, data) {
         let tdVelk = addElement("tr", table, "gameTdDiv");
+
         if (data == "Točke") {
             tdVelk.style.transform = " translateY(10px)";
             element = "" + element.toString().replace("+", "")
@@ -1320,9 +1340,30 @@ function gameData(infom, number) {
                 continue
             }
         }
+
         if (data == "Igra") {
             element1 = data + " " + completePodatki[data][1].toLowerCase();
-            element = completePodatki[data][2];
+            if (element1.includes("po meri") || element1.includes("klop")) {
+                if (element1.includes("po meri")) { createTableData("", "Po meri") } else {
+                    createTableData("", "Klop")
+                }
+                if (typeof completePodatki["Igralec"][1] == "string") completePodatki["Igralec"][1] = completePodatki["Igralec"][1].split(",")
+                console.log(completePodatki["Igralec"]);
+                if (typeof completePodatki["Točke"][1] == "number") completePodatki["Točke"][1] = completePodatki["Točke"][1].toString().split(",")
+                for (let ina = 0; ina < completePodatki["Igralec"][1].length; ina++) {
+                    const element = completePodatki["Igralec"][1][ina];
+                    if (completePodatki["Radlc"][1]) { createTableData(completePodatki["Točke"][1][ina] * 2, element) } else {
+                        createTableData(completePodatki["Točke"][1][ina], element)
+                    }
+
+
+                }
+                continue
+
+            } else {
+                element = completePodatki[data][2];
+            }
+
         }
         if (data == "Bonus Točke") {
             let bonusObject = completePodatki["Bonusi"][1]
@@ -1347,7 +1388,7 @@ function gameData(infom, number) {
         if (data == "Bonus Točke" && Object.keys(completePodatki["Bonusi"][1]).length == 0) {
             createTableData(element, element1, data)
         }
-        if (data !== "Bonus Točke") {
+        if (data !== "Bonus Točke" && !completePodatki["Igra"][1].toLowerCase().includes("po meri") && !completePodatki["Igra"][1].toLowerCase().includes("klop")) {
             createTableData(element, element1, data)
         }
     }
@@ -1594,13 +1635,17 @@ function settings() {
         hideDialog(dialog);
     });
     document.body.appendChild(dialog.parentNode)
-    var tema = addElement("md-text-button", dialog, null)
-    tema.setAttribute("type", "reset")
+    var holder = addElement("md-list", dialog, null)
+    var tema = addElement("md-list-item", holder, null)
+
+
+
+    tema.innerHTML = 'Tema aplikacije:'
+    var colPick = document.createElement("input")
     tema.addEventListener("click", function () {
         colPick.click()
     })
-    tema.innerHTML = 'Tema aplikacije:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-    var colPick = document.createElement("input")
+    colPick.setAttribute("slot", "end")
     colPick.setAttribute("type", "color")
     colPick.value = localStorage.getItem("themeColor")
     colPick.addEventListener("change", function () {
@@ -1608,12 +1653,13 @@ function settings() {
         changeTheme(event.target.value)
     });
     tema.appendChild(colPick)
-    addElement("div", dialog, "break").style.height = "50px"
-    var razlikaOkroz = addElement("md-text-button", dialog, null)
+    addElement("md-divider", holder, null)
+    var razlikaOkroz = addElement("md-list-item", holder, null)
     razlikaOkroz.setAttribute("style", "display: flex;align-items: center;")
     razlikaOkroz.innerHTML = "Zaokroževanje razlike:&nbsp;&nbsp;&nbsp;&nbsp;"
     var switchRaz = addElement("md-switch", razlikaOkroz, null)
-    if (JSON.parse(localStorage.getItem("razlikaOkrozi"))) {
+    switchRaz.setAttribute("slot", "end")
+    if (JSON.parse(localStorage.getItem("razlikaOkrozi")) || localStorage.getItem("razlikaOkrozi") == null) {
         switchRaz.setAttribute("selected", "");
 
     }
@@ -1651,8 +1697,8 @@ function helpMe() {
     });
     document.body.appendChild(dialog.parentNode)
     dialog.innerHTML = `<div id="pomoc"> <md-list>
-    <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako ustvariti skupino z novimi igralci?</b> <md-icon slot="end">expand_more</md-icon>
-        <p style="font-size:1rem;margin:0px;transition: all .4s ease-in-out;height:0px;"><br>Za ustvarjanje nove igre na domačem zaslonu kliknite na gumb 'Nova igra'.<br><br>Po kliku se bo odprlo okno, v katerem lahko vnesete imena igralcev, ki sodelujejo v igri. Za dodajanje večih igralcev uporabite gumb 'Dodaj igralca'. Po kliku gumba 'Naprej' vnesite še ime igre in kliknite  'Končano'.</p>
+    <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako ustvariti novo skupino?</b> <md-icon slot="end">expand_more</md-icon>
+        <p style="font-size:1rem;margin:0px;transition: all .4s ease-in-out;height:0px;"><br>Za ustvarjanje nove skupine na domačem zaslonu kliknite na gumb 'Nova skupina'.<br><br>Po kliku se bo odprlo okno, v katerem lahko vnesete imena igralcev, ki sodelujejo v skupini. Za dodajanje večih igralcev uporabite gumb 'Dodaj igralca'. Po kliku gumba 'Naprej' vnesite še vzdevek skupine in kliknite  'Končano'.</p>
     </md-list-item>
     <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako dodati novo igro na seznam?</b> <md-icon slot="end">expand_more</md-icon>
         <p style="font-size: 1rem;margin:0px;transition: all .4s ease-in-out;height:0px;"><br>Če želite dodati novo igro, na zaslonu za štetje kliknite na igralca, ki jo je igral. Nato sledite navodilom, da boste uspešno dodali novo igro na seznam.</p>

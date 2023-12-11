@@ -728,7 +728,7 @@ span.btnIcon {
         --colorBtn: var(--md-sys-color-primary);
         color: var(--colorTxt);
         margin: 0;
-
+        overflow: hidden;
         background-color: var(--bgColor);
     }
 
@@ -737,6 +737,10 @@ span.btnIcon {
         border: 1px solid #747775;
         color: #e3e3e3;
     }
+}
+
+md-filled-text-field {
+    --md-filled-text-field-container-color: var(--md-sys-color-surface-container);
 }
 
 html {
@@ -766,6 +770,7 @@ md-outlined-text-field {
         --colorBtn: var(--md-sys-color-primary);
         color: var(--colorTxt);
         margin: 0;
+        overflow: hidden;
         background-color: var(--bgColor);
     }
 
