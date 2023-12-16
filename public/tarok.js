@@ -776,7 +776,7 @@ async function upload() {
             var gameContent = await loadDataPath(text)
             if (text.includes(localStorage.uid)) {
                 dlgNotif("Ta skupina je vaša.")
-                window.history.pushState({}, document.title, "/" + "");
+                window.history.replaceState({}, document.title, "/" + "");
             } else {
                 // window.location.href = location.host
                 var iks = document.createElement("md-icon-button")
@@ -785,7 +785,7 @@ async function upload() {
                 iks.innerHTML = showIks;
                 var newElement = dialogBuilder(iks, "Ali želite uvoziti igro '" + gameContent["!gameName!"] + "' z igralci " + JSON.stringify(Object.keys(gameContent).filter((key) => key !== "!gamesData!" && key !== "!gameName!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ") + "?")
                 gameContent["!gameName!"] = text
-                window.history.pushState({}, document.title, "/" + "");
+                window.history.replaceState({}, document.title, "/" + "");
                 document.body.appendChild(newElement.parentNode)
                 iks.addEventListener("click", function (e) {
                     document.getElementById("game").style.animation = "none";
@@ -816,7 +816,7 @@ async function upload() {
 
         if (!location.pathname.includes("public")) {
             dlgNotif("Za dostop do skupinske igre morate biti prijavljeni in imeti internetno povezavo.")
-            window.history.pushState({}, document.title, "/" + "");
+            window.history.replaceState({}, document.title, "/" + "");
         }
 
     }
@@ -1074,9 +1074,11 @@ async function clickedUser(slcta, fulla) {
     if (listOfPlayers["!gameName!"].includes("/users/")) {
         updateSharedRemote()
         count(true);
+
     } else {
         count(true);
     }
+    window.history.pushState({}, document.title, "/games/" + listOfPlayers["!gameName!"]);
 }
 function dlgNotif(msg) {
     var iks = addElement("md-icon-button", null, "iksColor");
@@ -1968,3 +1970,4 @@ self.addEventListener("install", (event) => {
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
     changeTheme(localStorage.themeColor)
 })
+window.addEventListener('popstate', function (event) { console.log("BACK"); if (location.pathname !== "/") document.querySelector(".homeBtn").click() })
