@@ -3,7 +3,7 @@
     "name": "Števec taroka",
     "short_name": "Števec taroka",
     "start_url": "/",
-    "background_color": "#000000",
+    "background_color": "#22282d",
     "theme_color": "#1b1b1b",
     "orientation": "natural",
     "display": "standalone",

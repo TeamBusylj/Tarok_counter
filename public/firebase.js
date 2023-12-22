@@ -260,7 +260,7 @@ export async function loadDataPath(path) {
 
             result = snapshot.val()
 
-            localStorage.uploadedGame = result
+
 
         } else {
             console.log("No data available");

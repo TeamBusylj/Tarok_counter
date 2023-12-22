@@ -1,0 +1,179 @@
+
+function gameData(infom, number) {
+    /* gamename, prvi igralc, drug igralc, tocke, ima radlc, razlika, dobil zgubil, bonusi, bonusi Tocke*/
+    var info = listOfPlayers["!gamesData!"][parseInt(infom)];
+
+    var newElement = dialogBuilder(null, "Tukaj lahko vidite podatke o igri in jih spremenite");
+    document.body.appendChild(newElement.parentNode)
+    if (info[0] !== "Po meri" && info[0] !== "Klop") {
+        var changeValue = document.createElement("md-outlined-text-field");
+        changeValue.type = "number";
+        if (info[4]) {
+            changeValue.value = info[3] * 2
+        } else {
+            changeValue.value = info[3];
+        }
+        changeValue.label = "Točke";
+        newElement.appendChild(changeValue);
+    }
+    var table = addElement("table", null, "gameData");
+    var podatki = ["Igra", "Igralec", "Partner", "Točke", "Radlc", "Razlika", "Uspeh", "Bonusi", "Bonus Točke"];
+    table.style.marginBottom = " 10px"
+    for (let i = 0; i < podatki.length; i++) {
+        var key = podatki[i];
+        let value = info[i];
+        if (i == 0 && value !== "Po Meri") {
+
+            completePodatki[key] = [i, value, games[value.toString()][0]]
+        } else {
+
+            if (value == "Po Meri") {
+                completePodatki[key] = [i, value], "Različno"
+            } else {
+                completePodatki[key] = [i, value]
+            }
+        }
+    }
+    console.log(completePodatki);
+    var vrstniRed = [0, 5, 8, 4, 3]
+
+    function createTableData(element, element1, data) {
+        let tdVelk = addElement("tr", table, "gameTdDiv");
+
+        if (data == "Točke") {
+            tdVelk.style.transform = " translateY(10px)";
+            element = "" + element.toString().replace("+", "")
+        }
+        let td1 = addElement("td", tdVelk, "gameDataTd");
+        td1.innerHTML = element1;
+        let td = addElement("td", tdVelk, "gameDataTdBottom");
+        td.innerHTML = element;
+    }
+    for (let i = 0; i < 5; i++) {
+        let data = 0
+        for (const key in completePodatki) {
+            if (completePodatki[key][0] == vrstniRed[i])
+                data = key
+        }
+        let element1 = data;
+        let element = completePodatki[data][1];
+        if (element == null || element == 0) {
+            continue
+        }
+        if (completePodatki["Radlc"][1] && data == "Točke") {
+            element = element * 2
+        }
+        if (data == "Radlc") {
+            if (completePodatki["Radlc"][1]) {
+                element = completePodatki["Točke"][1];
+            } else {
+                if (!info[6]) {
+                    element = "-" + element
+                }
+                continue
+            }
+        }
+
+        if (data == "Igra") {
+            element1 = data + " " + completePodatki[data][1].toLowerCase();
+            if (element1.includes("po meri") || element1.includes("klop")) {
+                if (element1.includes("po meri")) { createTableData("", "Po meri") } else {
+                    createTableData("", "Klop")
+                }
+                if (typeof completePodatki["Igralec"][1] == "string") completePodatki["Igralec"][1] = completePodatki["Igralec"][1].split(",")
+                console.log(completePodatki["Igralec"]);
+                if (typeof completePodatki["Točke"][1] == "number") completePodatki["Točke"][1] = completePodatki["Točke"][1].toString().split(",")
+                for (let ina = 0; ina < completePodatki["Igralec"][1].length; ina++) {
+                    const element = completePodatki["Igralec"][1][ina];
+                    if (completePodatki["Radlc"][1]) { createTableData(completePodatki["Točke"][1][ina] * 2, element) } else {
+                        createTableData(completePodatki["Točke"][1][ina], element)
+                    }
+
+
+                }
+                continue
+
+            } else {
+                element = completePodatki[data][2];
+            }
+
+        }
+        if (data == "Bonus Točke") {
+            let bonusObject = completePodatki["Bonusi"][1]
+            let tocke = { "Kralji": 20, "Trula": 20, "Pagat ultimo": 50, "Kralj ultimo": 20 }
+            for (const key in completePodatki["Bonusi"][1]) {
+                if (bonusObject[key][1]) {
+                    if (tocke[key] * 2 == bonusObject[key][0]) {
+                        createTableData(bonusObject[key][0], "Napovedano in kontrirano: <wbr>" + key, data)
+                    } else if (tocke[key] * 4 == bonusObject[key][0]) {
+                        createTableData(bonusObject[key][0], "Napovedano in rekontrirano: <wbr>" + key, data)
+
+                    } else {
+                        createTableData(bonusObject[key][0], "Napovedano: <wbr>" + key, data)
+                    }
+
+                    continue;
+                } else {
+                    createTableData(bonusObject[key][0], key, data)
+                    continue;
+                }
+            }
+        } else {
+            if (!info[6]) {
+                if (!element.toString().includes("-")) {
+                    element = "-" + element
+                }
+            } else {
+                element = "+" + element
+            }
+        }
+
+        if (data == "Bonus Točke" && Object.keys(completePodatki["Bonusi"][1]).length == 0) {
+            createTableData(element, element1, data)
+        }
+        if (data !== "Bonus Točke" && !completePodatki["Igra"][1].toLowerCase().includes("po meri") && !completePodatki["Igra"][1].toLowerCase().includes("klop")) {
+            createTableData(element, element1, data)
+        }
+    }
+    newElement.appendChild(table);
+    addElement("div", newElement, "break");
+    var actionsHold = addElement("span", newElement.parentNode, null)
+    actionsHold.setAttribute("slot", "actions")
+    var izbrisiIgro = document.createElement("md-outlined-button");
+    izbrisiIgro.innerHTML = ' <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg> Izbriši';
+    actionsHold.appendChild(izbrisiIgro);
+    izbrisiIgro.style.margin = "0"
+    izbrisiIgro.addEventListener("click", function (e) {
+        listOfPlayersCopy.push(JSON.stringify(listOfPlayers)); if (!navigator.onLine) {
+            localStorage.offlineChanges = true
+        }
+        listOfPlayers["!gamesData!"].splice(infom, 1);
+        const keys = Object.keys(listOfPlayers["!gamesData!"]);
+        keys.sort((a, b) => a - b);
+        const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
+        gamesObject[listOfPlayers["!gameName!"]] = listOfPlayers
+        localStorage.setItem("games", JSON.stringify(gamesObject));
+        removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
+        updateUserData()
+        hideDialog(newElement);
+        count(true);
+    })
+    var iks = document.createElement("md-filled-button");
+    iks.innerHTML = "Končano";
+    iks.style.margin = "0"
+    actionsHold.appendChild(iks);
+    iks.addEventListener("click", function (e) {
+        if (info[0] !== "Po Meri" && info[0] !== "Klop" && listOfPlayers["!gamesData!"][infom][3] !== changeValue.value) {
+            if (info[4]) {
+                listOfPlayers["!gamesData!"][infom][3] = changeValue.value / 2
+            } else {
+                listOfPlayers["!gamesData!"][infom][3] = changeValue.value;
+            }
+            removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
+
+            count(true);
+
+        }
+        hideDialog(newElement);
+    });
+}
