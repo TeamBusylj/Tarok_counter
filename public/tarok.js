@@ -15,6 +15,7 @@ var games = {
     "Berač": [70, false, "", false, "B"],
     "Odprti Berač": [90, false, "", false, "OB"],
     "Klop": ["", false, "", true, "K"],
+    "Renons": [0, false, "", true, "R"],
     "Po meri": [0, false, "", true, "+"],
     "Dodaj radlce": ["", false, "", true, "*"],
 };
@@ -27,6 +28,9 @@ async function addScore(firstPlayer) {
     iks.addEventListener("click", function (e) {
         hideDialog(newElement);
     });
+    newElement.parentNode.addEventListener("cancel", function () {
+        hideDialog(newElement)
+    })
     let i = 0
     for (const key in games) {
         if (i == 3 || i == 7 || i == 11) addElement("md-divider", newElement, null).style.margin = "5px"
@@ -41,11 +45,14 @@ async function addScore(firstPlayer) {
         icon.innerHTML = games[key][4]
         btn.addEventListener("click", function () {
             newElement.innerHTML = "";
-            if (key == "Klop") {
-                klop(newElement, key);
+            if (key == "Renons") {
+                renons(newElement);
             }
-            if (key == "Po meri") {
-                poMeri(newElement, key);
+            else if (key == "Klop") {
+                klop(newElement);
+            }
+            else if (key == "Po meri") {
+                poMeri(newElement);
             } else {
                 if (key == "Dodaj radlce") {
                     radlciDodaj(true);
@@ -130,7 +137,7 @@ function poMeri(newElement2) {
 }
 var zaokrožuj = JSON.parse(localStorage.getItem("razlikaOkrozi")) || true
 if (zaokrožuj == null || zaokrožuj == undefined) zaokrožuj = true
-async function klop(newElement2, gamename) {
+async function klop(newElement2) {
     var iks = document.createElement("md-icon-button")
     hideDialog(newElement2);
     iks.setAttribute("value", "close")
@@ -154,7 +161,7 @@ async function klop(newElement2, gamename) {
     document.body.appendChild(newElement.parentNode);
     poln.addEventListener("click", function () {
         newElement.innerHTML = ""
-        changeOpis(newElement, "Izberite kdo je bil poln.")
+        changeOpis(newElement, "Kdo je bil poln?")
         for (const user in listOfPlayers) {
             if (user == "!gamesData!" || user == "!gameName!") {
                 continue;
@@ -178,7 +185,7 @@ async function klop(newElement2, gamename) {
     })
     prazn.addEventListener("click", function () {
         newElement.innerHTML = ""
-        changeOpis(newElement, "Izberite kdo je bil prazn.")
+        changeOpis(newElement, "Kdo je bil prazen?")
         for (const user in listOfPlayers) {
             if (user == "!gamesData!" || user == "!gameName!") {
                 continue;
@@ -233,7 +240,6 @@ async function klop(newElement2, gamename) {
         var plNombers = document.querySelectorAll(".klopPlayer");
         var tockice = []
         for (const pl of plNombers) {
-            console.log(pl.label.replace("Točke osebe ", ""));
             if (listOfPlayers[pl.label.replace("Točke osebe ", "")][0].length > 0) {
                 tockice.push("-" + pl.value * 2)
             } else {
@@ -256,13 +262,58 @@ async function klop(newElement2, gamename) {
     });
 
 }
+
+async function renons(newElement) {
+    newElement.innerHTML = ""
+
+    let vsi = []
+    let playerWho
+    changeOpis(newElement, "Kdo je naredil renons?")
+    for (const user in listOfPlayers) {
+        if (user == "!gamesData!" || user == "!gameName!") {
+            continue;
+        }
+        let player = addElement("md-outlined-button", newElement, null);
+        player.innerHTML = user
+        vsi.push(player)
+        player.setAttribute("type", "reset")
+        player.addEventListener("click", function () {
+            playerWho = player
+            /* gamename, prvi igralc, drug igralc, tocke, ima radlc, razlika, dobil zgubil, bonusi, bonusi Tocke*/
+            listOfPlayersCopy.push(JSON.stringify(listOfPlayers)); if (!navigator.onLine) {
+                localStorage.offlineChanges = true
+            }
+
+        })
+    }
+    await waitForButtonClick(vsi)
+    newElement.innerHTML = ""
+    changeOpis(newElement, "Koliko znaša renons?")
+    let renonsSlider = addElement("md-slider", newElement, "klopPlayer");
+    renonsSlider.setAttribute("max", "50")
+    renonsSlider.setAttribute("min", "0")
+    renonsSlider.setAttribute("labeled", "")
+    if (zaokrožuj) renonsSlider.setAttribute("step", "5");
+    renonsSlider.setAttribute("ticks", "")
+    addElement("div", newElement, "break")
+    let okButt = addElement("md-filled-button", newElement, null);
+    okButt.innerHTML = "Končano"
+    okButt.addEventListener("click", function () {
+        listOfPlayers["!gamesData!"].push(["Renons", playerWho.innerHTML, null, -Math.abs(parseInt(renonsSlider.value)), false, null, true, [], 0])
+        hideDialog(newElement)
+        removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
+
+        count(true);
+    })
+
+}
 async function calculate(gameName, properties, newElement, firstPlayer) {
     if (Object.keys(listOfPlayers).length == 5) {
         partner(newElement, gameName, properties, false, firstPlayer);
     } else {
         var btn = addElement("md-filled-button", null, null);
         var teamWork = properties[3];
-        // dodajOpis(newElement, "Tukaj izberite ali je oseba <b>" + firstPlayer + "</b> igrala solo ali s partnerjem.",);
+        changeOpis(newElement, "Je oseba <b>" + firstPlayer + "</b> igrala solo ali s partnerjem?",);
         btn.setAttribute("type", "reset")
         var dv = [];
         btn.addEventListener("click", function () {
@@ -381,45 +432,64 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
     var bonusTocke = 0;
     if (!teamWork) {
         slct2 = "partnerigralcakimuniimenic"
-        changeOpis(newElement, "Igrala je oseba " + firstPlayer + ", z razliko " + razlika + ".")
+        if (!properties[1]) {
+            slct2 = "partnerigralcakimuniimenic"
+            changeOpis(newElement, "Igrala je oseba " + firstPlayer + ".")
+
+        } else {
+            changeOpis(newElement, "Igrala je oseba " + firstPlayer + ", z razliko " + razlika + ".")
+        }
+
     } else {
-        changeOpis(newElement, "Igrali sta osebi " + firstPlayer + " in " + slct2 + ", z razliko " + razlika + ".")
+        if (!properties[1]) {
+            slct2 = "partnerigralcakimuniimenic"
+            changeOpis(newElement, "Igrali sta osebi " + firstPlayer + " in " + slct2 + ".")
+        } else {
+            changeOpis(newElement, "Igrali sta osebi " + firstPlayer + " in " + slct2 + ", z razliko " + razlika + ".")
+        }
+
     }
+
     if (properties[1]) {
         for (const key in bonusi) {
             let btn = document.createElement("md-outlined-button");
             btn.innerHTML = key;
             btn.style.transition = " all .2s";
             btn.style.height = "45px";
-            btn.setAttribute("type", "reset")
+
             btn.addEventListener("click", function () {
-                newElement.parentNode.close()
-                var iks = document.createElement("md-icon-button")
-                iks.setAttribute("value", "close")
-                iks.classList.add("iksRight")
-                iks.innerHTML = "<md-icon>arrow_back</md-icon>";
-                var bonusDialog = dialogBuilder(iks, "Izberite")
+                newElement.parentNode.removeAttribute("open")
+
+
+
+
+                var bonusDialog = dialogBuilder(null, "Izberite")
                 document.body.appendChild(bonusDialog.parentNode)
-                iks.addEventListener("click", function (e) {
-                    newElement.parentNode.show()
-                    hideDialog(bonusDialog)
-                });
+
 
                 var napovedanboolean = true;
                 var dobil = true;
                 let ninapoved = addElement("md-outlined-button", bonusDialog, null);
                 ninapoved.setAttribute("type", "reset")
                 let napovedano = addElement("md-filled-tonal-button", bonusDialog, null);
-                let deleteBonus = addElement("md-filled-button", bonusDialog, null);
+                let actions = document.createElement('div')
+                actions.setAttribute("slot", "actions")
+                bonusDialog.parentNode.appendChild(actions)
+                let deleteBonus = addElement("md-filled-button", actions, null);
                 deleteBonus.innerHTML = "Odstrani bonus";
+                deleteBonus.setAttribute("type", "reset")
                 deleteBonus.addEventListener("click", function () {
                     bonusi[key][2] = null
                     bonusi[key][3] = false
                     bonusi[key][4] = false
                     btn.innerHTML = key
+
                     hideDialog(bonusDialog)
 
-                    newElement.parentNode.show()
+                    setTimeout(() => {
+                        newElement.parentNode.setAttribute("open", "")
+                    }, 100);
+
                 })
                 napovedano.innerHTML = "Napovedano";
                 napovedano.setAttribute("type", "reset")
@@ -437,7 +507,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
                         dobil = false;
                         zmagal.click();
                     });
-                    let zmagal = addElement("md-filled-button", bonusDialog, null);
+                    let zmagal = addElement("md-filled-tonal-button", bonusDialog, null);
                     zmagal.innerHTML = "Dobljeno";
                     zmagal.addEventListener("click", function () {
                         if (dobil) {
@@ -450,9 +520,11 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
                         } else {
                             bonusi[key][3] = false;
                         }
+                        newElement.parentNode.show()
+                        document.body.appendChild(newElement.parentNode)
                         hideDialog(bonusDialog)
 
-                        newElement.parentNode.show()
+
 
                     });
                 });
@@ -464,87 +536,171 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
     let kontra = addElement("md-outlined-button", newElement, null)
     kontra.innerHTML = "Kontra"
     let rekontra = addElement("md-outlined-button", newElement, null)
-    rekontra.innerHTML = "Rekontra"
+    rekontra.innerHTML = "Rekontra (kmalu)"
+
     var IgraK = false
     var KraljiK = false
     var TrulaK = false
     var KUltK = false
     var PUltK = false
-    kontra.addEventListener("click", function () {
-        newElement.parentNode.close()
-        console.log(bonusi);
+    var IgraK2 = false
+    var KraljiK2 = false
+    var TrulaK2 = false
+    var KUltK2 = false
+    var PUltK2 = false
+    var RekontraIf = false
+
+    rekontra.addEventListener("click", function () {
+        newElement.removeAttribute("open")
+        RekontraIf = true
         var iks = document.createElement("md-icon-button")
-        iks.setAttribute("value", "close")
+
         iks.classList.add("iksRight")
         iks.innerHTML = "<md-icon>arrow_back</md-icon>";
         var kontraDialog = dialogBuilder(iks, "Izberite")
         document.body.appendChild(kontraDialog.parentNode)
         iks.addEventListener("click", function (e) {
-            newElement.parentNode.show()
+            setTimeout(() => {
+                newElement.parentNode.setAttribute("open", "")
+            }, 100);
+
             hideDialog(kontraDialog)
         });
 
 
-        var chkbxw = addElement("label", newElement, null)
-        chkbxw.setAttribute("style", "align-items: center;display: flex;width: 100%;justify-content: start;")
-        addElement("md-checkbox", chkbxw, null).setAttribute("touch-target", "wrapper")
-        chkbxw.innerHTML += "Igra " + gameName.toLowerCase()
+        var chkbxw2 = addElement("label", newElement, null)
+        chkbxw2.setAttribute("style", "align-items: center;display: flex;width: 100%;justify-content: start;")
+        addElement("input", chkbxw2, null).setAttribute("type", "checkbox")
+        chkbxw2.innerHTML += "Igra " + gameName.toLowerCase()
 
-        kontraDialog.appendChild(chkbxw)
-        chkbxw.addEventListener("click", function () {
-            if (chkbxw.getElementsByTagName("md-checkbox")[0].checked) { IgraK = true } else { IgraK = false }
-
+        kontraDialog.appendChild(chkbxw2)
+        chkbxw2.getElementsByTagName("input")[0].addEventListener("click", function () {
+            if (chkbxw2.getElementsByTagName("input")[0].checked) { IgraK2 = true } else { IgraK2 = false }
         })
 
-        console.log(bonusi["Kralji"][3]);
         if (bonusi["Kralji"][3]) {
-            var chkbx = addElement("label", newElement, null)
-            chkbx.setAttribute("style", "align-items: center;display: flex;width: 100%;justify-content: start;")
-            addElement("md-checkbox", chkbx, null).setAttribute("touch-target", "wrapper")
-            chkbx.innerHTML += "Kralji"
+            let chkbxw = addElement("label", newElement, null)
+            chkbxw.setAttribute("style", "align-items: center;display: flex;width: 100%;justify-content: start;")
+            addElement("input", chkbxw, null).setAttribute("type", "checkbox")
+            chkbxw.innerHTML += "Kralji"
 
-            kontraDialog.appendChild(chkbx)
-            chkbx.addEventListener("click", function () {
-                if (chkbx.getElementsByTagName("md-checkbox")[0].checked) { KraljiK = true } else { KraljiK = false }
-                console.log(chkbx.getElementsByTagName("md-checkbox")[0].checked);
+            kontraDialog.appendChild(chkbxw)
+            chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
+                if (chkbxw.getElementsByTagName("input")[0].checked) { KraljiK2 = true } else { KraljiK2 = false }
+
             })
-            console.log(chkbx.getElementsByTagName("md-checkbox")[0].checked);
         }
         if (bonusi["Trula"][3]) {
-            var chkbx = addElement("label", newElement, null)
-            chkbx.setAttribute("style", "align-items: center;display: flex;width: 100%;justify-content: start;")
-            addElement("md-checkbox", chkbx, null).setAttribute("touch-target", "wrapper")
-            chkbx.innerHTML += "Trula"
+            let chkbxw = addElement("label", newElement, null)
+            chkbxw.setAttribute("style", "align-items: center;display: flex;width: 100%;justify-content: start;")
+            addElement("input", chkbxw, null).setAttribute("type", "checkbox")
+            chkbxw.innerHTML += "Trula"
 
-            kontraDialog.appendChild(chkbx)
-            chkbx.addEventListener("click", function () {
-                if (chkbx.getElementsByTagName("md-checkbox")[0].checked) { TrulaK = true } else { TrulaK = false }
+            kontraDialog.appendChild(chkbxw)
+            chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
+                if (chkbxw.getElementsByTagName("input")[0].checked) { TrulaK2 = true } else { TrulaK2 = false }
 
             })
-            cons
         }
         if (bonusi["Kralj ultimo"][3]) {
-            var chkbx = addElement("label", newElement, null)
-            chkbx.setAttribute("style", "align-items: center;display: flex;width: 100%;justify-content: start;")
-            addElement("md-checkbox", chkbx, null).setAttribute("touch-target", "wrapper")
-            chkbx.innerHTML += "Kralj ultimo"
+            let chkbxw = addElement("label", newElement, null)
+            chkbxw.setAttribute("style", "align-items: center;display: flex;width: 100%;justify-content: start;")
+            addElement("input", chkbxw, null).setAttribute("type", "checkbox")
+            chkbxw.innerHTML += "Kralj ultimo"
 
-            kontraDialog.appendChild(chkbx)
-            chkbx.addEventListener("click", function () {
-                if (chkbx.getElementsByTagName("md-checkbox")[0].checked) { KUltK = true } else { KUltK = false }
+            kontraDialog.appendChild(chkbxw)
+            chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
+                if (chkbxw.getElementsByTagName("input")[0].checked) { KUltK2 = true } else { KUltK2 = false }
 
             })
         }
         if (bonusi["Pagat ultimo"][3]) {
-            var chkbx = addElement("label", newElement, null)
-            chkbx.setAttribute("style", "align-items: center;display: flex;width: 100%;justify-content: start;")
-            addElement("md-checkbox", chkbx, null).setAttribute("touch-target", "wrapper")
-            chkbx.innerHTML += "Pagat ultimo"
+            let chkbxw = addElement("label", newElement, null)
+            chkbxw.setAttribute("style", "align-items: center;display: flex;width: 100%;justify-content: start;")
+            addElement("input", chkbxw, null).setAttribute("type", "checkbox")
+            chkbxw.innerHTML += "Pagat ultimo"
 
-            kontraDialog.appendChild(chkbx)
-            chkbx.addEventListener("click", function () {
-                if (chkbx.getElementsByTagName("md-checkbox")[0].checked) { PUltK = true } else { PUltK = false }
+            kontraDialog.appendChild(chkbxw)
+            chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
+                if (chkbxw.getElementsByTagName("input")[0].checked) { PUltK2 = true } else { PUltK2 = false }
 
+            })
+        }
+
+    })
+    kontra.addEventListener("click", function () {
+        newElement.parentNode.close()
+        var iks = document.createElement("md-icon-button")
+
+        iks.classList.add("iksRight")
+        iks.innerHTML = "<md-icon>arrow_back</md-icon>";
+        var kontraDialog = dialogBuilder(iks, "Izberite")
+        document.body.appendChild(kontraDialog.parentNode)
+        iks.addEventListener("click", function (e) {
+            setTimeout(() => {
+                newElement.parentNode.setAttribute("open", "")
+            }, 100);
+            hideDialog(kontraDialog)
+        });
+
+
+        var chkbxw2 = addElement("label", newElement, null)
+        chkbxw2.setAttribute("style", "align-items: center;display: flex;width: 100%;justify-content: start;")
+        addElement("input", chkbxw2, null).setAttribute("type", "checkbox")
+        chkbxw2.innerHTML += "Igra " + gameName.toLowerCase()
+
+        kontraDialog.appendChild(chkbxw2)
+        chkbxw2.getElementsByTagName("input")[0].addEventListener("click", function () {
+            if (chkbxw2.getElementsByTagName("input")[0].checked) { IgraK = true } else { IgraK = false }
+            if (RekontraIf) RekontraForMore = true
+        })
+
+        if (bonusi["Kralji"][3]) {
+            let chkbxw = addElement("label", newElement, null)
+            chkbxw.setAttribute("style", "align-items: center;display: flex;width: 100%;justify-content: start;")
+            addElement("input", chkbxw, null).setAttribute("type", "checkbox")
+            chkbxw.innerHTML += "Kralji"
+
+            kontraDialog.appendChild(chkbxw)
+            chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
+                if (chkbxw.getElementsByTagName("input")[0].checked) { KraljiK = true } else { KraljiK = false }
+                if (RekontraIf) RekontraForMore = true
+            })
+        }
+        if (bonusi["Trula"][3]) {
+            let chkbxw = addElement("label", newElement, null)
+            chkbxw.setAttribute("style", "align-items: center;display: flex;width: 100%;justify-content: start;")
+            addElement("input", chkbxw, null).setAttribute("type", "checkbox")
+            chkbxw.innerHTML += "Trula"
+
+            kontraDialog.appendChild(chkbxw)
+            chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
+                if (chkbxw.getElementsByTagName("input")[0].checked) { TrulaK = true } else { TrulaK = false }
+                if (RekontraIf) RekontraForMore = true
+            })
+        }
+        if (bonusi["Kralj ultimo"][3]) {
+            let chkbxw = addElement("label", newElement, null)
+            chkbxw.setAttribute("style", "align-items: center;display: flex;width: 100%;justify-content: start;")
+            addElement("input", chkbxw, null).setAttribute("type", "checkbox")
+            chkbxw.innerHTML += "Kralj ultimo"
+
+            kontraDialog.appendChild(chkbxw)
+            chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
+                if (chkbxw.getElementsByTagName("input")[0].checked) { KUltK = true } else { KUltK = false }
+                if (RekontraIf) RekontraForMore = true
+            })
+        }
+        if (bonusi["Pagat ultimo"][3]) {
+            let mchkbxw = addElement("label", newElement, null)
+            chkbxw.setAttribute("style", "align-items: center;display: flex;width: 100%;justify-content: start;")
+            addElement("input", chkbxw, null).setAttribute("type", "checkbox")
+            chkbxw.innerHTML += "Pagat ultimo"
+
+            kontraDialog.appendChild(chkbxw)
+            chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
+                if (chkbxw.getElementsByTagName("input")[0].checked) { PUltK = true } else { PUltK = false }
+                if (RekontraIf) RekontraForMore = true
             })
         }
 
@@ -561,6 +717,10 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
         if (TrulaK) bonusi["Trula"][1] *= 2
         if (KUltK) bonusi["Kralj ultimo"][1] *= 2
         if (PUltK) bonusi["Pagat ultimo"][1] *= 2
+        if (KraljiK2) bonusi["Kralji"][1] *= 4
+        if (TrulaK2) bonusi["Trula"][1] *= 4
+        if (KUltK2) bonusi["Kralj ultimo"][1] *= 4
+        if (PUltK2) bonusi["Pagat ultimo"][1] *= 4
         for (const key in bonusi) {
             if (bonusi[key][2] !== null) {
                 if (bonusi[key][2]) {
@@ -585,29 +745,30 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
         listOfPlayersCopy.push(JSON.stringify(listOfPlayers)); if (!navigator.onLine) {
             localStorage.offlineChanges = true
         }
-        console.log(bnsi);
         if (slct2 !== "" || teamWork) {
             this.remove();
             if (properties[1]) {
                 if (teamWork) {
-                    listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, parseInt(properties[0]) + parseInt(razlika) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), true, bnsi, bonusTocke])
+                    listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, parseInt(properties[0]) + parseInt(razlika) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), true, bnsi, bonusTocke, false, false])
                 } else {
-                    listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, parseInt(properties[0]) + parseInt(razlika) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), true, bnsi, bonusTocke])
+                    listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, parseInt(properties[0]) + parseInt(razlika) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), true, bnsi, bonusTocke, false, false])
                 }
             } else {
                 if (teamWork) {
-                    listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, parseInt(properties[0] + bonusTocke), listOfPlayers[firstPlayer][0].length > 0, null, true, bnsi, bonusTocke])
+                    listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, parseInt(properties[0] + bonusTocke), listOfPlayers[firstPlayer][0].length > 0, null, true, bnsi, bonusTocke, false, false])
                 } else {
-                    listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, parseInt(properties[0] + bonusTocke), listOfPlayers[firstPlayer][0].length > 0, null, true, bnsi, bonusTocke])
+                    listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, parseInt(properties[0] + bonusTocke), listOfPlayers[firstPlayer][0].length > 0, null, true, bnsi, bonusTocke, false, false])
                 }
             }
         }
-        if (IgraK) listOfPlayers["!gamesData!"].at(-1)[3] *= 2
 
         if (listOfPlayers["!gamesData!"].slice(-1)[0][3] > 0 && listOfPlayers[firstPlayer][0].length > 0) {
             listOfPlayers[firstPlayer][0] = listOfPlayers[firstPlayer][0].replace("*", "");
 
         }
+        if (IgraK) listOfPlayers["!gamesData!"].at(-1)[9] = true
+        if (IgraK2) listOfPlayers["!gamesData!"].at(-1)[10] = true
+
         removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
         hideDialog(newElement);
         if (gameName.includes('Valat') || gameName.includes('Berač')) {
@@ -624,6 +785,11 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
         if (TrulaK) bonusi["Trula"][1] *= 2
         if (KUltK) bonusi["Kralj ultimo"][1] *= 2
         if (PUltK) bonusi["Pagat ultimo"][1] *= 2
+        if (KraljiK2) bonusi["Kralji"][1] *= 4
+        if (TrulaK2) bonusi["Trula"][1] *= 4
+        if (KUltK2) bonusi["Kralj ultimo"][1] *= 4
+        if (PUltK2) bonusi["Pagat ultimo"][1] *= 4
+
         for (const key in bonusi) {
             if (bonusi[key][2] !== null) {
                 if (bonusi[key][2]) {
@@ -650,15 +816,15 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
         }
         if (properties[1]) {
             if (teamWork) {
-                listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, -Math.abs(parseInt(properties[0]) + parseInt(razlika)) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), false, bnsi, bonusTocke])
+                listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, -Math.abs(parseInt(properties[0]) + parseInt(razlika)) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), false, bnsi, bonusTocke, false, false])
             } else {
-                listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, -Math.abs(parseInt(properties[0]) + parseInt(razlika)) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), false, bnsi, bonusTocke])
+                listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, -Math.abs(parseInt(properties[0]) + parseInt(razlika)) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), false, bnsi, bonusTocke, false, false])
             }
         } else {
             if (teamWork) {
-                listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, -Math.abs(parseInt(properties[0])) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, null, false, bnsi, bonusTocke])
+                listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, -Math.abs(parseInt(properties[0])) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, null, false, bnsi, bonusTocke, false, false])
             } else {
-                listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, -Math.abs(parseInt(properties[0])) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, null, false, bnsi, bonusTocke])
+                listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, -Math.abs(parseInt(properties[0])) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, null, false, bnsi, bonusTocke, false, false])
             }
         }
 
@@ -666,7 +832,9 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
             listOfPlayers[firstPlayer][0] = listOfPlayers[firstPlayer][0].replace("*", "");
 
         }
-        if (IgraK) listOfPlayers["!gamesData!"].at(-1)[3] *= 2
+        if (IgraK) listOfPlayers["!gamesData!"].at(-1)[9] = true
+        if (IgraK2) listOfPlayers["!gamesData!"].at(-1)[10] = true
+
         removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
         hideDialog(newElement);
         if (gameName.includes('Valat') || gameName.includes('Berač')) {
@@ -680,65 +848,33 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 
 function download() {
     var text = JSON.stringify(listOfPlayers);
-    // if (localStorage.uid !== null && localStorage.uid !== undefined && localStorage.uid !== 'null') {
-    var result = "https://tarock-counter.web.app/" + encodeURIComponent('users/' + localStorage.uid + "/games/" + listOfPlayers["!gameName!"]);
+    // if (sessionStorage.uid !== null && sessionStorage.uid !== undefined && sessionStorage.uid !== 'null') {
+    var result = "https://tarock-counter.web.app/" + encodeURIComponent('users/' + sessionStorage.uid + "/games/" + listOfPlayers["!gameName!"]);
 
 
     console.log(result);
 
-    var iks = document.createElement("md-icon-button")
-    iks.setAttribute("value", "close")
-    iks.classList.add("iksRight")
-    iks.innerHTML = showIks;
-    var newElement = dialogBuilder(iks, "Povabi v skupino")
 
 
-    document.body.appendChild(newElement.parentNode)
-    iks.addEventListener("click", function (e) {
-
-        hideDialog(newElement);
-    });
-
-
-    var shareButton = document.createElement("md-filled-button");
-    shareButton.innerHTML = "Deli";
-    var copyButton = document.createElement("md-filled-button");
-    copyButton.innerHTML = "Kopiraj";
-    newElement.appendChild(copyButton);
-    newElement.appendChild(shareButton);
-    shareButton.addEventListener("click", function () {
-        try {
-            if (navigator.userAgent.includes("wv")) {
-                Android.share(result);
-            } else {
-                if (navigator.share) {
-                    navigator.share({
-                        title: 'Tarok igra',
-                        text: 'Deli to igro s prijatelji.',
-                        url: result,
-                    })
-                        .then(() => console.log('Error sharing', error))
-                        .catch((error) => console.log('Error sharing', error))
-                }
+    try {
+        if (navigator.userAgent.includes("wv")) {
+            Android.share(result);
+        } else {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Tarok igra',
+                    text: 'Vabim te, da se mi pridružiš v moji tarok skupini.',
+                    url: result,
+                })
+                    .then(() => console.log('Success sharing'))
+                    .catch((error) => console.log('Error sharing', error))
             }
-        } catch (error) {
-
         }
-    });
-    copyButton.addEventListener("click", function () {
-        try {
-            var copyText = document.createElement("input");
-            copyText.value = result;
-            document.body.appendChild(copyText);
-            copyText.style.display = "none"
-            copyText.select();
-            copyText.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(copyText.value);
-        } catch (error) {
+    } catch (error) {
 
-        }
-    });
-    // }
+    }
+
+
 }
 
 function deleteAllData() {
@@ -771,11 +907,11 @@ function deleteAllData() {
 
 async function upload() {
 
-    if (localStorage.uid !== null && localStorage.uid !== undefined && localStorage.uid !== 'null' && navigator.onLine) {
+    if (sessionStorage.uid !== null && sessionStorage.uid !== undefined && sessionStorage.uid !== 'null' && navigator.onLine) {
         try {
             var text = decodeURIComponent(location.pathname.slice(1));
             var gameContent = await loadDataPath(text)
-            if (text.includes(localStorage.uid)) {
+            if (text.includes(sessionStorage.uid)) {
                 dlgNotif("Ta skupina je vaša.")
                 window.history.replaceState({}, document.title, "/" + "");
             } else {
@@ -909,20 +1045,44 @@ function dialogBuilder(xButt, desc) {
             "fill": "forwards"
         }]]
     } else {
-        newElement.getOpenAnimation().dialog = [[[{
-            "transform": "scale(0)"
+        newElement.getOpenAnimation().container = [[[{
+            "opacity": "0"
         }, {
-            "transform": "scale(1)"
+
+            "opacity": "1"
+        }], {
+            "duration": 100,
+            "easing": "cubic-bezier(.3,.5,0,1)",
+            "fill": "forwards"
+        }]]
+        newElement.getCloseAnimation().container = [[[{
+            "opacity": "1"
+        }, {
+
+            "opacity": "0"
+        }], {
+            "duration": 1000,
+            "easing": "cubic-bezier(.3,.5,0,1)",
+            "fill": "forwards"
+        }]]
+        newElement.getOpenAnimation().dialog = [[[{
+            "transform": "scale(.5)",
+            "opacity": "0"
+        }, {
+            "transform": "scale(1)",
+            "opacity": "1"
         }], {
             "duration": 500,
             "easing": "cubic-bezier(.3,.5,0,1.3)"
         }]]
         newElement.getOpenAnimation().content = [[[{
-            "transform": "scale(0)",
-            "overflow": "hidden"
+            "transform": "scale(.5)",
+            "overflow": "hidden",
+            "opacity": "0"
         }, {
             "overflow": "scroll",
-            "transform": "scale(1)"
+            "transform": "scale(1)",
+            "opacity": "1"
         }], {
             "duration": 500,
             "easing": "cubic-bezier(.3,.5,0,1)",
@@ -932,7 +1092,7 @@ function dialogBuilder(xButt, desc) {
             "transform": "scale(1)",
             "opacity": "1"
         }, {
-            "transform": "scale(0)",
+            "transform": "scale(.5)",
             "opacity": "0"
         }], {
             "duration": 500,
@@ -941,7 +1101,7 @@ function dialogBuilder(xButt, desc) {
         newElement.getCloseAnimation().content = [[[{
             "transform": "scale(1)"
         }, {
-            "transform": "scale(0)"
+            "transform": "scale(.5)"
         }], {
             "duration": 500,
             "easing": "linear",
@@ -952,7 +1112,7 @@ function dialogBuilder(xButt, desc) {
         }, {
             "opacity": "0"
         }], {
-            "duration": 400,
+            "duration": 300,
             "easing": "linear",
             "fill": "forwards"
         }]]
@@ -970,12 +1130,13 @@ function dialogBuilder(xButt, desc) {
     xHolder.setAttribute("slot", "headline")
     xHolder.setAttribute("class", "dialog-headline")
     xHolder.innerHTML = '<span style="flex: .83;">' + desc + '</span>'
-    var help = addElement("md-icon-button", xHolder, "iksRight")
-    help.innerHTML = "<md-icon>help</md-icon>"
-    help.style.right = "50px"
-    help.addEventListener("click", function () { helpMe() })
+
     if (xButt !== null) {
         xHolder.appendChild(xButt)
+        var help = addElement("md-icon-button", xHolder, "iksRight")
+        help.innerHTML = "<md-icon>help</md-icon>"
+        help.style.right = "50px"
+        help.addEventListener("click", function () { helpMe() })
     }
     var content = addElement("form", newElement, null);
     content.setAttribute("slot", "content")
@@ -986,7 +1147,6 @@ function dialogBuilder(xButt, desc) {
 
 function Game(already) {
     if (already !== undefined && already !== null) {
-        console.log(already);
         clickedUser(already.toString(), already.toString())
     } else {
 
@@ -1000,7 +1160,10 @@ function Game(already) {
             document.getElementById("game").style.animation = "none";
             hideDialog(dialog);
         });
-        dialog.id = "dlgSlct"
+        dialog.setAttribute("id", "dlgSlct")
+        dialog.parentNode.addEventListener("cancel", function () {
+            hideDialog(dialog)
+        })
         var slct = document.createElement("md-list");
         var slct2 = document.createElement("md-list");
         dialog.style.borderRadius = "15px"
@@ -1049,7 +1212,7 @@ function hideDialog(dlg) {
     if (queryAnim) { dlg.parentNode.remove() } else {
         setTimeout(() => {
             dlg.parentNode.remove()
-        }, 350);
+        }, 300);
     }
 }
 
@@ -1058,6 +1221,7 @@ function hideDialog(dlg) {
 
 
 async function clickedUser(slcta, fulla) {
+    try { hideDialog(document.getElementById("dlgSlct")) } catch { }
     let full = decodeURIComponent(fulla)
     if (slcta !== full) {
         if (navigator.onLine) {
@@ -1084,34 +1248,43 @@ async function clickedUser(slcta, fulla) {
         const gamesObject2 = JSON.parse(localStorage.getItem('games')) || {};
         listOfPlayers = gamesObject2[slcta];
     }
-    try {
-        hideDialog(document.getElementById("dlgSlct"))
-    } catch { }
 
-    if (listOfPlayers["!gamesData!"] == null) {
-        listOfPlayers["!gamesData!"] = [];
-    }
-    if (listOfPlayers["!gameName!"].includes("/users/")) {
-        updateSharedRemote()
-        count(true);
 
-    } else {
-        count(true);
+
+
+    if (listOfPlayers !== undefined) {
+        if (listOfPlayers["!gamesData!"] == null) {
+            listOfPlayers["!gamesData!"] = [];
+        }
+        if (listOfPlayers["!gameName!"].includes("/users/")) {
+            updateSharedRemote()
+            count(true);
+
+        } else {
+            count(true);
+        }
     }
+
     if (location.pathname !== "/public/") {
         window.history.pushState({}, document.title, "/" + encodeURIComponent(listOfPlayers["!gameName!"]));
 
     }
 }
 function dlgNotif(msg) {
-    var iks = addElement("md-icon-button", null, "iksColor");
-    iks.setAttribute("value", "close")
-    iks.innerHTML = showIks;
-    iks.classList.add("iksRight")
-    var content = dialogBuilder(iks, "Napaka")
+
+    var iks = addElement("md-text-button", null, null);
+
+    iks.innerHTML = "Ok";
+
+
+    var content = dialogBuilder(null, "Napaka")
     iks.addEventListener("click", function (e) {
         hideDialog(content);
     });
+    let actions = document.createElement('div')
+    actions.setAttribute("slot", "actions")
+    content.parentNode.appendChild(actions)
+    actions.appendChild(iks)
     content.innerHTML = msg
     document.body.appendChild(content.parentNode)
 }
@@ -1141,6 +1314,10 @@ function newGame() {
     iks.addEventListener("click", function (e) {
         hideDialog(content);
     });
+    content.parentNode.addEventListener("cancel", function () {
+        hideDialog(content)
+    })
+    listOfPlayers = {};
     var endHolder = addElement("div", content.parentNode, null)
     endHolder.setAttribute("slot", "actions")
     var onePl = document.createElement("md-outlined-text-field");
@@ -1211,7 +1388,14 @@ function count(animate, undoed) {
     if (listOfPlayers["!gamesData!"] == null) {
         listOfPlayers["!gamesData!"] = [];
     }
-    console.log("count");
+    setTimeout(() => {
+        let dlgs = document.getElementsByTagName("md-dialog")
+        console.log(dlgs);
+        for (let ia = 0; ia < dlgs.length; ia++) {
+            dlgs[ia].remove()
+        }
+    }, 300);
+
     if (listOfPlayersCopy.length > 0) {
         document.querySelector(".undoBtn").disabled = false
     }
@@ -1230,7 +1414,7 @@ function count(animate, undoed) {
         document.querySelector(".shrBtn").disabled = false
         document.querySelector(".dltBtn").innerHTML = "<md-icon>delete</md-icon>"
     }
-    if (localStorage.uid == null || localStorage.uid == undefined || localStorage.uid == "null" || localStorage.uid == "undefined" || !navigator.onLine) {
+    if (sessionStorage.uid == null || sessionStorage.uid == undefined || sessionStorage.uid == "null" || sessionStorage.uid == "undefined" || !navigator.onLine) {
 
         if (document.getElementById("clck").label !== "yes") {
             document.getElementById("clck").addEventListener("click", function () {
@@ -1267,17 +1451,17 @@ function count(animate, undoed) {
         chl.innerHTML = String(chl.innerHTML).replace("undefined", "");
         chl.innerHTML += '<p style = "" class="noText" ></p>';
         chl.innerHTML += ' <p style = "" class="noText" ></p>';
-        chl.setAttribute("class", "chl chlName_" + name);
+        chl.setAttribute("class", "chl chlName_" + name.replace(/ /g, "_"));
         prnt.innerHTML += '<md-ripple style="z-index:303030; position:absolute;"></md-ripple>'
         chl.style.display = "inline-block;";
         var pointView = addElement("p", rezultLine, null)
-        pointView.setAttribute("class", "rezult_" + name);
+        pointView.setAttribute("class", "rezult_" + name.replace(/ /g, "_"));
         pointView.setAttribute("style", "flex: 1; color: var(--colorTxtDialog); background-color:var(--colorDialog); padding-top: 15px; padding-bottom: 15px; border-top-left-radius: 30px; border-top-right-radius: 30px; margin-left:10px;margin-right:10px;")
         pointView.innerHTML = ""
         pointView.addEventListener("click", function () {
             addScore(name)
         })
-        prnt.setAttribute("class", "prnt prntName_" + name);
+        prnt.setAttribute("class", "prnt prntName_" + name.replace(/ /g, "_"));
         prnt.addEventListener("click", function () {
             if (!event.target.className.includes("word")) {
                 addScore(name)
@@ -1321,8 +1505,18 @@ function count(animate, undoed) {
                 } else {
                     kkk.innerHTML = parseInt(playerPoints)
                 }
+                if (listOfPlayers["!gamesData!"][game][9]) {
+
+                    playerPoints = parseInt(kkk.innerHTML) * 2;
+                    kkk.innerHTML = parseInt(playerPoints);
+                }
+                if (listOfPlayers["!gamesData!"][game][10]) {
+
+                    playerPoints = parseInt(kkk.innerHTML) * 4;
+                    kkk.innerHTML = parseInt(playerPoints);
+                }
             }
-            document.querySelector(".chlName_" + player).appendChild(kkk);
+            document.querySelector(".chlName_" + player.replace(/ /g, "_")).appendChild(kkk);
             kkk.style.marginTop = "2px";
             kkk.style.marginBottom = "2px";
             kkk.style.fontSize = "1rem";
@@ -1346,7 +1540,7 @@ function count(animate, undoed) {
                 kkk.innerHTML = "&nbsp;"
             }
             // document.querySelector(".chlName_" + player).innerHTML += '<md-divider style="--_color: var(--md-sys-color-surface);height: 5px;"></md-divider>'
-            addElement("div", document.querySelector(".chlName_" + player), "break");
+            addElement("div", document.querySelector(".chlName_" + player.replace(/ /g, "_")), "break");
         }
         for (const key in listOfPlayers) {
             if (nameOne.includes(key) || key == "!gamesData!" || key == "!gameName!") {
@@ -1358,10 +1552,10 @@ function count(animate, undoed) {
                 kkk.style.fontSize = "1rem";
 
                 kkk.innerHTML = "&nbsp;";
-                document.querySelector(".chlName_" + key).appendChild(kkk);
+                document.querySelector(".chlName_" + key.replace(/ /g, "_")).appendChild(kkk);
                 kkk.disabled = true
                 kkk.classList.add("noText");
-                addElement("div", document.querySelector(".chlName_" + key), "break")
+                addElement("div", document.querySelector(".chlName_" + key.replace(/ /g, "_")), "break")
 
             }
         }
@@ -1401,8 +1595,14 @@ function count(animate, undoed) {
         if (key == "!gamesData!" || key == "!gameName!") {
             continue
         }
-        document.querySelector(".rezult_" + key).innerHTML = pointsList[key]
+        document.querySelector(".rezult_" + key.replace(/ /g, "_")).innerHTML = pointsList[key]
     }
+    setTimeout(() => {
+        var objDiv = document.getElementsByClassName("chl")[0];
+        // objDiv.scrollTop = objDiv.scrollHeight;
+        objDiv.scrollTo({ top: objDiv.scrollHeight, behavior: 'smooth' });
+    }, 200);
+
 }
 
 
@@ -1437,8 +1637,8 @@ function gameData(infom, number) {
         newElement.appendChild(changeValue);
     }
     var table = addElement("table", null, "gameData");
-    var podatki = ["Igra", "Igralec", "Partner", "Točke", "Radlc", "Razlika", "Uspeh", "Bonusi", "Bonus Točke"];
-    table.style.marginBottom = " 10px"
+    var podatki = ["Igra", "Igralec", "Partner", "Točke", "Radlc", "Razlika", "Uspeh", "Bonusi", "Bonus Točke", "Kontra", "Rekontra"];
+    table.style.marginBottom = "10px"
     for (let i = 0; i < podatki.length; i++) {
         var key = podatki[i];
         let value = info[i];
@@ -1455,8 +1655,6 @@ function gameData(infom, number) {
         }
     }
     console.log(completePodatki);
-    var vrstniRed = [0, 5, 8, 4, 3]
-
     function createTableData(element, element1, data) {
         let tdVelk = addElement("tr", table, "gameTdDiv");
 
@@ -1482,12 +1680,14 @@ function gameData(infom, number) {
     element = completePodatki[data][1];
 
     element1 = data + " " + completePodatki[data][1].toLowerCase();
-    if (element1.toLowerCase().includes("po meri") || element1.toLowerCase().includes("klop")) {
-        if (element1.includes("po meri")) { createTableData("", "Po meri") } else {
+    if (element1.toLowerCase().includes("po meri") || element1.toLowerCase().includes("klop") || element1.toLowerCase().includes("renons")) {
+        element = 0
+        if (element1.includes("po meri")) { createTableData("", "Po meri") } else if (element1.includes("klop")) {
             createTableData("", "Klop")
+        } else {
+            createTableData("", "Renons")
         }
         if (typeof completePodatki["Igralec"][1] == "string") completePodatki["Igralec"][1] = completePodatki["Igralec"][1].split(",")
-        console.log(completePodatki["Igralec"]);
         if (typeof completePodatki["Točke"][1] == "number") completePodatki["Točke"][1] = completePodatki["Točke"][1].toString().split(",")
         for (let ina = 0; ina < completePodatki["Igralec"][1].length; ina++) {
             const element = completePodatki["Igralec"][1][ina];
@@ -1501,14 +1701,21 @@ function gameData(infom, number) {
 
     } else {
         element = completePodatki[data][2];
+        if (!info[6]) {
+            element = "-" + element
+        }
+        createTableData(element, element1, data)
     }
 
-    createTableData(element, element1, data)
+
     //Razlika
-    if (!completePodatki["Igra"][1].toLowerCase().includes("po meri") && !completePodatki["Igra"][1].toLowerCase().includes("klop") && completePodatki["Razlika"][1] !== undefined && completePodatki["Razlika"][1] !== false) {
+    if (!completePodatki["Igra"][1].toLowerCase().includes("po meri") && !completePodatki["Igra"][1].toLowerCase().includes("klop") && completePodatki["Razlika"][1] !== undefined && completePodatki["Razlika"][1] !== false && completePodatki["Razlika"][1] !== null) {
         data = "Razlika"
         element1 = data
         element = completePodatki[data][1];
+        if (!info[6]) {
+            element = "-" + element
+        }
         createTableData(element, element1, data)
     }
     //Bonusi
@@ -1541,8 +1748,6 @@ function gameData(infom, number) {
                 if (!element.toString().includes("-")) {
                     element = "-" + element
                 }
-            } else {
-                element = "+" + element
             }
             createTableData(element, element1, data)
         }
@@ -1556,22 +1761,66 @@ function gameData(infom, number) {
 
         if (completePodatki["Radlc"][1]) {
             element = completePodatki["Točke"][1];
-        } else {
-            if (!info[6]) {
-                element = "-" + element
-            }
-
         }
+
         if (element !== false) createTableData(element, element1, data)
     }
+
+    //Kontra
+    try {
+        if (!completePodatki["Igra"][1].toLowerCase().includes("po meri") && !completePodatki["Igra"][1].toLowerCase().includes("klop") && completePodatki["Kontra"][1]) {
+
+            data = "Kontra"
+            element1 = data
+
+
+            if (completePodatki["Kontra"][1]) {
+                if (completePodatki["Radlc"][1]) {
+                    element = completePodatki["Točke"][1] * 2;
+                } else {
+                    element = completePodatki["Točke"][1];
+                }
+            }
+
+            if (element !== false) createTableData(element, element1, data)
+        }
+    } catch { }
+
+
+    //Rekontra
+    try {
+        if (!completePodatki["Igra"][1].toLowerCase().includes("po meri") && !completePodatki["Igra"][1].toLowerCase().includes("klop") && completePodatki["Rekontra"][1]) {
+
+            data = "Rekontra"
+            element1 = data
+
+
+            if (completePodatki["Rekontra"][1]) {
+                if (completePodatki["Radlc"][1]) {
+                    element = completePodatki["Točke"][1] * 4;
+                } else {
+                    element = completePodatki["Točke"][1] * 2;
+                }
+            }
+
+            if (element !== false) createTableData(element, element1, data)
+        }
+    } catch { }
+
     //Tocke
-    if (!completePodatki["Igra"][1].toLowerCase().includes("po meri") && !completePodatki["Igra"][1].toLowerCase().includes("klop")) {
+    if (!completePodatki["Igra"][1].toLowerCase().includes("po meri") && !completePodatki["Igra"][1].toLowerCase().includes("klop") && !completePodatki["Igra"][1].toLowerCase().includes("renons")) {
 
         data = "Točke"
         element1 = data
         element = completePodatki[data][1];
         if (completePodatki["Radlc"][1]) {
             element = element * 2
+        }
+        if (completePodatki["Kontra"][1]) {
+            element = element * 2
+        }
+        if (completePodatki["Rekontra"][1]) {
+            element = element * 4
         }
         createTableData(element, element1, data)
     }
@@ -1621,28 +1870,28 @@ function gameData(infom, number) {
 
 
 function deleteGame() {
-    var iks = document.createElement("md-icon-button")
-    iks.setAttribute("value", "close")
-    iks.classList.add("iksRight")
-    iks.innerHTML = showIks;
+
     var newElement
     if (listOfPlayers["!gameName!"].includes("/users/")) {
-        newElement = dialogBuilder(iks, "Ali želite zapustiti to skupno igro?")
+        newElement = dialogBuilder(null, "Ali želite zapustiti to deljeno skupino?")
     } else {
-        newElement = dialogBuilder(iks, "Ali želite izbrisati to igro?")
+        newElement = dialogBuilder(null, "Ali želite izbrisati to skupino?")
     }
 
-    iks.addEventListener("click", function (e) {
-        document.getElementById("game").style.animation = "none";
-        hideDialog(newElement);
-    });
+    let iconaa = addElement("md-icon", newElement.parentNode, null)
+    iconaa.innerHTML = "delete_outline"
+    iconaa.setAttribute("slot", "icon")
     document.body.appendChild(newElement.parentNode)
-    var shareButton = document.createElement("md-filled-button");
+    var shareButton = document.createElement("md-text-button");
     shareButton.innerHTML = "Da";
-    var copyButton = document.createElement("md-filled-button");
+    var copyButton = document.createElement("md-filled-tonal-button");
     copyButton.innerHTML = "Ne";
-    newElement.appendChild(copyButton);
-    newElement.appendChild(shareButton);
+    let actions = document.createElement('div')
+    actions.setAttribute("slot", "actions")
+    newElement.parentNode.appendChild(actions)
+    actions.appendChild(shareButton);
+    actions.appendChild(copyButton);
+
     shareButton.addEventListener("click", function () {
         listOfPlayersCopy.push(JSON.stringify(listOfPlayers)); if (!navigator.onLine) {
             localStorage.offlineChanges = true
@@ -1654,7 +1903,7 @@ function deleteGame() {
         }
         localStorage.setItem("games", JSON.stringify(gamesObject));
         updateUserData()
-        location.reload();
+        document.querySelector(".homeBtn").click()
         hideDialog(newElement);
     });
     copyButton.addEventListener("click", function () {
@@ -1668,72 +1917,10 @@ async function resolveAfter(s) {
         }, s);
     });
 }
-/*
-async function createRipple(event) {
-    if (!event.target.className.includes("whlScreen") && !event.target.closest('.whlScreen') && document.getElementsByClassName("whlScreen")[0] !== undefined) {
-        hideDialog(document.getElementsByClassName("whlScreen")[0])
-    }
-    if (event.target.tagName == "BUTTON" || event.target.className.includes("chl")) {
- 
-        if (event.target.getAttribute("disabled") == null && !event.target.className.includes("Google")) {
-            const button = event.target;
-            if (event.target.className.includes("chl")) { button.style.overflow = "hidden" }
-            const circle = document.createElement("span");
-            const diameter = Math.max(button.offsetWidth, button.offsetHeight);
-            const radius = diameter / 2;
- 
-            circle.classList.add("ripple");
-            const rect = button.getBoundingClientRect();
- 
-            circle.style.left = (event.touches[0].clientX - rect.left) + "px";
-            circle.style.top = (event.touches[0].clientY - rect.top) + "px";
-            circle.style.width = circle.style.height = (diameter / 4) + "px";
-            circle.style.opacity = "0";
-            button.appendChild(circle);
-            circle.style.transition = " all " + (Math.round(diameter) / 700) + "s"
-            transitionDUr = (Math.round(diameter) / 500)
-            await resolveAfter(2);
-            circle.style.opacity = ".4";
-            circle.style.width = circle.style.height = (diameter * 2) + "px";
- 
-            let mouse = false;
-            let animation = false;
-            document.body.addEventListener("touchend", function () {
-                mouse = true;
- 
-                if (animation) {
-                    setTimeout(() => {
- 
-                        circle.classList.add("fadeOutIt");
-                        setTimeout(() => {
-                            if (event.target.className.includes("chl")) { button.style.overflow = "scroll" }
- 
-                            circle.remove();
-                        }, 200);
-                    }, 0);
-                }
-            });
-            circle.addEventListener("transitionend", function () {
-                animation = true;
-                if (mouse) {
- 
-                    setTimeout(() => {
- 
-                        circle.classList.add("fadeOutIt");
-                        setTimeout(() => {
-                            if (event.target.className.includes("chl")) { button.style.overflow = "scroll" }
- 
-                            circle.remove();
-                        }, 200);
-                    }, 0);
-                }
-            });
- 
-        }
-    }
-}
-document.addEventListener("touchstart", createRipple);
-*/
+
+
+
+
 function removeElement() {
     for (const element of arguments) {
         element.remove()
@@ -1787,23 +1974,25 @@ function feedback() {
 }
 var queryAnim = false
 window.addEventListener("load", function () {
-
-    if (localStorage.uid == null) {
+    if (!HTMLScriptElement.supports('importmap')) {
+        document.head.innerHTML !== '<script async src="https://unpkg.com/es-module-shims@1.3.0/dist/es-module-shims.js"></script>'
+    }
+    if (sessionStorage.uid == null) {
         hideElement(document.querySelector(".loader"))
     }
     queryAnim = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var androidV = null;
-
+    try { hideElement(document.querySelector(".loader")) } catch { }
     if (location.pathname.includes("users")) { upload() } else {
         if (location.pathname !== "/") { Game(decodeURIComponent(location.pathname.slice(1))) }
     }
-    if (localStorage.offlineChanges == undefined) { window.loadDataFromWeb() } else { if (navigator.onLine) { console.log('update'); updateUserData(); localStorage.offlineChanges = undefined } };
+    if (localStorage.offlineChanges == undefined) { window.loadDataFromWeb(); console.log("ddd"); } else { if (navigator.onLine) { console.log('update'); updateUserData(); localStorage.offlineChanges = undefined } };
 
     changeTheme(localStorage.themeColor);
 
 
 
-    if (localStorage.uid !== null && localStorage.uid !== undefined && localStorage.uid !== 'null' && localStorage.uid !== 'undefined') {
+    if (sessionStorage.uid !== null && sessionStorage.uid !== undefined && sessionStorage.uid !== 'null' && sessionStorage.uid !== 'undefined') {
         watchChanges()
     }
     navigator.userAgentData

@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js";
 
 import { getDatabase, ref, set, child, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+import { getAuth, signInWithRedirect, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -13,7 +13,7 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChang
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
     apiKey: "AIzaSyBrxvJ-fs7wtfnsLzOy6WI_1J_CMHPXpoU",
-    authDomain: "tarock-counter.firebaseapp.com",
+    authDomain: "tarock-counter.web.app",
     projectId: "tarock-counter",
     storageBucket: "tarock-counter.appspot.com",
     messagingSenderId: "1058014595030",
@@ -29,14 +29,14 @@ const analytics = getAnalytics(app);
 const auth = getAuth()
 const provider = new GoogleAuthProvider()
 const signInButton = document.getElementById("signInGoogle")
-const signOutButton = document.getElementById("signOutGoogle")
+
 const signInMessage = document.getElementById("signInMessage")
 var uid = null
-signOutButton.style.display = "none"
+
 
 
 export function deleteAllDataF() {
-    if (localStorage.uid !== null && navigator.onLine) {
+    if (sessionStorage.uid !== null && navigator.onLine) {
         userSignOut()
         setTimeout(() => {
             localStorage.clear();
@@ -46,7 +46,7 @@ export function deleteAllDataF() {
         const db = getDatabase();
 
         const updates = {};
-        updates['users/' + localStorage.uid] = {};
+        updates['users/' + sessionStorage.uid] = {};
 
 
         return update(ref(db), updates);
@@ -56,29 +56,35 @@ window.deleteAllDataF = deleteAllDataF
 
 
 const userSignIn = async () => {
-    signInWithPopup(auth, provider)
-        .then((result) => {
-            const user = result.user
+    if (sessionStorage.uid !== null && sessionStorage.uid !== undefined && sessionStorage.uid !== "null" && sessionStorage.uid !== "undefined") {
+        userSignOut()
+    } else {
 
-            uid = result.user.uid
-            localStorage.uid = uid
-            userk = user
-            console.log(uid);
-            loadDataFromWeb()
-        }).catch((error) => {
-            console.log(error.code, error.message)
-            signInMessage.innerHTML = "Nekaj je šlo narobe pri prijavi.";
-        })
+        signInWithRedirect(auth, provider)
+            .then((result) => {
+                const user = result.user
+
+                uid = result.user.uid
+                sessionStorage.uid = uid
+                userk = user
+
+                loadDataFromWeb()
+            }).catch((error) => {
+
+                signInMessage.innerHTML = "Nekaj je šlo narobe pri prijavi.";
+            })
+    }
+
 }
 
 const userSignOut = async () => {
     signOut(auth)
         .then((result) => {
-            console.log("signed out");
+
             let clr = localStorage.themeColor
             localStorage.clear()
             localStorage.themeColor = clr
-            location.reload()
+            //location.reload()
         }).catch((error) => {
 
         })
@@ -87,35 +93,39 @@ const userSignOut = async () => {
 
 
 onAuthStateChanged(auth, (user) => {
-    try { hideElement(document.querySelector(".loader")) } catch { }
-
+    try { hideElement(document.getElementById("login-loader")) } catch { }
     if (user) {
-        signOutButton.style.display = "flex";
-        signInButton.style.display = "none"
-        localStorage.uid = user.uid
+
+        document.querySelector(".gsi-material-button-contents").innerHTML = "Odjava"
+
+        sessionStorage.uid = user.uid
+        if (localStorage.offlineChanges == undefined) { window.loadDataFromWeb(); } else { if (navigator.onLine) { console.log('update'); updateUserData(); localStorage.offlineChanges = undefined } };
+        if (sessionStorage.uid !== null && sessionStorage.uid !== undefined && sessionStorage.uid !== 'null' && sessionStorage.uid !== 'undefined') {
+            watchChanges()
+        }
         userk = user
         signInMessage.innerHTML = "Pozdravljeni, " + user.displayName + ".";
     } else {
-        signInButton.style.display = "flex"
-        signOutButton.style.display = "none";
-        localStorage.uid = null
-        signInMessage.innerHTML = "Za shranjevanje podatkov se prijavite.";
+        document.querySelector(".gsi-material-button-contents").innerHTML = "Google prijava"
+
+        sessionStorage.uid = null
+        signInMessage.innerHTML = "Za dodatne funkcije se prijavite..";
     }
 })
 
 
 
 signInButton.addEventListener('click', userSignIn);
-signOutButton.addEventListener('click', userSignOut);
+
 
 
 const database = getDatabase(app);
-console.log(database);
+
 
 
 export function updateUserData() {
 
-    if (localStorage.uid !== null && localStorage.uid !== undefined && localStorage.uid !== "null" && localStorage.uid !== "undefined") {
+    if (sessionStorage.uid !== null && sessionStorage.uid !== undefined && sessionStorage.uid !== "null" && sessionStorage.uid !== "undefined") {
 
         const db = getDatabase();
 
@@ -131,7 +141,7 @@ export function updateUserData() {
             }
         }
 
-        updates['/users/' + localStorage.uid + "/games/"] = gamesObject;
+        updates['/users/' + sessionStorage.uid + "/games/"] = gamesObject;
 
 
         return update(ref(db), updates);
@@ -156,7 +166,7 @@ export async function updateSharedRemote() {
     onValue(starCountRef, async (snapshot) => {
 
         let result = snapshot.val()
-        console.log(result);
+
         let name = listOfPlayers["!gameName!"]
         const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
         gamesObject[listOfPlayers["!gameName!"]] = result
@@ -178,11 +188,11 @@ export async function updateSharedRemote() {
 }
 
 export async function watchChanges() {
-    var starCountRef = ref(database, "users/" + localStorage.uid);
+    var starCountRef = ref(database, "users/" + sessionStorage.uid);
     onValue(starCountRef, async (snapshot) => {
 
         let result = snapshot.val()["games"]
-        console.log(result);
+
         var gamesObject = JSON.parse(localStorage.getItem('games')) || {};
         gamesObject = result
         for (const key in gamesObject) {
@@ -213,19 +223,9 @@ window.watchChanges = watchChanges
 
 export function loadDataFromWeb() {
 
-    if (userk) {
-        signOutButton.style.display = "flex";
-        signInButton.style.display = "none"
 
-        signInMessage.innerHTML = "Pozdravljeni, " + userk.displayName + ".";
-    } else {
-        signInButton.style.display = "flex"
-        signOutButton.style.display = "none";
-
-        signInMessage.innerHTML = "Za shranjevanje podatkov se prijavite.";
-    }
     const dbRef = ref(getDatabase());
-    get(child(dbRef, `users/${localStorage.uid}`)).then((snapshot) => {
+    get(child(dbRef, `users/${sessionStorage.uid}`)).then((snapshot) => {
 
         if (snapshot.exists()) {
 
@@ -240,7 +240,7 @@ export function loadDataFromWeb() {
             updateUserData()
             return true
         } else {
-            console.log("No data available");
+
 
             return false
         }
@@ -263,7 +263,7 @@ export async function loadDataPath(path) {
 
 
         } else {
-            console.log("No data available");
+
 
             return ""
         }
