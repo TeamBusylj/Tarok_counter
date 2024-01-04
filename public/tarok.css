@@ -4,6 +4,7 @@ input[type="checkbox"] {
     margin: 5px;
 }
 
+
 div#bottomBar {
     z-index: 1;
     position: fixed;
@@ -78,8 +79,7 @@ md-dialog [slot="headline"] {
 }
 
 #newapp {
-    position: relative;
-    bottom: 135%;
+
     text-align: center;
     color: var(--colorTxtDialog);
     scale: .8;
@@ -155,12 +155,23 @@ md-menu {
     --_container-color: var(--md-sys-color-surface-container-high)
 }
 
+.nextHolder {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    z-index: 40;
+    height: 80px;
+    width: 100%;
+    background-color: var(--md-sys-color-surface);
+}
+
 md-list {
     margin-right: auto;
     margin-left: auto;
     width: 90%;
     border-radius: 25px;
     -ms-overflow-style: none;
+
     /* IE and Edge */
     scrollbar-width: none;
     /* Firefox */
@@ -197,6 +208,46 @@ md-outlined-button {
 
 #signInGoogle {
     --md-filled-button-container-color: #fff
+}
+
+@keyframes hideTab {
+    0% {
+        transform: translateX(0px);
+        opacity: 1;
+
+    }
+
+    99% {
+        transform: translateX(-100px);
+        opacity: 0;
+
+    }
+
+    100% {
+        transform: translateX(-100px);
+        opacity: 0;
+        display: none;
+    }
+}
+
+@keyframes showTab {
+    0% {
+        transform: translateX(100px);
+        opacity: 0;
+        display: none;
+    }
+
+    1% {
+        transform: translateX(100px);
+        opacity: 0;
+        display: flex;
+    }
+
+    100% {
+        transform: translateX(0px);
+        opacity: 1;
+    }
+
 }
 
 :root {
@@ -496,16 +547,20 @@ slot[name="content"]::slotted(*) {
     padding: 15px;
 }
 
-#pomoc {
+#pomoc,
+#pomoc2 {
     background: var(--md-sys-color-surface);
     background: var(--md-sys-color-surface);
     z-index: 4;
 
+
     overflow: scroll;
     overflow-y: scroll;
+    top: 10px;
 }
 
-#pomoc md-list-item {
+#pomoc md-list-item,
+#pomoc2 md-list-item {
     border-radius: 15px;
     background-color: var(--md-sys-color-secondary-container);
     width: 90%;
@@ -757,6 +812,19 @@ span.btnIcon {
     }
 }
 
+#firstTime {
+    z-index: 300;
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    color: var(--colorTxt);
+    background-color: var(--md-sys-color-surface, black);
+
+    top: 0;
+    text-align: center;
+}
+
 md-filled-text-field {
     --md-filled-text-field-container-color: var(--md-sys-color-surface-container);
 }
@@ -840,7 +908,12 @@ p {
     }
 }
 
-
+#nextTab {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    z-index: 40;
+}
 
 .poMeri {
     margin: 10px;
@@ -852,8 +925,15 @@ md-fab {
     position: absolute;
     right: 20px;
     bottom: 40px;
+    --fabHeight: var(--_container-height);
     -webkit-tap-highlight-color: transparent;
 }
+
+
+
+
+
+
 
 .gsi-material-button {
 

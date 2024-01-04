@@ -16,6 +16,7 @@ var games = {
     "Odprti Berač": [90, false, "", false, "OB"],
     "Klop": ["", false, "", true, "K"],
     "Renons": [0, false, "", true, "R"],
+    "Mondfang": [-21, false, "", false, "R"],
     "Po meri": [0, false, "", true, "+"],
     "Dodaj radlce": ["", false, "", true, "*"],
 };
@@ -28,9 +29,7 @@ async function addScore(firstPlayer) {
     iks.addEventListener("click", function (e) {
         hideDialog(newElement);
     });
-    newElement.parentNode.addEventListener("cancel", function () {
-        hideDialog(newElement)
-    })
+
     let i = 0
     for (const key in games) {
         if (i == 3 || i == 7 || i == 11) addElement("md-divider", newElement, null).style.margin = "5px"
@@ -45,7 +44,10 @@ async function addScore(firstPlayer) {
         icon.innerHTML = games[key][4]
         btn.addEventListener("click", function () {
             newElement.innerHTML = "";
-            if (key == "Renons") {
+            if (key == "Mondfang") {
+                mondfang(newElement);
+            }
+            else if (key == "Renons") {
                 renons(newElement);
             }
             else if (key == "Klop") {
@@ -124,18 +126,18 @@ function poMeri(newElement2) {
             nmbs2.push(document.getElementById("meri_" + iterator.label).name)
         }
 
-        /* gamename, prvi igralc, drug igralc, tocke, ima radlc, razlika, dobil zgubil, bonusi, bonusi Tocke*/
+        /* gamename, prvi igralc, drug igralc, tocke, ima radlc, razlika, dobil zgubil, bonusi, bonusi Tocke, datum*/
         listOfPlayersCopy.push(JSON.stringify(listOfPlayers)); if (!navigator.onLine) {
             localStorage.offlineChanges = true
         }
-        listOfPlayers["!gamesData!"].push(["Po Meri", nmbs, null, nmbs2, false, null, true, [], 0])
+        listOfPlayers["!gamesData!"].push(["Po Meri", nmbs, null, nmbs2, false, null, true, [], 0, false, false, Date.now()])
         hideDialog(newElement)
 
         removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
         count(true);
     })
 }
-var zaokrožuj = JSON.parse(localStorage.getItem("razlikaOkrozi")) || true
+var zaokrožuj = JSON.parse(localStorage.getItem("razlikaOkrozi"))
 if (zaokrožuj == null || zaokrožuj == undefined) zaokrožuj = true
 async function klop(newElement2) {
     var iks = document.createElement("md-icon-button")
@@ -175,7 +177,7 @@ async function klop(newElement2) {
                 listOfPlayersCopy.push(JSON.stringify(listOfPlayers)); if (!navigator.onLine) {
                     localStorage.offlineChanges = true
                 }
-                listOfPlayers["!gamesData!"].push(["Klop", player.innerHTML, null, 70, listOfPlayers[player.innerHTML][0].length > 0, null, true, [], 0])
+                listOfPlayers["!gamesData!"].push(["Klop", player.innerHTML, null, 70, listOfPlayers[player.innerHTML][0].length > 0, null, true, [], 0, false, false, Date.now()])
                 hideDialog(newElement)
                 removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
 
@@ -199,7 +201,7 @@ async function klop(newElement2) {
                 listOfPlayersCopy.push(JSON.stringify(listOfPlayers)); if (!navigator.onLine) {
                     localStorage.offlineChanges = true
                 }
-                listOfPlayers["!gamesData!"].push(["Klop", player.innerHTML, null, -70, listOfPlayers[player.innerHTML][0].length > 0, null, true, [], 0])
+                listOfPlayers["!gamesData!"].push(["Klop", player.innerHTML, null, -70, listOfPlayers[player.innerHTML][0].length > 0, null, true, [], 0, false, false, Date.now()])
                 hideDialog(newElement)
                 removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
 
@@ -251,7 +253,7 @@ async function klop(newElement2) {
             localStorage.offlineChanges = true
         }
 
-        listOfPlayers["!gamesData!"].push(["Klop", igralci, null, tockice, null, null, null, null])
+        listOfPlayers["!gamesData!"].push(["Klop", igralci, null, tockice, null, null, null, [], false, false, false, Date.now()])
         radlciDodaj(false)
         if (isfull) {
             hideDialog(newElement)
@@ -260,6 +262,40 @@ async function klop(newElement2) {
             count(true);
         }
     });
+
+}
+
+async function mondfang(newElement) {
+    newElement.innerHTML = ""
+
+    let vsi = []
+    let playerWho
+    changeOpis(newElement, "Kdo je izgubil monda?")
+    for (const user in listOfPlayers) {
+        if (user == "!gamesData!" || user == "!gameName!") {
+            continue;
+        }
+        let player = addElement("md-outlined-button", newElement, null);
+        player.innerHTML = user
+        vsi.push(player)
+        player.setAttribute("type", "reset")
+        player.addEventListener("click", function () {
+            playerWho = player
+            /* gamename, prvi igralc, drug igralc, tocke, ima radlc, razlika, dobil zgubil, bonusi, bonusi Tocke*/
+            listOfPlayersCopy.push(JSON.stringify(listOfPlayers)); if (!navigator.onLine) {
+                localStorage.offlineChanges = true
+            }
+
+        })
+    }
+    await waitForButtonClick(vsi)
+
+    listOfPlayers["!gamesData!"].push(["Mondfang", playerWho.innerHTML, null, -21, listOfPlayers[playerWho.innerHTML][0].length > 0, null, true, [], 0, false, false, Date.now()])
+    hideDialog(newElement)
+    removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
+
+    count(true);
+
 
 }
 
@@ -299,7 +335,7 @@ async function renons(newElement) {
     let okButt = addElement("md-filled-button", newElement, null);
     okButt.innerHTML = "Končano"
     okButt.addEventListener("click", function () {
-        listOfPlayers["!gamesData!"].push(["Renons", playerWho.innerHTML, null, -Math.abs(parseInt(renonsSlider.value)), false, null, true, [], 0])
+        listOfPlayers["!gamesData!"].push(["Renons", playerWho.innerHTML, null, -Math.abs(parseInt(renonsSlider.value)), false, null, true, [], 0, false, false, Date.now()])
         hideDialog(newElement)
         removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"))
 
@@ -308,6 +344,7 @@ async function renons(newElement) {
 
 }
 async function calculate(gameName, properties, newElement, firstPlayer) {
+
     if (Object.keys(listOfPlayers).length == 5) {
         partner(newElement, gameName, properties, false, firstPlayer);
     } else {
@@ -365,8 +402,9 @@ function waitForButtonClick(btn) {
     })
 }
 async function partner(newElement, gameName, properties, teamWork, firstPlayer, secondPlayer) {
+
     var slct2 = ""
-    if (teamWork && secondPlayer !== null) {
+    if (teamWork && secondPlayer) {
         slct2 = secondPlayer
     }
     changeOpis(newElement, "Izberite razliko")
@@ -442,7 +480,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 
     } else {
         if (!properties[1]) {
-            slct2 = "partnerigralcakimuniimenic"
+
             changeOpis(newElement, "Igrali sta osebi " + firstPlayer + " in " + slct2 + ".")
         } else {
             changeOpis(newElement, "Igrali sta osebi " + firstPlayer + " in " + slct2 + ", z razliko " + razlika + ".")
@@ -536,7 +574,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
     let kontra = addElement("md-outlined-button", newElement, null)
     kontra.innerHTML = "Kontra"
     let rekontra = addElement("md-outlined-button", newElement, null)
-    rekontra.innerHTML = "Rekontra (kmalu)"
+    rekontra.innerHTML = "Rekontra"
 
     var IgraK = false
     var KraljiK = false
@@ -722,7 +760,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
         if (KUltK2) bonusi["Kralj ultimo"][1] *= 4
         if (PUltK2) bonusi["Pagat ultimo"][1] *= 4
         for (const key in bonusi) {
-            if (bonusi[key][2] !== null) {
+            if (bonusi[key][2]) {
                 if (bonusi[key][2]) {
                     if (bonusi[key][3]) {
                         bnsi[key] = [bonusi[key][1], true, true]
@@ -749,15 +787,15 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
             this.remove();
             if (properties[1]) {
                 if (teamWork) {
-                    listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, parseInt(properties[0]) + parseInt(razlika) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), true, bnsi, bonusTocke, false, false])
+                    listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, parseInt(properties[0]) + parseInt(razlika) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), true, bnsi, bonusTocke, false, false, Date.now()])
                 } else {
-                    listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, parseInt(properties[0]) + parseInt(razlika) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), true, bnsi, bonusTocke, false, false])
+                    listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, parseInt(properties[0]) + parseInt(razlika) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), true, bnsi, bonusTocke, false, false, Date.now()])
                 }
             } else {
                 if (teamWork) {
-                    listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, parseInt(properties[0] + bonusTocke), listOfPlayers[firstPlayer][0].length > 0, null, true, bnsi, bonusTocke, false, false])
+                    listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, parseInt(properties[0] + bonusTocke), listOfPlayers[firstPlayer][0].length > 0, null, true, bnsi, bonusTocke, false, false, Date.now()])
                 } else {
-                    listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, parseInt(properties[0] + bonusTocke), listOfPlayers[firstPlayer][0].length > 0, null, true, bnsi, bonusTocke, false, false])
+                    listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, parseInt(properties[0] + bonusTocke), listOfPlayers[firstPlayer][0].length > 0, null, true, bnsi, bonusTocke, false, false, Date.now()])
                 }
             }
         }
@@ -791,7 +829,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
         if (PUltK2) bonusi["Pagat ultimo"][1] *= 4
 
         for (const key in bonusi) {
-            if (bonusi[key][2] !== null) {
+            if (bonusi[key][2]) {
                 if (bonusi[key][2]) {
                     if (bonusi[key][3]) {
                         bnsi[key] = [bonusi[key][1], true, true]
@@ -816,15 +854,15 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
         }
         if (properties[1]) {
             if (teamWork) {
-                listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, -Math.abs(parseInt(properties[0]) + parseInt(razlika)) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), false, bnsi, bonusTocke, false, false])
+                listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, -Math.abs(parseInt(properties[0]) + parseInt(razlika)) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), false, bnsi, bonusTocke, false, false, Date.now()])
             } else {
-                listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, -Math.abs(parseInt(properties[0]) + parseInt(razlika)) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), false, bnsi, bonusTocke, false, false])
+                listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, -Math.abs(parseInt(properties[0]) + parseInt(razlika)) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, parseInt(razlika), false, bnsi, bonusTocke, false, false, Date.now()])
             }
         } else {
             if (teamWork) {
-                listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, -Math.abs(parseInt(properties[0])) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, null, false, bnsi, bonusTocke, false, false])
+                listOfPlayers["!gamesData!"].push([String(gameName), [firstPlayer, slct2], null, -Math.abs(parseInt(properties[0])) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, null, false, bnsi, bonusTocke, false, false, Date.now()])
             } else {
-                listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, -Math.abs(parseInt(properties[0])) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, null, false, bnsi, bonusTocke, false, false])
+                listOfPlayers["!gamesData!"].push([String(gameName), firstPlayer, null, -Math.abs(parseInt(properties[0])) + bonusTocke, listOfPlayers[firstPlayer][0].length > 0, null, false, bnsi, bonusTocke, false, false, Date.now()])
             }
         }
 
@@ -863,7 +901,7 @@ function download() {
             if (navigator.share) {
                 navigator.share({
                     title: 'Tarok igra',
-                    text: 'Vabim te, da se mi pridružiš v moji tarok skupini.',
+                    text: 'Vabim te, da se pridružiš moji tarok skupini.',
                     url: result,
                 })
                     .then(() => console.log('Success sharing'))
@@ -889,13 +927,16 @@ function deleteAllData() {
         document.getElementById("game").style.animation = "none";
         hideDialog(newElement);
     });
-
-    var shareButton = document.createElement("md-filled-button");
+    let actions = document.createElement('div')
+    actions.setAttribute("slot", "actions")
+    newElement.parentNode.appendChild(actions)
+    var shareButton = document.createElement("md-text-button");
     shareButton.innerHTML = "Da";
-    var copyButton = document.createElement("md-filled-button");
+    var copyButton = document.createElement("md-filled-tonal-button");
     copyButton.innerHTML = "Ne";
-    newElement.appendChild(copyButton);
-    newElement.appendChild(shareButton);
+
+    actions.appendChild(shareButton);
+    actions.appendChild(copyButton);
     shareButton.addEventListener("click", function () {
         deleteAllDataF()
         hideDialog(newElement);
@@ -906,7 +947,6 @@ function deleteAllData() {
 }
 
 async function upload() {
-
     if (sessionStorage.uid !== null && sessionStorage.uid !== undefined && sessionStorage.uid !== 'null' && navigator.onLine) {
         try {
             var text = decodeURIComponent(location.pathname.slice(1));
@@ -920,7 +960,7 @@ async function upload() {
                 iks.setAttribute("value", "close")
                 iks.classList.add("iksRight")
                 iks.innerHTML = showIks;
-                var newElement = dialogBuilder(iks, "Ali želite uvoziti igro '" + gameContent["!gameName!"] + "' z igralci " + JSON.stringify(Object.keys(gameContent).filter((key) => key !== "!gamesData!" && key !== "!gameName!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ") + "?")
+                var newElement = dialogBuilder(iks, "Ali se želite pridružiti skupini '" + gameContent["!gameName!"] + "' z igralci " + JSON.stringify(Object.keys(gameContent).filter((key) => key !== "!gamesData!" && key !== "!gameName!"),).replace(/"/g, "").replace("[", "").replace("]", "").replace(/,/g, ", ") + "?")
                 gameContent["!gameName!"] = text
                 window.history.replaceState({}, document.title, "/" + "");
                 document.body.appendChild(newElement.parentNode)
@@ -928,13 +968,15 @@ async function upload() {
                     document.getElementById("game").style.animation = "none";
                     hideDialog(newElement);
                 });
-
-                var shareButton = document.createElement("md-filled-button");
+                let actions = document.createElement('div')
+                actions.setAttribute("slot", "actions")
+                newElement.parentNode.appendChild(actions)
+                var shareButton = document.createElement("md-filled-tonal-button");
                 shareButton.innerHTML = "Da";
-                var copyButton = document.createElement("md-filled-button");
+                var copyButton = document.createElement("md-text-button");
                 copyButton.innerHTML = "Ne";
-                newElement.appendChild(copyButton);
-                newElement.appendChild(shareButton);
+                actions.appendChild(copyButton);
+                actions.appendChild(shareButton);
                 shareButton.addEventListener("click", function () {
                     const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
                     gamesObject["/" + gameContent["!gameName!"]] = gameContent;
@@ -952,7 +994,7 @@ async function upload() {
     } else {
 
         if (!location.pathname.includes("public")) {
-            dlgNotif("Za dostop do skupinske igre morate biti prijavljeni in imeti internetno povezavo.")
+            dlgNotif("Za dostop do deljene skupine morate biti prijavljeni in imeti internetno povezavo.")
             window.history.replaceState({}, document.title, "/" + "");
         }
 
@@ -976,169 +1018,28 @@ function changeOpis(dlg, desc) {
 function dialogBuilder(xButt, desc) {
     var newElement = document.createElement("md-dialog");
     newElement.setAttribute("open", "");
+    newElement.addEventListener("cancel", function () {
+        hideDialog(newElement)
 
-    if (queryAnim) {
-        newElement.getOpenAnimation().dialog = [[[{
-            "opacity": "0"
-        }, {
-
-            "opacity": "1"
-        }], {
-            "duration": 10,
-            "easing": "cubic-bezier(.3,.5,0,1.3)"
-        }]]
-        newElement.getOpenAnimation().container = [[[{
-            "opacity": "0"
-        }, {
-
-            "opacity": "1"
-        }], {
-            "duration": 10,
-            "easing": "cubic-bezier(.3,.5,0,1.3)"
-        }]]
-        newElement.getOpenAnimation().content = [[[{
-            "opacity": "0"
-        }, {
-
-            "opacity": "1"
-        }], {
-            "duration": 100,
-            "easing": "cubic-bezier(.3,.5,0,1)",
-            "fill": "forwards"
-        }]]
-        newElement.getCloseAnimation().dialog = [[[{
-
-            "opacity": "1"
-        }, {
-
-            "opacity": "0"
-        }], {
-            "duration": 100,
-            "easing": "cubic-bezier(.3,.5,0,1.0)"
-        }]]
-        newElement.getCloseAnimation().content = [[[{
-            "opacity": "1"
-        }, {
-
-            "opacity": "0"
-        }], {
-            "duration": 100,
-            "easing": "linear",
-            "fill": "forwards"
-        }]]
-        newElement.getCloseAnimation().scrim = [[[{
-            "opacity": "0.32"
-        }, {
-            "opacity": "0"
-        }], {
-            "duration": 50,
-            "easing": "linear",
-            "fill": "forwards"
-        }]]
-        newElement.getOpenAnimation().scrim = [[[{
-            "opacity": "0"
-        }, {
-            "opacity": "0.32"
-        }], {
-            "duration": 50,
-            "easing": "linear",
-            "fill": "forwards"
-        }]]
-    } else {
-        newElement.getOpenAnimation().container = [[[{
-            "opacity": "0"
-        }, {
-
-            "opacity": "1"
-        }], {
-            "duration": 100,
-            "easing": "cubic-bezier(.3,.5,0,1)",
-            "fill": "forwards"
-        }]]
-        newElement.getCloseAnimation().container = [[[{
-            "opacity": "1"
-        }, {
-
-            "opacity": "0"
-        }], {
-            "duration": 1000,
-            "easing": "cubic-bezier(.3,.5,0,1)",
-            "fill": "forwards"
-        }]]
-        newElement.getOpenAnimation().dialog = [[[{
-            "transform": "scale(.5)",
-            "opacity": "0"
-        }, {
-            "transform": "scale(1)",
-            "opacity": "1"
-        }], {
-            "duration": 500,
-            "easing": "cubic-bezier(.3,.5,0,1.3)"
-        }]]
-        newElement.getOpenAnimation().content = [[[{
-            "transform": "scale(.5)",
-            "overflow": "hidden",
-            "opacity": "0"
-        }, {
-            "overflow": "scroll",
-            "transform": "scale(1)",
-            "opacity": "1"
-        }], {
-            "duration": 500,
-            "easing": "cubic-bezier(.3,.5,0,1)",
-            "fill": "forwards"
-        }]]
-        newElement.getCloseAnimation().dialog = [[[{
-            "transform": "scale(1)",
-            "opacity": "1"
-        }, {
-            "transform": "scale(.5)",
-            "opacity": "0"
-        }], {
-            "duration": 500,
-            "easing": "cubic-bezier(.3,.5,0,1.0)"
-        }]]
-        newElement.getCloseAnimation().content = [[[{
-            "transform": "scale(1)"
-        }, {
-            "transform": "scale(.5)"
-        }], {
-            "duration": 500,
-            "easing": "linear",
-            "fill": "forwards"
-        }]]
-        newElement.getCloseAnimation().scrim = [[[{
-            "opacity": ".32"
-        }, {
-            "opacity": "0"
-        }], {
-            "duration": 300,
-            "easing": "linear",
-            "fill": "forwards"
-        }]]
-        newElement.getOpenAnimation().scrim = [[[{
-            "opacity": "0"
-        }, {
-            "opacity": "0.32"
-        }], {
-            "duration": 500,
-            "easing": "linear",
-            "fill": "forwards"
-        }]]
+    })
+    if (queryAnim) { noDialogAnimations(newElement) } else {
+        dialogAnimations(newElement)
     }
     var xHolder = addElement("span", newElement, null);
     xHolder.setAttribute("slot", "headline")
     xHolder.setAttribute("class", "dialog-headline")
     xHolder.innerHTML = '<span style="flex: .83;">' + desc + '</span>'
 
-    if (xButt !== null) {
+    if (xButt) {
         xHolder.appendChild(xButt)
         var help = addElement("md-icon-button", xHolder, "iksRight")
         help.innerHTML = "<md-icon>help</md-icon>"
         help.style.right = "50px"
-        help.addEventListener("click", function () { helpMe() })
+        help.addEventListener("click", function () { helpMe(newElement) })
     }
-    var content = addElement("form", newElement, null);
+
+    var content = addElement("div", newElement, null);
+    content.setAttribute("style", "display: flex;flex-wrap: wrap;justify-content: center;")
     content.setAttribute("slot", "content")
 
     content.setAttribute("method", "dialog")
@@ -1146,7 +1047,7 @@ function dialogBuilder(xButt, desc) {
 }
 
 function Game(already) {
-    if (already !== undefined && already !== null) {
+    if (already) {
         clickedUser(already.toString(), already.toString())
     } else {
 
@@ -1155,15 +1056,13 @@ function Game(already) {
         iks.setAttribute("value", "close")
         iks.classList.add("iksRight")
         iks.innerHTML = showIks;
-        var dialog = dialogBuilder(iks, "Izberite igro")
+        var dialog = dialogBuilder(iks, "Izberite skupino")
         iks.addEventListener("click", function (e) {
             document.getElementById("game").style.animation = "none";
             hideDialog(dialog);
         });
         dialog.setAttribute("id", "dlgSlct")
-        dialog.parentNode.addEventListener("cancel", function () {
-            hideDialog(dialog)
-        })
+
         var slct = document.createElement("md-list");
         var slct2 = document.createElement("md-list");
         dialog.style.borderRadius = "15px"
@@ -1198,9 +1097,9 @@ function Game(already) {
         }
         var pTxt = document.createElement("p")
         var pTxt2 = document.createElement("p")
-        if (slct.getElementsByTagName("md-list-item").length !== 0) { pTxt2.innerHTML = "Zasebne igre"; dialog.appendChild(pTxt2); dialog.appendChild(slct); }
+        if (slct.getElementsByTagName("md-list-item").length !== 0) { pTxt2.innerHTML = "Zasebne skupine"; dialog.appendChild(pTxt2); dialog.appendChild(slct); }
 
-        if (slct2.getElementsByTagName("md-list-item").length !== 0) { pTxt.innerHTML = "Skupne igre"; dialog.appendChild(pTxt); dialog.appendChild(slct2); }
+        if (slct2.getElementsByTagName("md-list-item").length !== 0) { pTxt.innerHTML = "Deljene skupine"; dialog.appendChild(pTxt); dialog.appendChild(slct2); }
 
         document.body.appendChild(dialog.parentNode);
     }
@@ -1212,7 +1111,7 @@ function hideDialog(dlg) {
     if (queryAnim) { dlg.parentNode.remove() } else {
         setTimeout(() => {
             dlg.parentNode.remove()
-        }, 300);
+        }, 150);
     }
 }
 
@@ -1231,7 +1130,7 @@ async function clickedUser(slcta, fulla) {
                 listOfPlayers = await loadDataPath(full)
                 listOfPlayers["!gameName!"] = full
             } catch {
-                dlgNotif("Zgodila se je napaka. Skupna igra je mogoče bila izbrisana ali pa trenutno ni dostopna.")
+                dlgNotif("Zgodila se je napaka. Skupina je bila verjetno izbrisana.")
 
                 const gamesObject = JSON.parse(localStorage.getItem('games')) || {};
                 delete gamesObject[full]
@@ -1241,7 +1140,7 @@ async function clickedUser(slcta, fulla) {
             }
 
         } else {
-            dlgNotif("Brez internetne povezave ne morete dostopati do skupne igre.")
+            dlgNotif("Brez internetne povezave ne morete dostopati do deljene skupine.")
         }
 
     } else {
@@ -1253,7 +1152,7 @@ async function clickedUser(slcta, fulla) {
 
 
     if (listOfPlayers !== undefined) {
-        if (listOfPlayers["!gamesData!"] == null) {
+        if (!listOfPlayers["!gamesData!"]) {
             listOfPlayers["!gamesData!"] = [];
         }
         if (listOfPlayers["!gameName!"].includes("/users/")) {
@@ -1306,17 +1205,22 @@ var listOfPlayers = {};
 var listOfPlayersCopy = [];
 
 function newGame() {
+
     var iks = addElement("md-icon-button", null, "iksColor");
     iks.setAttribute("value", "close")
     iks.innerHTML = showIks;
     iks.classList.add("iksRight")
     var content = dialogBuilder(iks, "Vpišite igralce")
+
+
+    document.body.appendChild(content.parentNode);
+
+
     iks.addEventListener("click", function (e) {
         hideDialog(content);
+
     });
-    content.parentNode.addEventListener("cancel", function () {
-        hideDialog(content)
-    })
+
     listOfPlayers = {};
     var endHolder = addElement("div", content.parentNode, null)
     endHolder.setAttribute("slot", "actions")
@@ -1329,6 +1233,7 @@ function newGame() {
     newPl.innerHTML = "Dodaj igralca";
     onePl.style.marginBottom = "10px"
     onePl.label = "Ime";
+    onePl.style.borderRadius = "4px"
     onePl.setAttribute("slot", "content")
     endPl.innerHTML = "Naprej";
     content.appendChild(onePl);
@@ -1337,42 +1242,58 @@ function newGame() {
     lnbrk.setAttribute("slot", "content")
     endHolder.appendChild(newPl);
     endHolder.appendChild(endPl);
-    document.body.appendChild(content.parentNode);
+
     newPl.addEventListener("click", function () {
         let onePl2 = addElement("md-outlined-text-field", content, null);
+        onePl2.style.borderRadius = "4px"
         onePl2.label = "Ime";
         onePl2.style.marginBottom = "10px"
         content.appendChild(onePl2);
         onePl2.focus;
     });
     endPl.addEventListener("click", async function () {
+        let nicist = false
         for (var i = 0; i < document.getElementsByTagName("md-outlined-text-field").length; i++) {
-            let input = document.getElementsByTagName("md-outlined-text-field")[i].value;
-            listOfPlayers[input] = [""];
-        }
-        listOfPlayersCopy.push(JSON.stringify(listOfPlayers)); if (!navigator.onLine) {
-            localStorage.offlineChanges = true
-        };
-        content.innerHTML = ""
-        newPl.remove()
-        endPl.remove()
-        listOfPlayers["!gamesData!"] = [];
+            let inpute = document.getElementsByTagName("md-outlined-text-field")[i];
 
-        changeOpis(content, "Vpišite vzdevek skupine")
-        var imeIgre = document.createElement("md-filled-text-field");
-        var koncajIme = document.createElement("md-filled-tonal-button");
-        imeIgre.label = "Ime igre"
-        imeIgre.value = JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").split(",").sort().toString().replace(/,/g, ", ")
-        koncajIme.innerHTML = "Končano"
-        content.appendChild(imeIgre)
-        endHolder.appendChild(koncajIme)
-        await waitForButtonClick([koncajIme])
-        listOfPlayers["!gameName!"] = imeIgre.value;
-        if (!navigator.onLine) {
-            localStorage.offlineChanges = true
+            if (inpute.value.length == 0) {
+                inpute.style.outline = "7px red solid"
+                setTimeout(() => {
+                    inpute.style.outline = "0px red solid"
+                }, 200);
+                nicist = true
+            }
         }
-        hideDialog(content);
-        count(true);
+        if (!nicist) {
+            for (var i = 0; i < document.getElementsByTagName("md-outlined-text-field").length; i++) {
+                let input = document.getElementsByTagName("md-outlined-text-field")[i].value;
+                listOfPlayers[input] = [""];
+            }
+            listOfPlayersCopy.push(JSON.stringify(listOfPlayers)); if (!navigator.onLine) {
+                localStorage.offlineChanges = true
+            };
+            content.innerHTML = ""
+            newPl.remove()
+            endPl.remove()
+            listOfPlayers["!gamesData!"] = [];
+
+            changeOpis(content, "Vpišite vzdevek skupine")
+            var imeIgre = document.createElement("md-filled-text-field");
+            var koncajIme = document.createElement("md-filled-tonal-button");
+            imeIgre.label = "Vzdevek skupine"
+            imeIgre.value = JSON.stringify(Object.keys(listOfPlayers).filter((key) => key !== "!gamesData!"),).replace(/"/g, "").replace("[", "").replace("]", "").split(",").sort().toString().replace(/,/g, ", ")
+            koncajIme.innerHTML = "Končano"
+            content.appendChild(imeIgre)
+            endHolder.appendChild(koncajIme)
+            await waitForButtonClick([koncajIme])
+            listOfPlayers["!gameName!"] = imeIgre.value;
+            if (!navigator.onLine) {
+                localStorage.offlineChanges = true
+            }
+            hideDialog(content);
+            count(true);
+        }
+
     });
 }
 
@@ -1385,12 +1306,12 @@ function loclStrg() {
 }
 
 function count(animate, undoed) {
-    if (listOfPlayers["!gamesData!"] == null) {
+    if (!listOfPlayers["!gamesData!"]) {
         listOfPlayers["!gamesData!"] = [];
     }
     setTimeout(() => {
         let dlgs = document.getElementsByTagName("md-dialog")
-        console.log(dlgs);
+
         for (let ia = 0; ia < dlgs.length; ia++) {
             dlgs[ia].remove()
         }
@@ -1403,7 +1324,7 @@ function count(animate, undoed) {
         document.querySelector(".shrBtn").disabled = true
         if (document.getElementById("clck").label !== "yes") {
             document.getElementById("clck").addEventListener("click", function () {
-                dlgNotif("Da povabite nekoga v igro morate biti lastnik igre.")
+                dlgNotif("Da povabite nekoga v skupino morate biti njen lastnik.")
             })
             document.getElementById("clck").label = "yes"
         }
@@ -1418,7 +1339,7 @@ function count(animate, undoed) {
 
         if (document.getElementById("clck").label !== "yes") {
             document.getElementById("clck").addEventListener("click", function () {
-                dlgNotif("Da povabite nekoga v igro morate biti prijavljeni in imeti internetno povezavo.")
+                dlgNotif("Da povabite nekoga v skupino morate biti prijavljeni in imeti internetno povezavo.")
             })
             document.getElementById("clck").label = "yes"
         }
@@ -1483,7 +1404,7 @@ function count(animate, undoed) {
     for (var ia = 0; ia < listOfPlayers["!gamesData!"].length; ia++) {
         let game = ia
 
-        if (listOfPlayers["!gamesData!"][game] == null) continue
+        if (!listOfPlayers["!gamesData!"][game]) continue
         let nameOne = listOfPlayers["!gamesData!"][game][1]
         let points = listOfPlayers["!gamesData!"][game][3]
         if (!Array.isArray(nameOne)) {
@@ -1609,10 +1530,10 @@ function count(animate, undoed) {
 function addElement(tag, parent, className) {
 
     var element = document.createElement(tag);
-    if (className !== null) {
+    if (className) {
         element.classList.add(className);
     }
-    if (parent !== null) {
+    if (parent) {
         parent.appendChild(element);
     }
     return element;
@@ -1623,7 +1544,7 @@ function gameData(infom, number) {
     /* gamename, prvi igralc, drug igralc, tocke, ima radlc, razlika, dobil zgubil, bonusi, bonusi Tocke*/
     var info = listOfPlayers["!gamesData!"][parseInt(infom)];
 
-    var newElement = dialogBuilder(null, "Tukaj lahko vidite podatke o igri in jih spremenite");
+    var newElement = dialogBuilder(null, "Igra");
     document.body.appendChild(newElement.parentNode)
     if (info[0] !== "Po meri" && info[0] !== "Klop") {
         var changeValue = document.createElement("md-outlined-text-field");
@@ -1637,7 +1558,7 @@ function gameData(infom, number) {
         newElement.appendChild(changeValue);
     }
     var table = addElement("table", null, "gameData");
-    var podatki = ["Igra", "Igralec", "Partner", "Točke", "Radlc", "Razlika", "Uspeh", "Bonusi", "Bonus Točke", "Kontra", "Rekontra"];
+    var podatki = ["Igra", "Igralec", "Partner", "Točke", "Radlc", "Razlika", "Uspeh", "Bonusi", "Bonus Točke", "Kontra", "Rekontra", "Datum"];
     table.style.marginBottom = "10px"
     for (let i = 0; i < podatki.length; i++) {
         var key = podatki[i];
@@ -1654,6 +1575,7 @@ function gameData(infom, number) {
             }
         }
     }
+
     console.log(completePodatki);
     function createTableData(element, element1, data) {
         let tdVelk = addElement("tr", table, "gameTdDiv");
@@ -1667,6 +1589,16 @@ function gameData(infom, number) {
         let td = addElement("td", tdVelk, "gameDataTdBottom");
         td.innerHTML = element;
     }
+
+    //Datum
+    if (completePodatki["Datum"][1]) {
+        var date = new Date(completePodatki["Datum"][1]);
+        var dateString = (date.toLocaleString('sl-Si', { weekday: 'long' })) + ", " + date.getDate() + ". " + (date.toLocaleString('sl-Si', { month: 'long' })) + " " + date.getFullYear() + ", ob " + date.getHours() + "." + date.getMinutes()
+        changeOpis(newElement, dateString)
+    }
+
+
+
     let element1
     let element
     let data
@@ -1680,18 +1612,18 @@ function gameData(infom, number) {
     element = completePodatki[data][1];
 
     element1 = data + " " + completePodatki[data][1].toLowerCase();
-    if (element1.toLowerCase().includes("po meri") || element1.toLowerCase().includes("klop") || element1.toLowerCase().includes("renons")) {
+    if (element1.toLowerCase().includes("po meri") || element1.toLowerCase().includes("klop") || element1.toLowerCase().includes("renons") || element1.toLowerCase().includes("mondfang")) {
         element = 0
         if (element1.includes("po meri")) { createTableData("", "Po meri") } else if (element1.includes("klop")) {
             createTableData("", "Klop")
-        } else {
+        } else if (element1.includes("mondfang")) { createTableData("", "Mondfang") } else {
             createTableData("", "Renons")
         }
         if (typeof completePodatki["Igralec"][1] == "string") completePodatki["Igralec"][1] = completePodatki["Igralec"][1].split(",")
         if (typeof completePodatki["Točke"][1] == "number") completePodatki["Točke"][1] = completePodatki["Točke"][1].toString().split(",")
         for (let ina = 0; ina < completePodatki["Igralec"][1].length; ina++) {
             const element = completePodatki["Igralec"][1][ina];
-            if (completePodatki["Radlc"][1]) { createTableData(completePodatki["Točke"][1][ina] * 2, element) } else {
+            if (completePodatki["Radlc"][1] && !element1.includes("mondfang")) { createTableData(completePodatki["Točke"][1][ina] * 2, element) } else {
                 createTableData(completePodatki["Točke"][1][ina], element)
             }
 
@@ -1768,7 +1700,7 @@ function gameData(infom, number) {
 
     //Kontra
     try {
-        if (!completePodatki["Igra"][1].toLowerCase().includes("po meri") && !completePodatki["Igra"][1].toLowerCase().includes("klop") && completePodatki["Kontra"][1]) {
+        if (!completePodatki["Igra"][1].toLowerCase().includes("po meri") && !completePodatki["Igra"][1].toLowerCase().includes("klop") && !completePodatki["Igra"][1].toLowerCase().includes("mondfang") && completePodatki["Kontra"][1]) {
 
             data = "Kontra"
             element1 = data
@@ -1789,7 +1721,7 @@ function gameData(infom, number) {
 
     //Rekontra
     try {
-        if (!completePodatki["Igra"][1].toLowerCase().includes("po meri") && !completePodatki["Igra"][1].toLowerCase().includes("klop") && completePodatki["Rekontra"][1]) {
+        if (!completePodatki["Igra"][1].toLowerCase().includes("po meri") && !completePodatki["Igra"][1].toLowerCase().includes("klop") && !completePodatki["Igra"][1].toLowerCase().includes("mondfang") && completePodatki["Rekontra"][1]) {
 
             data = "Rekontra"
             element1 = data
@@ -1808,7 +1740,7 @@ function gameData(infom, number) {
     } catch { }
 
     //Tocke
-    if (!completePodatki["Igra"][1].toLowerCase().includes("po meri") && !completePodatki["Igra"][1].toLowerCase().includes("klop") && !completePodatki["Igra"][1].toLowerCase().includes("renons")) {
+    if (!completePodatki["Igra"][1].toLowerCase().includes("po meri") && !completePodatki["Igra"][1].toLowerCase().includes("klop") && !completePodatki["Igra"][1].toLowerCase().includes("renons") && !completePodatki["Igra"][1].toLowerCase().includes("mondfang")) {
 
         data = "Točke"
         element1 = data
@@ -1851,7 +1783,9 @@ function gameData(infom, number) {
     iks.innerHTML = "Končano";
     iks.style.margin = "0"
     actionsHold.appendChild(iks);
+
     iks.addEventListener("click", function (e) {
+        hideDialog(newElement);
         if (info[0] !== "Po Meri" && info[0] !== "Klop" && listOfPlayers["!gamesData!"][infom][3] !== changeValue.value) {
             if (info[4]) {
                 listOfPlayers["!gamesData!"][infom][3] = changeValue.value / 2
@@ -1863,7 +1797,7 @@ function gameData(infom, number) {
             count(true);
 
         }
-        hideDialog(newElement);
+
     });
 }
 
@@ -1935,8 +1869,19 @@ function privacy() {
     var newElement = dialogBuilder(iks, "Politika zasebnosti")
     newElement.parentNode.classList.add("fullscreen")
     iks.addEventListener("click", function (e) {
-        hideDialog(newElement);
+
+        document.getElementById("game").style.animation = "none";
+
+        document.getElementById("homeContainer").style.animation = "none"
+        document.getElementById("homeContainer").style.display = "block"
+
+        setTimeout(() => {
+            hideDialog(newElement);
+            document.getElementById("homeContainer").style.animation = ""
+
+        }, 1);
     });
+    dlgFullscreen(newElement.parentNode)
     document.body.appendChild(newElement.parentNode)
     var policy = addElement("p", newElement, null);
     policy.setAttribute("style", "white-space: pre;text-wrap: wrap;width: 80%;margin: 20px;color: var(--colorTxtDialog);")
@@ -1964,49 +1909,54 @@ function feedback() {
     emailContentInput.placeholder = "Kar po domače..."
     newElement.appendChild(emailContentInput);
     emailContentInput.focus();
-    var shareButton = document.createElement("md-filled-button");
+    let actions = document.createElement('div')
+    actions.setAttribute("slot", "actions")
+    newElement.parentNode.appendChild(actions)
+    var shareButton = document.createElement("md-filled-tonal-button");
     shareButton.innerHTML = "Pošlji";
-    addElement("div", newElement, "break");
-    newElement.appendChild(shareButton);
+
+    actions.appendChild(shareButton);
     shareButton.addEventListener("click", function () {
         window.open("mailto:stevec.taroka@gmail.com?subject=Imam izbolšavo&body=" + emailContentInput.value, "_blank");
     });
 }
 var queryAnim = false
 window.addEventListener("load", function () {
-    if (!HTMLScriptElement.supports('importmap')) {
-        document.head.innerHTML !== '<script async src="https://unpkg.com/es-module-shims@1.3.0/dist/es-module-shims.js"></script>'
+
+    if (sessionStorage.uid == "null") {
+        hideElement(document.querySelectorAll(".loader")[0])
     }
-    if (sessionStorage.uid == null) {
-        hideElement(document.querySelector(".loader"))
+    if (!localStorage.firstTime) {
+        localStorage.firstTime = true
+    }
+    if (localStorage.firstTime == "true") {
+
+        //document.getElementById("firstTime").style.display = "block"
     }
     queryAnim = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var androidV = null;
-    try { hideElement(document.querySelector(".loader")) } catch { }
-    if (location.pathname.includes("users")) { upload() } else {
-        if (location.pathname !== "/") { Game(decodeURIComponent(location.pathname.slice(1))) }
-    }
-    if (localStorage.offlineChanges == undefined) { window.loadDataFromWeb(); console.log("ddd"); } else { if (navigator.onLine) { console.log('update'); updateUserData(); localStorage.offlineChanges = undefined } };
 
-    changeTheme(localStorage.themeColor);
+    try { hideElement(document.querySelectorAll(".loader")[0]); } catch { }
+    if (!location.pathname.includes("users") && location.pathname !== "/") {
+        Game(decodeURIComponent(location.pathname.slice(1)))
+    }
+    if (localStorage.offlineChanges == undefined) { window.loadDataFromWeb(); } else { if (navigator.onLine) { updateUserData(); localStorage.offlineChanges = undefined } };
+
+    try {
+        changeTheme(localStorage.themeColor);
+    } catch (error) {
+        console.log(error);
+    }
+
 
 
 
     if (sessionStorage.uid !== null && sessionStorage.uid !== undefined && sessionStorage.uid !== 'null' && sessionStorage.uid !== 'undefined') {
         watchChanges()
     }
-    navigator.userAgentData
-        .getHighEntropyValues([
-            "platform",
-            "platformVersion",
-        ])
-        .then((ua) => {
-            if (ua.platform == "Android") androidV = ua.platformVersion
-        });
 
-    if (androidV !== null && androidV < 10) queryAnim = true
 
     if (queryAnim) document.body.style.setProperty('--transDur', '0s');
+
 })
 
 function settings() {
@@ -2018,15 +1968,25 @@ function settings() {
     dialog.parentNode.classList.add("fullscreen")
     iks.addEventListener("click", function (e) {
         document.getElementById("game").style.animation = "none";
-        hideDialog(dialog);
+
+        document.getElementById("homeContainer").style.animation = "none"
+        document.getElementById("homeContainer").style.display = "block"
+
+        setTimeout(() => {
+            hideDialog(dialog);
+            document.getElementById("homeContainer").style.animation = ""
+
+        }, 1);
     });
+    dlgFullscreen(dialog.parentNode)
     document.body.appendChild(dialog.parentNode)
     var holder = addElement("md-list", dialog, null)
     var tema = addElement("md-list-item", holder, null)
 
 
 
-    tema.innerHTML = 'Tema aplikacije:'
+    tema.innerHTML = 'Tema aplikacije'
+    addElement("md-ripple", tema, null)
     var colPick = document.createElement("input")
     tema.addEventListener("click", function () {
         colPick.click()
@@ -2042,7 +2002,7 @@ function settings() {
     addElement("md-divider", holder, null)
     var razlikaOkroz = addElement("md-list-item", holder, null)
     razlikaOkroz.setAttribute("style", "display: flex;align-items: center;")
-    razlikaOkroz.innerHTML = "Zaokroževanje razlike:&nbsp;&nbsp;&nbsp;&nbsp;"
+    razlikaOkroz.innerHTML = "Zaokroževanje razlike&nbsp;&nbsp;&nbsp;&nbsp;"
     var switchRaz = addElement("md-switch", razlikaOkroz, null)
     switchRaz.setAttribute("slot", "end")
     if (JSON.parse(localStorage.getItem("razlikaOkrozi")) == true || localStorage.getItem("razlikaOkrozi") == null) {
@@ -2061,47 +2021,78 @@ function settings() {
         zaokrožuj = JSON.parse(localStorage.getItem("razlikaOkrozi"))
     });
 }
+
+
+
 window.addEventListener("load", function () {
 
     document.querySelector("#game").addEventListener("click", function () {
         event.target.setAttribute("clicked", "")
 
     })
+    const tabs = document.getElementById("tabsi")
+    let currentPanel = null;
+    const panelIda = tabs.activeTab?.getAttribute('aria-controls');
+    const roota = tabs.getRootNode();
+    currentPanel = roota.querySelector(`#${panelIda}`);
+    setTimeout(() => {
+        const next = tabs.activeTab.nextElementSibling;
 
-})
+        if (next) {
+            tabs.activeTab.active = false; next.active = true;
 
-function helpMe() {
-    var iks = document.createElement("md-icon-button")
-    iks.setAttribute("value", "close")
-    iks.classList.add("iksRight")
-    iks.innerHTML = showIks;
-    var dialog = dialogBuilder(iks, "Pomoč")
-    dialog.parentNode.classList.add("fullscreen")
-    iks.addEventListener("click", function (e) {
-        hideDialog(dialog);
+        }
+    }, 300);
+
+    setTimeout(() => {
+        document.querySelector("#nextTab").addEventListener("click", function () {
+
+            currentPanel.hidden = true;
+            currentPanel.style.animation = "hideTab var(--transDur) forwards"
+            const panelId = tabs.activeTab?.getAttribute('aria-controls');
+            const root = tabs.getRootNode();
+            const nexta = tabs.activeTab.nextElementSibling; if (nexta) {
+                tabs.activeTab.active = false; nexta.active = true;
+
+            }
+            currentPanel = root.querySelector(`#${panelId}`);
+
+            if (currentPanel && currentPanel.id !== "panel-four") {
+                setTimeout(() => {
+                    currentPanel.style.animation = "showTab var(--transDur) forwards"
+
+                    currentPanel.hidden = false;
+
+                }, 200);
+
+
+            } else {
+
+                document.getElementById("firstTime").style.backgroundColor = "transparent";
+                document.getElementById("nextTab").style.animation = "hideTab var(--transDur) forwards"
+                localStorage.firstTime = false
+                setTimeout(() => {
+                    document.getElementById("firstTime").remove()
+                    document.getElementById("nextTab").remove()
+                }, 300);
+            }
+
+        })
+    }, 300);
+
+
+    document.getElementById("colorTrigger").addEventListener("click", function () {
+        document.getElementById("colPickStart").click()
+    })
+    document.getElementById("colPickStart").addEventListener("change", function () {
+        localStorage.themeColor = event.target.value;
+
+        changeTheme(event.target.value)
     });
-    document.body.appendChild(dialog.parentNode)
-    dialog.innerHTML = `<div id="pomoc"> <md-list>
-    <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako ustvariti novo skupino?</b> <md-icon slot="end">expand_more</md-icon>
-        <p style="font-size:1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>Za ustvarjanje nove skupine na domačem zaslonu kliknite na gumb 'Nova skupina'.<br><br>Po kliku se bo odprlo okno, v katerem lahko vnesete imena igralcev, ki sodelujejo v skupini. Za dodajanje večih igralcev uporabite gumb 'Dodaj igralca'. Po kliku gumba 'Naprej' vnesite še vzdevek skupine in kliknite  'Končano'.</p>
-    </md-list-item>
-    <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako dodati novo igro na seznam?</b> <md-icon slot="end">expand_more</md-icon>
-        <p style="font-size: 1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>Če želite dodati novo igro, na zaslonu za štetje kliknite na igralca, ki jo je igral. Nato sledite navodilom, da boste uspešno dodali novo igro na seznam.</p>
-    </md-list-item>
-    <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako spremeniti barvno temo?</b> <md-icon slot="end">expand_more</md-icon>
-        <p style="font-size: 1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>Za spreminjanje barvne teme aplikacije na domačem zaslonu kliknite na gumb 'Nastavitve', zatem pa gumb 'Tema aplikacije' in izberite barvo, ki vam je všeč.</p>
-    </md-list-item>
-    <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Zakaj Google prijava?</b> <md-icon slot="end">expand_more</md-icon>
-        <p style="font-size:1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>Prijava s storitvijo Google vam omogoča enostavno shranjevanje podatkov v oblaku. To pomeni, da lahko na katerikoli napravi, kjer se prijavite s svojim Google računom, dostopate do svojih iger in jih urejate. Google prijava vam omogoča tudi deljenje igre s prijatelji.</p>
-    </md-list-item>
-    <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kaj pomenijo gumbi v spodnjem delu zaslona za štetje?</b> <md-icon slot="end">expand_more</md-icon>
-        <p style="font-size: 1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>● <md-icon>home</md-icon> vam omogoča, da se vrnete na domači zaslon.<br><br>● <md-icon>undo</md-icon> vam omogoča, da razveljavite zadnje dejanje na seznamu.<br><br>● <md-icon>person_add</md-icon> vam omogoča, da povabite prijatelje v skupino, kjer bodo imeli tudi oni možnost urejanja.<br><br>● <md-icon>delete</md-icon> vam omogoča, da izbrišete celotno igro. </p>
-    </md-list-item>
-    <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako povabiti prijatelje v skupino?</b> <md-icon slot="end">expand_more</md-icon>
-        <p style="font-size: 1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>Če želite povabiti prijatelje v skupino, kliknite na tretji gumb v spodnjem delu zaslona <md-icon>person_add</md-icon>. Odpre se vam okno, kjer lahko kopirate ali delite povezavo do igre.<br><br>Ko prijatelj dobi povezavo, jo mora le odpreti.<br><br>Za dodajanje prijateljev v skupino morate biti prijavljeni in imeti internetno povezavo.</p>
-    </md-list-item>
-</md-list></div>`
-    var lst = document.getElementById("pomoc").getElementsByTagName("md-list-item")
+    document.getElementById("panel-three").innerHTML = pomoc
+    document.getElementById("pomoc").id = "pomoc2"
+    document.getElementById("pomoc2").style.position = "absolute"
+    var lst = document.getElementById("pomoc2").getElementsByTagName("md-list-item")
     for (const item of lst) {
         item.addEventListener("click", function () {
             if (item.getElementsByTagName('p')[0].style.height == '0px') {
@@ -2117,7 +2108,92 @@ function helpMe() {
             }
         })
     }
+})
+
+function helpMe(dlg) {
+    if (!document.getElementById("pomoc")) {
+
+
+        var iks = document.createElement("md-icon-button")
+        iks.setAttribute("value", "close")
+        iks.classList.add("iksRight")
+        iks.innerHTML = showIks;
+        var dialog = dialogBuilder(iks, "Pomoč")
+        dialog.parentNode.classList.add("fullscreen")
+        if (dlg) {
+            dlg.removeAttribute("open")
+        }
+        iks.addEventListener("click", function (e) {
+
+            if (!dlg) {
+                document.getElementById("game").style.animation = "none";
+
+                document.getElementById("homeContainer").style.animation = "none"
+                document.getElementById("homeContainer").style.display = "block"
+
+                setTimeout(() => {
+                    hideDialog(dialog);
+                    document.getElementById("homeContainer").style.animation = ""
+
+                }, 1);
+            } else {
+                document.getElementById("game").style.animation = "none";
+
+
+
+                setTimeout(() => {
+                    hideDialog(dialog);
+                    dlg.setAttribute("open", "")
+
+                }, 1);
+            }
+
+        });
+        dlgFullscreen(dialog.parentNode, dlg)
+        dialog.innerHTML = pomoc
+        document.body.appendChild(dialog.parentNode)
+
+        var lst = document.getElementById("pomoc").getElementsByTagName("md-list-item")
+        for (const item of lst) {
+
+            item.addEventListener("click", function () {
+
+                if (item.getElementsByTagName('p')[0].style.height == '0px') {
+                    expandSection(item.getElementsByTagName('p')[0])
+
+                    item.getElementsByTagName('md-icon')[0].innerHTML = "expand_less"
+
+
+                } else {
+                    collapseSection(item.getElementsByTagName('p')[0])
+
+                    item.getElementsByTagName('md-icon')[0].innerHTML = "expand_more"
+                }
+            })
+        }
+    }
 }
+
+const pomoc = `<div id="pomoc"> <md-list>
+<md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako ustvariti novo skupino?</b> <md-icon slot="end">expand_more</md-icon>
+    <p style="font-size:1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>Za ustvarjanje nove skupine na domačem zaslonu kliknite na gumb 'Nova skupina'.<br><br>Po kliku se bo odprlo okno, v katerem lahko vnesete imena igralcev, ki sodelujejo v skupini. Za dodajanje večih igralcev uporabite gumb 'Dodaj igralca'. Po kliku gumba 'Naprej' vnesite še vzdevek skupine in kliknite  'Končano'.</p>
+</md-list-item>
+<md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako dodati novo igro na seznam?</b> <md-icon slot="end">expand_more</md-icon>
+    <p style="font-size: 1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>Če želite dodati novo igro, na zaslonu za štetje kliknite na igralca, ki jo je igral. Nato sledite navodilom, da boste uspešno dodali novo igro na seznam.</p>
+</md-list-item>
+<md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako spremeniti barvno temo?</b> <md-icon slot="end">expand_more</md-icon>
+    <p style="font-size: 1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>Za spreminjanje barvne teme aplikacije na domačem zaslonu kliknite na gumb 'Nastavitve', zatem pa gumb 'Tema aplikacije' in izberite barvo, ki vam je všeč.</p>
+</md-list-item>
+<md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Zakaj Google prijava?</b> <md-icon slot="end">expand_more</md-icon>
+    <p style="font-size:1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>Prijava s storitvijo Google vam omogoča enostavno shranjevanje podatkov v oblaku. To pomeni, da lahko na katerikoli napravi, kjer se prijavite s svojim Google računom, dostopate do svojih iger in jih urejate. Google prijava vam omogoča tudi deljenje igre s prijatelji.</p>
+</md-list-item>
+<md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kaj pomenijo gumbi v spodnjem delu zaslona za štetje?</b> <md-icon slot="end">expand_more</md-icon>
+    <p style="font-size: 1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>● <md-icon>home</md-icon> vam omogoča, da se vrnete na domači zaslon.<br><br>● <md-icon>undo</md-icon> vam omogoča, da razveljavite zadnje dejanje na seznamu.<br><br>● <md-icon>person_add</md-icon> vam omogoča, da povabite prijatelje v skupino, kjer bodo imeli tudi oni možnost urejanja.<br><br>● <md-icon>delete</md-icon> vam omogoča, da izbrišete celotno igro. </p>
+</md-list-item>
+<md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako povabiti prijatelje v skupino?</b> <md-icon slot="end">expand_more</md-icon>
+    <p style="font-size: 1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>Če želite povabiti prijatelje v skupino, kliknite na tretji gumb v spodnjem delu zaslona <md-icon>person_add</md-icon>. Odpre se vam okno, kjer lahko kopirate ali delite povezavo do igre.<br><br>Ko prijatelj dobi povezavo, jo mora le odpreti.<br><br>Za dodajanje prijateljev v skupino morate biti prijavljeni in imeti internetno povezavo.</p>
+</md-list-item>
+</md-list><div class="break" style="height:80px;"></div></div>`
 // This is the important part!
 
 function collapseSection(element) {
@@ -2206,11 +2282,30 @@ self.addEventListener("install", (event) => {
             "/tarok.css",
             "/tarok.js",
             "/firebase.js",
-            "/star-wars-logo.jpg",
+
             "/assets/icon.png",
             "/assets/btn_google_light_normal_ios.svg",
             "/assets/policies.txt",
-            "@material/web/all.js",
+
+            '@material/web/icon/icon.js',
+            '@material/web/menu/menu-item.js',
+            '@material/web/menu/menu.js',
+            '@material/web/dialog/dialog.js',
+            '@material/web/ripple/ripple.js',
+            '@material/web/button/outlined-button.js',
+            '@material/web/switch/switch.js',
+            '@material/web/iconbutton/icon-button.js',
+            '@material/web/iconbutton/filled-tonal-icon-button.js',
+            '@material/web/button/filled-button.js',
+            '@material/web/slider/slider.js',
+            '@material/web/list/list-item.js',
+            '@material/web/fab/fab.js',
+            '@material/web/progress/circular-progress.js',
+            '@material/web/list/list.js',
+            '@material/web/button/text-button.js',
+            '@material/web/textfield/outlined-text-field.js',
+            '@material/web/textfield/filled-text-field.js',
+            '@material/web/button/filled-tonal-button.js'
         ]),
     );
 });
@@ -2218,3 +2313,79 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', eve
     changeTheme(localStorage.themeColor)
 })
 window.addEventListener('popstate', function (event) { console.log("BACK"); if (location.pathname == "/") document.querySelector(".homeBtn").click() })
+
+
+
+
+window.addEventListener("load", async function () {
+    let installPrompt = null;
+    const installButton = document.querySelector("#pwa");
+    let ifitis = false
+    window.addEventListener("appinstalled", () => {
+        disableInAppInstallPrompt();
+        console.log("app installed");
+    });
+    window.addEventListener("beforeinstallprompt", (event) => {
+        event.preventDefault();
+        installPrompt = event;
+
+        installButton.style.display = "flex";
+
+
+    });
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        disableInAppInstallPrompt();
+        console.log("app standalone");
+    }
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+        if (!ifitis) {
+            installButton.style.display = "flex";
+
+        }
+    }
+    var relatedApps = []
+    try {
+        relatedApps = await navigator.getInstalledRelatedApps();
+        if (relatedApps.length !== 0 && !ifitis) {
+            installButton.innerHTML = 'Nadaljuj v aplikaciji<md-icon slot="icon">open_in_new</md-icon>'
+            installButton.style.display = "flex";
+        }
+    } catch {
+
+    }
+
+
+    installButton.addEventListener("click", async () => {
+        if (relatedApps.length !== 0) {
+            window.open('/', '_blank');
+            return
+        }
+
+        if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+            let dialog = dialogBuilder(null, "iOS Aplikacija")
+            dialog.innerHTML = 'Če želite naložiti aplikacijo, spodaj pritisnite gumb za deljenje&nbsp;<md-icon style="font-size: 1rem;display:contents;" aria-hidden="true">ios_share</md-icon></span>&nbsp;in poiščite gumb  "<md-icon style="font-size: 1rem;display:contents;" aria-hidden="true">add_box</md-icon> Add to home screen".'
+            let actions = document.createElement('div')
+            actions.setAttribute("slot", "actions")
+            dialog.parentNode.appendChild(actions)
+            let close = addElement("md-text-button", actions, null)
+            close.innerHTML = "Ok"
+            close.addEventListener("click", function () {
+                hideDialog(dialog)
+            })
+            document.body.appendChild(dialog.parentNode)
+        } else {
+            const result = await installPrompt.prompt();
+
+            disableInAppInstallPrompt();
+        }
+
+
+    });
+
+    function disableInAppInstallPrompt() {
+        ifitis = true
+        installPrompt = null;
+        installButton.style.display = "none";
+    }
+
+})

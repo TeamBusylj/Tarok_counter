@@ -9,7 +9,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Števec taroka</title>
     <meta name="theme-color" content="#22282d" />
-    <script async src="https://unpkg.com/es-module-shims@1.3.0/dist/es-module-shims.js"></script>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="tarok.css">
@@ -33,8 +32,12 @@
         }
         </script>
 </head>
+<script src="https://unpkg.com/es-module-shims@1.3.0/dist/es-module-shims.js"></script>
+<script src="https://unpkg.com/element-internals-polyfill@1.3.10/dist/index.js"></script>
 <script src="tarok.js"></script>
+<script src="longvars.js"></script>
 <script type="module">
+
 
 
     import '@material/web/icon/icon.js';
@@ -45,7 +48,6 @@
     import '@material/web/button/outlined-button.js'
     import '@material/web/switch/switch.js';
     import '@material/web/iconbutton/icon-button.js';
-    import '@material/web/iconbutton/filled-tonal-icon-button.js'
     import '@material/web/button/filled-button.js'
     import '@material/web/slider/slider.js';
     import '@material/web/list/list-item.js';
@@ -56,10 +58,13 @@
     import '@material/web/textfield/outlined-text-field.js'
     import '@material/web/textfield/filled-text-field.js'
     import '@material/web/button/filled-tonal-button.js'
+    import '@material/web/tabs/primary-tab.js';
+    import '@material/web/tabs/tabs.js';
+    import '@material/web/iconbutton/filled-tonal-icon-button.js'
 
+    import { argbFromHex } from "@material/material-color-utilities/utils/string_utils.js";
 
-
-    import { argbFromHex, themeFromSourceColor, applyTheme } from "@material/material-color-utilities/index.js";
+    import { applyTheme, themeFromSourceColor } from "@material/material-color-utilities/utils/theme_utils.js";
     function changeTheme(colorHex) {
 
         if (localStorage.themeColor == null || localStorage.themeColor == undefined) {
@@ -93,12 +98,12 @@
 
 <body>
     <div id="homeContainer">
-        <p id="signInMessage">Za shranjevanje podatkov se prijavite.<br></p>
+        <p id="signInMessage">Za dodatne funkcije se prijavite<br></p>
         <md-fab id="newgame" onclick="newGame()" label="Nova skupina" variant="primary" aria-label="Nova skupina">
             <md-icon slot="icon">add</md-icon>
         </md-fab>
         <div id="homescreen">
-            <md-filled-tonal-button id="game" onclick="Game()">Izberi igro <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+            <md-filled-tonal-button id="game" onclick="Game()">Izberi igro<svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
                     <path d="M280-600v-80h560v80H280Zm0 160v-80h560v80H280Zm0 160v-80h560v80H280ZM160-600q-17 0-28.5-11.5T120-640q0-17 11.5-28.5T160-680q17 0 28.5 11.5T200-640q0 17-11.5 28.5T160-600Zm0 160q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440Zm0 160q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360q17 0 28.5 11.5T200-320q0 17-11.5 28.5T160-280Z" />
                 </svg></md-filled-tonal-button>
             <button class="gsi-material-button" id="signInGoogle">
@@ -120,6 +125,8 @@
                     <span style="display: none;">Sign in with Google</span>
                 </div>
             </button>
+            <md-filled-button style="display: none;" id="pwa">Naloži aplikacijo<md-icon slot="icon">install_mobile</md-icon></md-filled-button>
+            <p id="newapp">Ker nam pomeni, da ste z aplikacijo zadovoljni, bomo veseli vsake povratne informacije v meniju treh pikic. </p>
         </div>
         <md-icon-button style="left: 10px;z-index: 5;" onclick="settings()" class="menu-container">
             <md-icon><span class="material-symbols-outlined"> settings </span></md-icon></md-icon-button>
@@ -151,7 +158,6 @@
             </md-menu>
         </span>
         <div id="actionBarStart">
-            <p id="newapp">Ker nam pomeni, da ste z aplikacijo zadovoljni, bomo veseli vsake povratne informacije v meniju treh pikic. </p>
         </div>
     </div>
     <div id="bottomBar" role="footer">
@@ -163,6 +169,28 @@
         </div>
     </div>
     <script src="firebase.js" type="module"></script>
+    <div id="firstTime">
+        <md-icon-button class="iksRight" onclick="document.getElementById('firstTime').remove()"><md-icon>close</md-icon><md-ripple for="touch" class="unbounded"></md-ripple></md-icon-button>
+        <md-tabs id="tabsi">
+            <md-primary-tab style="display: none;" aria-controls="panel-one" tabindex="0" active> Photos </md-primary-tab>
+            <md-primary-tab style="display: none;" aria-controls="panel-two" tabindex="-1"> Videos </md-primary-tab>
+            <md-primary-tab style="display: none;" aria-controls="panel-three" tabindex="-2"> Music </md-primary-tab>
+            <md-primary-tab style="display: none;" aria-controls="panel-four" tabindex="-3"> Music </md-primary-tab>
+        </md-tabs>
+        <div class="nextHolder">
+            <md-filled-button id="nextTab">Naprej</md-filled-button>
+        </div>
+        <div role="tabpanel" id="panel-one" style="display: flex;align-items: center;justify-content: center;height: 100%;">
+            <p style="margin-bottom: 240px;position: absolute;"><span style="font-size: 2rem;">Pozdravljeni!</span><br>Pritisnite gumb naprej za nadaljevanje.</p>
+        </div>
+        <div style="display: flex;align-items: center;justify-content: center;height: 100%; transform: translateX(100px);opacity: 0;" role="tabpanel" id="panel-two" hidden>
+            <p style="margin-bottom: 240px;position: absolute;"><span style="font-size: 2rem;">Tema</span><br>Kateja je vaša najljubša barva?</p>
+            <md-filled-button style="position: absolute;" id="colorTrigger">Spremeni barvo <md-icon slot="icon">palette</md-icon></md-filled-button>
+            <input style="visibility: hidden;" type="color" id="colPickStart"></input>
+        </div>
+        <div style="display: flex;align-items: center;justify-content: center;height: 100%;overflow: scroll; transform: translateX(100px);opacity: 0;" role="tabpanel" id="panel-three" hidden> gss </div>
+        <div role="tabpanel" id="panel-four" hidden> gss </div>
+    </div>
     <div class="loader">
         <div class="loaderInner" style="top: 40%;">
             <p style="position: relative;left: -20px;  top: -30px;">Nalaganje...</p> <svg class="circular-loader" viewBox="25 25 50 50">

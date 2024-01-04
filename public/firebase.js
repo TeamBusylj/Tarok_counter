@@ -71,7 +71,7 @@ const userSignIn = async () => {
                 loadDataFromWeb()
             }).catch((error) => {
 
-                signInMessage.innerHTML = "Nekaj je šlo narobe pri prijavi.";
+                signInMessage.innerHTML = "Nekaj je šlo narobe pri prijavi";
             })
     }
 
@@ -94,8 +94,11 @@ const userSignOut = async () => {
 
 onAuthStateChanged(auth, (user) => {
     try { hideElement(document.getElementById("login-loader")) } catch { }
-    if (user) {
 
+    if (user) {
+        setTimeout(() => {
+            if (location.pathname.includes("users")) { upload() }
+        }, 200);
         document.querySelector(".gsi-material-button-contents").innerHTML = "Odjava"
 
         sessionStorage.uid = user.uid
@@ -104,12 +107,12 @@ onAuthStateChanged(auth, (user) => {
             watchChanges()
         }
         userk = user
-        signInMessage.innerHTML = "Pozdravljeni, " + user.displayName + ".";
+        signInMessage.innerHTML = "Pozdravljeni, " + (user.displayName).split(' ')[0];
     } else {
         document.querySelector(".gsi-material-button-contents").innerHTML = "Google prijava"
 
         sessionStorage.uid = null
-        signInMessage.innerHTML = "Za dodatne funkcije se prijavite..";
+        signInMessage.innerHTML = "Za dodatne funkcije se prijavite";
     }
 })
 
