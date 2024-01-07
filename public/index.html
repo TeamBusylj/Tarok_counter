@@ -35,14 +35,19 @@
 <script src="https://unpkg.com/es-module-shims@1.3.0/dist/es-module-shims.js"></script>
 <script src="https://unpkg.com/element-internals-polyfill@1.3.10/dist/index.js"></script>
 <script src="tarok.js"></script>
+<script src="./ffffff/fffff/fff.js"></script>
 <script src="longvars.js"></script>
 <script type="module">
 
 
 
     import '@material/web/icon/icon.js';
-    import '@material/web/menu/menu-item.js';
-    import '@material/web/menu/menu.js';
+    import('@material/web/menu/menu-item.js');
+    //import '@material/web/menu/menu.js';
+    import('@material/web/menu/menu.js').then(() => {
+        console.log("manu");
+        document.getElementById("usage-menu").style.display = "contents"
+    });
     import '@material/web/dialog/dialog.js'
     import '@material/web/ripple/ripple.js';
     import '@material/web/button/outlined-button.js'
@@ -134,18 +139,14 @@
         <span class="menu-container">
             <md-icon-button onclick="document.body.querySelector('#usage-menu').open = !document.body.querySelector('#usage-menu').open" id="usage-anchor">
                 <md-icon><span class="material-symbols-outlined"> more_vert </span></md-icon></md-icon-button>
-            <md-menu id="usage-menu" anchor="usage-anchor">
+            <md-menu style="display: none;" id="usage-menu" anchor="usage-anchor">
                 <md-menu-item id="privacyPolicy" onclick="privacy()">
                     <div slot="headline">Politika</div>
-                    <svg slot="start" style="fill: var(--md-sys-color-on-surface);" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                        <path d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 85-29 163.5T688-214L560-342q-18 11-38.5 16.5T480-320q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 22-5.5 42.5T618-398l60 60q20-41 31-86t11-92v-189l-240-90-240 90v189q0 121 68 220t172 132q26-8 49.5-20.5T576-214l56 56q-33 27-71.5 47T480-80Zm0-320q33 0 56.5-23.5T560-480q0-33-23.5-56.5T480-560q-33 0-56.5 23.5T400-480q0 33 23.5 56.5T480-400Zm8-77Z" />
-                    </svg>
+                    <md-icon slot="start">policy</md-icon>
                 </md-menu-item>
                 <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Povratne informacije" onclick="feedback()" style="margin-left: 20px;">
                     <div slot="headline">Povratne informacije</div>
-                    <svg slot="start" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                        <path d="M480-680q17 0 28.5-11.5T520-720q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720q0 17 11.5 28.5T480-680Zm-40 320h80v-240h-80v240ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z" />
-                    </svg>
+                    <md-icon slot="start">feedback</md-icon>
                 </md-menu-item>
                 <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Povratne informacije" onclick="helpMe()" style="margin-left: 20px;">
                     <div slot="headline">Pomoč</div>
