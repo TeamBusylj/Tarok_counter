@@ -2,13 +2,13 @@ import "@material/web/icon/icon.js";
 import("@material/web/menu/menu-item.js");
 //import '@material/web/menu/menu.js';
 import("@material/web/menu/menu.js").then(() => {
-	console.log("manu");
 	document.getElementById("usage-menu").style.display = "contents";
 });
 
 import "@material/web/fab/fab.js";
 import "@material/web/progress/circular-progress.js";
 import "@material/web/button/filled-tonal-button.js";
+import "@material/web/button/filled-button.js";
 (async () => {
 	await import("@material/web/dialog/dialog.js");
 	await import("@material/web/ripple/ripple.js");
@@ -16,7 +16,6 @@ import "@material/web/button/filled-tonal-button.js";
 	await import("@material/web/iconbutton/icon-button.js");
 	await import("@material/web/dialog/dialog.js");
 	await import("@material/web/switch/switch.js");
-	await import("@material/web/button/filled-button.js");
 	await import("@material/web/iconbutton/filled-tonal-icon-button.js");
 	await import("@material/web/slider/slider.js");
 	await import("@material/web/list/list-item.js");

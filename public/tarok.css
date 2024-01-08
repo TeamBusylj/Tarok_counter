@@ -69,12 +69,11 @@ md-dialog [slot="headline"] {
 }
 
 #newapp {
-	text-align: center;
-	color: var(--colorTxtDialog);
-	scale: 0.8;
-	padding: 5px;
+    text-align: center;
+    color: var(--colorTxtDialog);
+   font-size: medium;
+      display: block;
 
-	display: block;
 }
 
 @media (max-height: 530px) {
@@ -463,7 +462,7 @@ html {
 	padding-bottom: 10px;
 	border-bottom-left-radius: 30px;
 	border-bottom-right-radius: 30px;
-	z-index: 50;
+	z-index: 9;
 	filter: saturate(0.6);
 	position: sticky;
 	top: 0px;
@@ -662,12 +661,12 @@ input:focus-visible {
 	display: flex;
 	flex-direction: row;
 	width: 100%;
-	z-index: 0;
+	z-index: 2;
 	position: relative;
 	transition: all var(--transDur);
 	justify-content: center;
 	align-items: top;
-	height: 100%;
+	height: 70%;
 }
 
 .brightnesslow {

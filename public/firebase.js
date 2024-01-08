@@ -1,11 +1,9 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js";
 
 import {
 	getDatabase,
 	ref,
-	set,
 	child,
 	get,
 	update,
@@ -19,11 +17,6 @@ import {
 	onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
 	apiKey: "AIzaSyBrxvJ-fs7wtfnsLzOy6WI_1J_CMHPXpoU",
 	authDomain: "tarock-counter.web.app",
@@ -37,7 +30,6 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const auth = getAuth();
 const provider = new GoogleAuthProvider();
 const signInButton = document.getElementById("signInGoogle");
@@ -220,6 +212,7 @@ export async function watchChanges() {
 				delete gamesObject[key];
 			}
 		}
+
 		localStorage.setItem("games", JSON.stringify(gamesObject));
 
 		setTimeout(() => {
