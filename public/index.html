@@ -32,74 +32,12 @@
         }
         </script>
 </head>
-<script src="https://unpkg.com/es-module-shims@1.3.0/dist/es-module-shims.js"></script>
-<script src="https://unpkg.com/element-internals-polyfill@1.3.10/dist/index.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.3.0/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/element-internals-polyfill@1.3.10/dist/index.js"></script>
 <script src="tarok.js"></script>
-<script src="./ffffff/fffff/fff.js"></script>
 <script src="longvars.js"></script>
-<script type="module">
-
-
-
-    import '@material/web/icon/icon.js';
-    import('@material/web/menu/menu-item.js');
-    //import '@material/web/menu/menu.js';
-    import('@material/web/menu/menu.js').then(() => {
-        console.log("manu");
-        document.getElementById("usage-menu").style.display = "contents"
-    });
-    import '@material/web/dialog/dialog.js'
-    import '@material/web/ripple/ripple.js';
-    import '@material/web/button/outlined-button.js'
-    import '@material/web/switch/switch.js';
-    import '@material/web/iconbutton/icon-button.js';
-    import '@material/web/button/filled-button.js'
-    import '@material/web/slider/slider.js';
-    import '@material/web/list/list-item.js';
-    import '@material/web/fab/fab.js';
-    import '@material/web/progress/circular-progress.js';
-    import '@material/web/list/list.js';
-    import '@material/web/button/text-button.js'
-    import '@material/web/textfield/outlined-text-field.js'
-    import '@material/web/textfield/filled-text-field.js'
-    import '@material/web/button/filled-tonal-button.js'
-    import '@material/web/tabs/primary-tab.js';
-    import '@material/web/tabs/tabs.js';
-    import '@material/web/iconbutton/filled-tonal-icon-button.js'
-
-    import { argbFromHex } from "@material/material-color-utilities/utils/string_utils.js";
-
-    import { applyTheme, themeFromSourceColor } from "@material/material-color-utilities/utils/theme_utils.js";
-    function changeTheme(colorHex) {
-
-        if (localStorage.themeColor == null || localStorage.themeColor == undefined) {
-            localStorage.themeColor = "#037ffc"
-            colorHex = "#037ffc"
-        }
-        const theme = themeFromSourceColor(argbFromHex(colorHex), [
-            {
-                name: "custom-1",
-                value: argbFromHex("#ff0000"),
-                blend: true,
-            },
-        ]);
-
-        // Print out the theme as JSON
-
-        // Check if the user has dark mode turned on
-        const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-        // Apply the theme to the body by updating custom properties for material tokens
-        applyTheme(theme, { target: document.body, dark: systemDark });
-        var themeColorMetaTag = document.querySelector("meta[name='theme-color']");
-        themeColorMetaTag.setAttribute("content", getComputedStyle(document.body).getPropertyValue('--md-sys-color-surface'));
-
-    }
-    window.changeTheme = changeTheme
-
-
-</script>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script type="module" src="module.js"></script>
+<script async src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
 <body>
     <div id="homeContainer">
@@ -108,9 +46,7 @@
             <md-icon slot="icon">add</md-icon>
         </md-fab>
         <div id="homescreen">
-            <md-filled-tonal-button id="game" onclick="Game()">Izberi igro<svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                    <path d="M280-600v-80h560v80H280Zm0 160v-80h560v80H280Zm0 160v-80h560v80H280ZM160-600q-17 0-28.5-11.5T120-640q0-17 11.5-28.5T160-680q17 0 28.5 11.5T200-640q0 17-11.5 28.5T160-600Zm0 160q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440Zm0 160q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360q17 0 28.5 11.5T200-320q0 17-11.5 28.5T160-280Z" />
-                </svg></md-filled-tonal-button>
+            <md-filled-tonal-button id="game" onclick="Game()">Izberi skupino <md-icon slot="icon">list</md-icon></md-filled-tonal-button>
             <button class="gsi-material-button" id="signInGoogle">
                 <md-ripple></md-ripple>
                 <div class="gsi-material-button-state"></div>
@@ -144,15 +80,15 @@
                     <div slot="headline">Politika</div>
                     <md-icon slot="start">policy</md-icon>
                 </md-menu-item>
-                <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Povratne informacije" onclick="feedback()" style="margin-left: 20px;">
+                <md-menu-item id="privacyPolicy" aria-label="Povratne informacije" onclick="feedback()">
                     <div slot="headline">Povratne informacije</div>
                     <md-icon slot="start">feedback</md-icon>
                 </md-menu-item>
-                <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Povratne informacije" onclick="helpMe()" style="margin-left: 20px;">
+                <md-menu-item id="privacyPolicy" aria-label="Povratne informacije" onclick="helpMe()">
                     <div slot="headline">Pomoč</div>
                     <md-icon slot="start">help</md-icon>
                 </md-menu-item>
-                <md-menu-item style="fill: var(--md-sys-color-on-surface);" id="privacyPolicy" aria-label="Povratne informacije" onclick="deleteAllData()" style="margin-left: 20px;">
+                <md-menu-item id="privacyPolicy" aria-label="Povratne informacije" onclick="deleteAllData()">
                     <div slot="headline">Izbriši vse moje podatke</div>
                     <md-icon slot="start">delete</md-icon>
                 </md-menu-item>
@@ -181,20 +117,20 @@
         <div class="nextHolder">
             <md-filled-button id="nextTab">Naprej</md-filled-button>
         </div>
-        <div role="tabpanel" id="panel-one" style="display: flex;align-items: center;justify-content: center;height: 100%;">
+        <div role="tabpanel" id="panel-one">
             <p style="margin-bottom: 240px;position: absolute;"><span style="font-size: 2rem;">Pozdravljeni!</span><br>Pritisnite gumb naprej za nadaljevanje.</p>
         </div>
-        <div style="display: flex;align-items: center;justify-content: center;height: 100%; transform: translateX(100px);opacity: 0;" role="tabpanel" id="panel-two" hidden>
+        <div role="tabpanel" id="panel-two" hidden>
             <p style="margin-bottom: 240px;position: absolute;"><span style="font-size: 2rem;">Tema</span><br>Kateja je vaša najljubša barva?</p>
             <md-filled-button style="position: absolute;" id="colorTrigger">Spremeni barvo <md-icon slot="icon">palette</md-icon></md-filled-button>
             <input style="visibility: hidden;" type="color" id="colPickStart"></input>
         </div>
-        <div style="display: flex;align-items: center;justify-content: center;height: 100%;overflow: scroll; transform: translateX(100px);opacity: 0;" role="tabpanel" id="panel-three" hidden> gss </div>
+        <div role="tabpanel" id="panel-three" hidden> gss </div>
         <div role="tabpanel" id="panel-four" hidden> gss </div>
     </div>
     <div class="loader">
         <div class="loaderInner" style="top: 40%;">
-            <p style="position: relative;left: -20px;  top: -30px;">Nalaganje...</p> <svg class="circular-loader" viewBox="25 25 50 50">
+            <p>Nalaganje...</p> <svg class="circular-loader" viewBox="25 25 50 50">
                 <circle class="loader-path" cx="50" cy="50" r="20" fill="none"></circle>
             </svg>
         </div>

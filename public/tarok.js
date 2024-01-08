@@ -1267,12 +1267,13 @@ function changeOpis(dlg, desc) {
 		desc;
 }
 
+/**
+ * Function displays text within an element on which is called
+ * @param {HTMLElement} xButt - button elem
+ * @param {string} desc - desctription of set element
+ * @returns {HTMLElement} HTML elem of x buttom
+ */
 function dialogBuilder(xButt, desc) {
-	/**
-	 * Function displays text within an element on which is called
-	 * @param xButt:
-	 */
-
 	var newElement = document.createElement("md-dialog");
 	newElement.setAttribute("open", "");
 
@@ -2304,6 +2305,7 @@ window.addEventListener("load", function () {
 		localStorage.firstTime = true;
 	}
 	if (localStorage.firstTime == "true") {
+		localStorage.firstTime = false;
 		//document.getElementById("firstTime").style.display = "block"
 	}
 	queryAnim = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
