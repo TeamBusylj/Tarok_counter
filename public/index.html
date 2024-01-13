@@ -11,12 +11,15 @@
     <meta name="theme-color" content="#22282d" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="tarok.css">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="tarok_v2.css">
     <link rel="stylesheet" href="theme.css">
     <script type="importmap">
         {
           "imports": {
-            "@material/web/": "https://cdn.jsdelivr.net/npm/@material/web@1.1.1/",
+            "@material/web/": "https://cdn.jsdelivr.net/npm/@material/web@nightly/",
             "lit": "https://cdn.jsdelivr.net/npm/lit@2/index.js",
             "lit/": "https://cdn.jsdelivr.net/npm/lit@2/",
             "@material/material-color-utilities/": "https://unpkg.com/@w3h/material-color-utilities@0.2.8/",
@@ -34,7 +37,7 @@
 </head>
 <script async src="https://unpkg.com/es-module-shims@1.3.0/dist/es-module-shims.js"></script>
 <script async src="https://unpkg.com/element-internals-polyfill@1.3.10/dist/index.js"></script>
-<script src="tarok.js"></script>
+<script src="tarok_v3.js"></script>
 <script async src="longvars.js"></script>
 <script type="module" src="module.js"></script>
 <script async src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -102,7 +105,7 @@
             <md-filled-tonal-icon-button class="bottomBtn  homeBtn" id="bottomBtn" onclick="document.getElementById('homeContainer').style.display = 'block';removeElement(document.getElementById('cntScreen'), document.getElementById('crezultLine'));document.getElementById('actionBar').style.display = 'none';listOfPlayersCopy=[];listOfPlayers=[];loadDataFromWeb();window.history.replaceState({}, document.title, '/');"> <md-icon>home</md-icon></md-filled-tonal-icon-button>
             <md-filled-tonal-icon-button class="bottomBtn undoBtn" disabled id="bottomBtn" onclick="undo()"> <md-icon>undo</md-icon></md-filled-tonal-icon-button>
             <div id="clck" style="flex-basis: auto;" class="bottomBtn"> <md-filled-tonal-icon-button style="width: 100%;" class="shrBtn" id="bottomBtn" onclick="download()"> <md-icon>person_add</md-icon></md-filled-tonal-icon-button></div>
-            <md-filled-tonal-icon-button class="bottomBtn dltBtn" id="bottomBtn" onclick="deleteGame()"> <md-icon>statistics</md-icon></md-filled-tonal-icon-button>
+            <md-filled-tonal-icon-button class="bottomBtn dltBtn" id="bottomBtn" onclick="statistika()"> <md-icon>insert_chart</md-icon></md-filled-tonal-icon-button>
         </div>
     </div>
     <script src="firebase.js" type="module"></script>

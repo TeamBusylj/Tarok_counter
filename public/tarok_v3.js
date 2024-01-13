@@ -15,7 +15,7 @@ var games = {
 	Renons: [0, false, "", true, "R"],
 	Mondfang: [-21, false, "", false, "R"],
 	"Po meri": [0, false, "", true, "+"],
-	"Dodaj radlce": ["", false, "", true, "*"]
+	"Uredi radlce": ["", false, "", true, "*"]
 };
 async function addScore(firstPlayer) {
 	var contentWh = dialogBuilder("Oseba <b>" + firstPlayer + "</b> je igrala...");
@@ -50,9 +50,8 @@ async function addScore(firstPlayer) {
 			} else if (key == "Po meri") {
 				poMeri(newElement, iks);
 			} else {
-				if (key == "Dodaj radlce") {
-					radlciDodaj(true);
-					hideDialog(newElement);
+				if (key == "Uredi radlce") {
+					radlciDodaj(true, newElement);
 				} else {
 					calculate(key, games[key], newElement, firstPlayer);
 				}
@@ -61,19 +60,72 @@ async function addScore(firstPlayer) {
 		newElement.appendChild(btn);
 	}
 }
-
-function radlciDodaj(remove) {
-	listOfPlayersCopy.push(JSON.stringify(listOfPlayers));
+function radlciDodajSamo() {
 	for (const key in listOfPlayers) {
 		if (key == "!gamesData!" || key == "!gameName!") {
 			continue;
 		}
 		listOfPlayers[key][0] += "*";
 	}
-	if (remove) {
-		removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"));
-		count(false);
+}
+function radlciDodaj(remove, newElement) {
+	changeOpis(newElement, "Uredi radlce");
+	newElement.innerHTML = "";
+	var divHolder = addElement("div", newElement, null);
+	let actions = document.createElement("div");
+	actions.setAttribute("slot", "actions");
+	newElement.parentNode.appendChild(actions);
+	createSliders();
+	let dodajRadlc = addElement("md-text-button", actions, null);
+	dodajRadlc.innerHTML = "Dodaj radlce";
+	dodajRadlc.addEventListener("click", function () {
+		listOfPlayersCopy.push(JSON.stringify(listOfPlayers));
+		for (const key in listOfPlayers) {
+			if (key == "!gamesData!" || key == "!gameName!") {
+				continue;
+			}
+			listOfPlayers[key][0] += "*";
+		}
+		divHolder.innerHTML = "";
+		createSliders();
+	});
+	function createSliders() {
+		for (const user in listOfPlayers) {
+			if (user == "!gamesData!" || user == "!gameName!") {
+				continue;
+			}
+			let labelname = addElement("label", divHolder, null);
+
+			let radlciPLayer = addElement("md-outlined-text-field", labelname, "radlciPLayer");
+			radlciPLayer.name = user;
+			radlciPLayer.setAttribute("min", "0");
+			radlciPLayer.setAttribute("type", "text");
+			if (!Array.isArray(listOfPlayers[user])) {
+				const set = new Set([listOfPlayers[user]]);
+				listOfPlayers[user] = Array.from(set);
+			}
+			radlciPLayer.value = listOfPlayers[user][0];
+			if (zaokrožuj) radlciPLayer.setAttribute("step", "5");
+			radlciPLayer.setAttribute("pattern", "[\\*]");
+			radlciPLayer.label = "Radlci osebe " + user;
+
+			addElement("div", divHolder, "break");
+		}
 	}
+	let koncano = addElement("md-filled-button", actions, null);
+	koncano.innerHTML = "Končano";
+	koncano.addEventListener("click", function () {
+		listOfPlayersCopy.push(JSON.stringify(listOfPlayers));
+		for (const user in listOfPlayers) {
+			if (user == "!gamesData!" || user == "!gameName!") {
+				continue;
+			}
+			let rld = document.getElementsByName(user)[0].value;
+			listOfPlayers[user] = rld.replace(/[^*]/g, "");
+		}
+		hideDialog(newElement);
+		count(true);
+	});
 }
 var showIks = '<md-icon>close</md-icon><md-ripple for="touch" class="unbounded"></md-ripple>';
 
@@ -136,7 +188,6 @@ function poMeri(newElement, iks) {
 		]);
 		hideDialog(newElement);
 
-		removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"));
 		count(true);
 	});
 }
@@ -144,11 +195,11 @@ var zaokrožuj = JSON.parse(localStorage.getItem("razlikaOkrozi"));
 if (zaokrožuj == null || zaokrožuj == undefined) zaokrožuj = true;
 async function klop(newElement) {
 	changeOpis(newElement, "Ali je bil kdo poln oz. prazen?");
-
-	var poln = addElement("md-outlined-button", newElement, null);
-	poln.innerHTML = "Poln";
 	var prazn = addElement("md-outlined-button", newElement, null);
-	prazn.innerHTML = "Prazen";
+	prazn.innerHTML = "Poln";
+	var poln = addElement("md-outlined-button", newElement, null);
+	poln.innerHTML = "Prazen";
+
 	var nibil = addElement("md-filled-button", newElement, null);
 	nibil.innerHTML = "Ne";
 	prazn.setAttribute("type", "reset");
@@ -289,7 +340,7 @@ async function klop(newElement) {
 			false,
 			Date.now()
 		]);
-		radlciDodaj(false);
+		radlciDodajSamo();
 		if (isfull) {
 			hideDialog(newElement);
 			removeElement(
@@ -398,7 +449,6 @@ async function renons(newElement) {
 			Date.now()
 		]);
 		hideDialog(newElement);
-		removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"));
 
 		count(true);
 	});
@@ -871,9 +921,9 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 		if (KUltK2) bonusi["Kralj ultimo"][1] *= 4;
 		if (PUltK2) bonusi["Pagat ultimo"][1] *= 4;
 		for (const key in bonusi) {
-			if (bonusi[key][2]) {
-				if (bonusi[key][2]) {
-					if (bonusi[key][3]) {
+			if (bonusi[key][2] !== null) {
+				if (bonusi[key][2] !== false) {
+					if (bonusi[key][3] == true) {
 						bnsi[key] = [bonusi[key][1], true, true];
 						bonusTocke += bonusi[key][1];
 					} else {
@@ -881,7 +931,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 						bonusTocke += bonusi[key][0];
 					}
 				} else {
-					if (bonusi[key][3]) {
+					if (bonusi[key][3] == true) {
 						bnsi[key] = [-Math.abs(bonusi[key][1]), true, false];
 						bonusTocke -= bonusi[key][1];
 					} else {
@@ -973,10 +1023,9 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 		if (IgraK) listOfPlayers["!gamesData!"].at(-1)[9] = true;
 		if (IgraK2) listOfPlayers["!gamesData!"].at(-1)[10] = true;
 
-		removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"));
 		hideDialog(newElement);
 		if (gameName.includes("Valat") || gameName.includes("Berač")) {
-			radlciDodaj(false);
+			radlciDodajSamo();
 		}
 
 		count(true);
@@ -995,9 +1044,9 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 		if (PUltK2) bonusi["Pagat ultimo"][1] *= 4;
 
 		for (const key in bonusi) {
-			if (bonusi[key][2]) {
-				if (bonusi[key][2]) {
-					if (bonusi[key][3]) {
+			if (bonusi[key][2] !== null) {
+				if (bonusi[key][2] !== false) {
+					if (bonusi[key][3] == true) {
 						bnsi[key] = [bonusi[key][1], true, true];
 						bonusTocke += bonusi[key][1];
 					} else {
@@ -1005,8 +1054,8 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 						bonusTocke += bonusi[key][0];
 					}
 				} else {
-					if (bonusi[key][3]) {
-						bnsi[key] = [-Math.abs(bonusi[key][0]), true, false];
+					if (bonusi[key][3] == true) {
+						bnsi[key] = [-Math.abs(bonusi[key][1]), true, false];
 						bonusTocke -= bonusi[key][1];
 					} else {
 						bnsi[key] = [-Math.abs(bonusi[key][0]), false, false];
@@ -1015,6 +1064,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 				}
 			}
 		}
+
 		listOfPlayersCopy.push(JSON.stringify(listOfPlayers));
 		if (!navigator.onLine) {
 			localStorage.offlineChanges = true;
@@ -1094,10 +1144,9 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 		if (IgraK) listOfPlayers["!gamesData!"].at(-1)[9] = true;
 		if (IgraK2) listOfPlayers["!gamesData!"].at(-1)[10] = true;
 
-		removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"));
 		hideDialog(newElement);
 		if (gameName.includes("Valat") || gameName.includes("Berač")) {
-			radlciDodaj(false);
+			radlciDodajSamo();
 		}
 
 		count(true);
@@ -1271,7 +1320,7 @@ function dialogBuilder(desc, iksa) {
 	xHolder.setAttribute("class", "dialog-headline");
 	xHolder.innerHTML = '<span style="flex: .83;">' + desc + "</span>";
 	var iks = document.createElement("md-icon-button");
-	console.log(iks);
+
 	if (iksa !== false) {
 		iks.setAttribute("value", "close");
 		iks.classList.add("iksRight");
@@ -1329,47 +1378,61 @@ function Game(already) {
 				if (user.includes("/users/")) {
 					user = user.slice(user.lastIndexOf("/") + 1);
 					if (user !== "!gamesData!" || user !== "!gameName!") {
+						var listItem = addElement("md-list-item", null, null);
+
+						listItem.setAttribute("type", "button");
+						listItem.setAttribute("interactive", "");
 						if (slct2.getElementsByTagName("md-list-item").length > 0) {
-							slct2.innerHTML +=
-								'<md-divider style="--_color: var(--md-sys-color-surface-container-high);height: 5px;"></md-divider><md-list-item type="button" onclick=" clickedUser(\'' +
-								user +
-								"','" +
-								full +
-								"');\" interactive>" +
-								user +
-								"</md-list-item> ";
-						} else {
-							slct2.innerHTML +=
-								'<md-list-item type="button" onclick=" clickedUser(\'' +
-								user +
-								"','" +
-								full +
-								"');\" interactive>" +
-								user +
-								"</md-list-item>";
+							let divider = addElement("md-divider", slct2, null);
+							divider.setAttribute(
+								"style",
+								"height:5px;--_color: var(--md-sys-color-surface-container-high)"
+							);
 						}
+						listItem.innerHTML += user;
+						listItem.addEventListener("click", function () {
+							clickedUser(user, full);
+						});
+						let Btn = addElement("md-icon-button", listItem, null);
+						Btn.setAttribute("slot", "end");
+						Btn.innerHTML = "<md-icon >close</md-icon>";
+						Btn.addEventListener("click", async function () {
+							event.stopPropagation();
+							listOfPlayers = await loadDataPath(full);
+							listOfPlayers["!gameName!"] = full;
+
+							dialog.parentNode.close();
+							deleteGame();
+						});
+						slct2.appendChild(listItem);
 					}
 				} else {
 					if (user !== "!gamesData!" || user !== "!gameName!") {
+						var listItem = addElement("md-list-item", null, null);
+
+						listItem.setAttribute("type", "button");
+						listItem.setAttribute("interactive", "");
 						if (slct.getElementsByTagName("md-list-item").length > 0) {
-							slct.innerHTML +=
-								'<md-divider style="--_color: var(--md-sys-color-surface-container-high);height: 5px;"></md-divider><md-list-item type="button" onclick=" clickedUser(\'' +
-								user +
-								"','" +
-								full +
-								"');\" interactive>" +
-								user +
-								"</md-list-item> ";
-						} else {
-							slct.innerHTML +=
-								'<md-list-item type="button" onclick=" clickedUser(\'' +
-								user +
-								"','" +
-								full +
-								"');\" interactive>" +
-								user +
-								"</md-list-item>";
+							let divider = addElement("md-divider", slct, null);
+							divider.setAttribute(
+								"style",
+								"height:5px;--_color: var(--md-sys-color-surface-container-high)"
+							);
 						}
+						listItem.innerHTML += user;
+						listItem.addEventListener("click", function () {
+							clickedUser(user, full);
+						});
+						let Btn = addElement("md-icon-button", listItem, null);
+						Btn.setAttribute("slot", "end");
+						Btn.innerHTML = "<md-icon >delete</md-icon>";
+						Btn.addEventListener("click", function () {
+							event.stopPropagation();
+							listOfPlayers = JSON.parse(localStorage.games)[full.toString()];
+							dialog.parentNode.close();
+							deleteGame();
+						});
+						slct.appendChild(listItem);
 					}
 				}
 			}
@@ -1448,12 +1511,12 @@ async function clickedUser(slcta, fulla) {
 		);
 	}
 }
-function dlgNotif(msg) {
+function dlgNotif(msg, title = "Napaka") {
 	var iks = addElement("md-text-button", null, null);
 
 	iks.innerHTML = "Ok";
 
-	var content = dialogBuilder("Napaka");
+	var content = dialogBuilder(title, false)[0];
 	iks.addEventListener("click", function (e) {
 		hideDialog(content);
 	});
@@ -1468,7 +1531,7 @@ function undo() {
 	if (listOfPlayersCopy.length > 0) {
 		listOfPlayers = JSON.parse(listOfPlayersCopy[listOfPlayersCopy.length - 1]);
 		listOfPlayersCopy.pop();
-		removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"));
+
 		count(true, false);
 	}
 
@@ -1589,6 +1652,9 @@ function count(animate, undoed) {
 	if (!listOfPlayers["!gamesData!"]) {
 		listOfPlayers["!gamesData!"] = [];
 	}
+	try {
+		removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"));
+	} catch (error) {}
 	setTimeout(() => {
 		let dlgs = document.getElementsByTagName("md-dialog");
 
@@ -1609,10 +1675,10 @@ function count(animate, undoed) {
 			document.getElementById("clck").label = "yes";
 		}
 
-		document.querySelector(".dltBtn").innerHTML = "<md-icon>close</md-icon>";
+		document.querySelector(".dltBtn").innerHTML = "<md-icon>insert_chart</md-icon>";
 	} else {
 		document.querySelector(".shrBtn").disabled = false;
-		document.querySelector(".dltBtn").innerHTML = "<md-icon>delete</md-icon>";
+		document.querySelector(".dltBtn").innerHTML = "<md-icon>insert_chart</md-icon>";
 	}
 	if (
 		sessionStorage.uid == null ||
@@ -1654,23 +1720,18 @@ function count(animate, undoed) {
 		let name = key;
 		var chl = document.createElement("div");
 		var prnt = document.createElement("div");
+		if (!Array.isArray(listOfPlayers[key])) {
+			const set = new Set([listOfPlayers[key]]);
+			listOfPlayers[key] = Array.from(set);
+		}
 		prnt.innerHTML =
-			'<p class="namePlayers"> ' + listOfPlayers[key][0] + "<br>" + name + " </p>";
+			'<p class="namePlayers"> ' + listOfPlayers[key].toString() + "<br>" + name + " </p>";
 		chl.innerHTML = String(chl.innerHTML).replace("undefined", "");
 		chl.innerHTML += '<p style = "" class="noText" ></p>';
 		chl.innerHTML += ' <p style = "" class="noText" ></p>';
 		chl.setAttribute("class", "chl chlName_" + name.replace(/ /g, "_"));
 		let ripple = addElement("md-ripple", prnt, null);
 		ripple.style.zIndex = "10";
-
-		prnt.addEventListener("touchstart", function () {
-			console.log("k");
-			ripple.shadowRoot.querySelector("div").classList.add("pressed");
-		});
-		prnt.addEventListener("touchend", function () {
-			console.log("ka");
-			ripple.shadowRoot.querySelector("div").classList.remove("pressed");
-		});
 
 		chl.style.display = "inline-block;";
 		var pointView = addElement("p", rezultLine, null);
@@ -1700,6 +1761,7 @@ function count(animate, undoed) {
 			pointsList[key] = parseInt(0);
 		}
 	}
+	if (!listOfPlayers["!gamesData!"]) listOfPlayers["!gamesData!"] = [];
 	for (var ia = 0; ia < listOfPlayers["!gamesData!"].length; ia++) {
 		let game = ia;
 
@@ -1738,7 +1800,10 @@ function count(animate, undoed) {
 			kkk.style.marginTop = "2px";
 			kkk.style.marginBottom = "2px";
 			kkk.style.fontSize = "1rem";
-
+			if (!Array.isArray(listOfPlayers["!gamesData!"][game][1])) {
+				const set = new Set([listOfPlayers["!gamesData!"][game][1]]);
+				listOfPlayers["!gamesData!"][game][1] = Array.from(set);
+			}
 			if (
 				listOfPlayers["!gamesData!"][game][4] &&
 				listOfPlayers["!gamesData!"][game][1][0] == player
@@ -1830,7 +1895,6 @@ function count(animate, undoed) {
 	setTimeout(() => {
 		var objDiv = document.getElementsByClassName("chl")[0];
 		objDiv.scrollTo(0, objDiv.scrollHeight + 100);
-		console.log("dsd");
 	}, 1);
 }
 
@@ -1850,7 +1914,7 @@ function gameData(infom, number) {
 	/* gamename, prvi igralc, drug igralc, tocke, ima radlc, razlika, dobil zgubil, bonusi, bonusi Tocke*/
 	var info = listOfPlayers["!gamesData!"][parseInt(infom)];
 
-	var contentWh = dialogBuilder("Igra");
+	var contentWh = dialogBuilder("Igra", false);
 	var newElement = contentWh[0];
 
 	if (info[0] !== "Po meri" && info[0] !== "Klop") {
@@ -2006,20 +2070,20 @@ function gameData(infom, number) {
 			};
 			for (const key in completePodatki["Bonusi"][1]) {
 				if (bonusObject[key][1]) {
-					if (tocke[key] * 2 == bonusObject[key][0]) {
+					if (tocke[key] * 2 == Math.abs(bonusObject[key][0])) {
 						createTableData(
-							bonusObject[key][0],
+							bonusObject[key][0] * 2,
 							"Napovedano in kontrirano: <wbr>" + key,
 							data
 						);
-					} else if (tocke[key] * 4 == bonusObject[key][0]) {
+					} else if (tocke[key] * 4 == Math.abs(bonusObject[key][0])) {
 						createTableData(
-							bonusObject[key][0],
+							bonusObject[key][0] * 4,
 							"Napovedano in rekontrirano: <wbr>" + key,
 							data
 						);
 					} else {
-						createTableData(bonusObject[key][0], "Napovedano: <wbr>" + key, data);
+						createTableData(bonusObject[key][0] * 2, "Napovedano: <wbr>" + key, data);
 					}
 
 					continue;
@@ -2135,12 +2199,26 @@ function gameData(infom, number) {
 			localStorage.offlineChanges = true;
 		}
 		listOfPlayers["!gamesData!"].splice(infom, 1);
+		if (!Array.isArray(completePodatki["Igralec"][1])) {
+			const set = new Set([completePodatki["Igralec"][1]]);
+			completePodatki["Igralec"][1] = Array.from(set);
+		}
+
+		if (completePodatki["Radlc"][1] && completePodatki["Točke"][1] > -1);
+		{
+			if (!Array.isArray(listOfPlayers[completePodatki["Igralec"][1][0]])) {
+				const set = new Set([listOfPlayers[completePodatki["Igralec"][1][0]]]);
+				listOfPlayers[completePodatki["Igralec"][1][0]] = Array.from(set);
+			}
+			listOfPlayers[completePodatki["Igralec"][1][0]][0] =
+				listOfPlayers[completePodatki["Igralec"][1][0]][0] + "*";
+		}
 		const keys = Object.keys(listOfPlayers["!gamesData!"]);
 		keys.sort((a, b) => a - b);
 		const gamesObject = JSON.parse(localStorage.getItem("games")) || {};
 		gamesObject[listOfPlayers["!gameName!"]] = listOfPlayers;
 		localStorage.setItem("games", JSON.stringify(gamesObject));
-		removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"));
+
 		updateUserData();
 		hideDialog(newElement);
 		count(true);
@@ -2173,12 +2251,16 @@ function gameData(infom, number) {
 	});
 }
 
-function deleteGame() {
+function deleteGame(elem) {
 	var newElement;
-	if (listOfPlayers["!gameName!"].includes("/users/")) {
-		newElement = dialogBuilder("Ali želite zapustiti to deljeno skupino?", false)[0];
+	if (!elem) {
+		if (listOfPlayers["!gameName!"].includes("/users/")) {
+			newElement = dialogBuilder("Ali želite zapustiti to deljeno skupino?", false)[0];
+		} else {
+			newElement = dialogBuilder("Ali želite izbrisati to skupino?", false)[0];
+		}
 	} else {
-		newElement = dialogBuilder("Ali želite izbrisati to skupino?", false)[0];
+		newElement = elem;
 	}
 
 	let iconaa = addElement("md-icon", newElement.parentNode, null);
@@ -2196,7 +2278,6 @@ function deleteGame() {
 	actions.appendChild(copyButton);
 
 	shareButton.addEventListener("click", function () {
-		listOfPlayersCopy.push(JSON.stringify(listOfPlayers));
 		if (!navigator.onLine) {
 			localStorage.offlineChanges = true;
 		}
@@ -2310,6 +2391,10 @@ window.addEventListener("load", function () {
 	if (!location.pathname.includes("users") && location.pathname !== "/") {
 		Game(decodeURIComponent(location.pathname.slice(1)));
 	}
+	if (navigator.userAgent.match(/FBAN|FBAV/i)) {
+		window.open("googlechrome://navigate?url=https://tarock-counter.web.app");
+	}
+
 	if (localStorage.offlineChanges == undefined) {
 		window.loadDataFromWeb();
 	} else {
@@ -2538,7 +2623,7 @@ const pomoc = `<div id="pomoc"> <md-list>
     <p style="font-size: 1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>Za spreminjanje barvne teme aplikacije na domačem zaslonu kliknite na gumb 'Nastavitve', zatem pa gumb 'Tema aplikacije' in izberite barvo, ki vam je všeč.</p>
 </md-list-item>
 <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Zakaj Google prijava?</b> <md-icon slot="end">expand_more</md-icon>
-    <p style="font-size:1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>Prijava s storitvijo Google vam omogoča enostavno shranjevanje podatkov v oblaku. To pomeni, da lahko na katerikoli napravi, kjer se prijavite s svojim Google računom, dostopate do svojih iger in jih urejate. Google prijava vam omogoča tudi deljenje igre s prijatelji.</p>
+    <p style="font-size:1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>Prijava s storitvijo Google vam omogoča enostavno shranjevanje podatkov v oblaku. To pomeni, da lahko na katerikoli napravi, kjer se prijavite s svojim Google računom, dostopate do svojih iger in jih urejate. <br><br>Google prijava vam omogoča tudi deljenje igre s prijatelji.</p>
 </md-list-item>
 <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kaj pomenijo gumbi v spodnjem delu zaslona za štetje?</b> <md-icon slot="end">expand_more</md-icon>
     <p style="font-size: 1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>● <md-icon>home</md-icon> vam omogoča, da se vrnete na domači zaslon.<br><br>● <md-icon>undo</md-icon> vam omogoča, da razveljavite zadnje dejanje na seznamu.<br><br>● <md-icon>person_add</md-icon> vam omogoča, da povabite prijatelje v skupino, kjer bodo imeli tudi oni možnost urejanja.<br><br>● <md-icon>delete</md-icon> vam omogoča, da izbrišete celotno igro. </p>
@@ -2607,6 +2692,7 @@ const registerServiceWorker = async () => {
 				console.log("Service worker installed");
 			} else if (registration.active) {
 				console.log("Service worker active");
+				registration.update();
 			}
 		} catch (error) {
 			console.error(`Registration failed with ${error}`);
@@ -2664,7 +2750,7 @@ window.addEventListener("load", async function () {
 		}
 
 		if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
-			let dialog = dialogBuilder("iOS Aplikacija");
+			let dialog = dialogBuilder("iOS Aplikacija")[0];
 			dialog.innerHTML =
 				'Če želite naložiti aplikacijo, spodaj pritisnite gumb za deljenje&nbsp;<md-icon style="font-size: 1rem;display:contents;" aria-hidden="true">ios_share</md-icon></span>&nbsp;in poiščite gumb  "<md-icon style="font-size: 1rem;display:contents;" aria-hidden="true">add_box</md-icon> Add to home screen".';
 			let actions = document.createElement("div");
@@ -2688,3 +2774,54 @@ window.addEventListener("load", async function () {
 		installButton.style.display = "none";
 	}
 });
+
+function statistika() {
+	if (
+		!location.href.includes("https://tarock-counter--added-statistics-fw6szl24.web.app") &&
+		!location.href.includes("http://127.0.0.1:5500/public/")
+	) {
+		dlgNotif("Prihaja kmalu", "Statistika");
+	} else {
+		var contentWh = dialogBuilder("Statistika - " + listOfPlayers["!gameName!"]);
+		var newElement = contentWh[0];
+		var iks = contentWh[1];
+		newElement.parentNode.classList.add("fullscreen");
+		dlgFullscreen(newElement.parentNode);
+		iks.addEventListener("click", function (e) {
+			hideDialog(newElement);
+		});
+		let list = addElement("md-list", newElement, "stat-list");
+		let i = 0;
+		let vseTocke = 0;
+		let lit = [];
+		let usr = {};
+		for (const key in listOfPlayers) {
+			if (key == "!gamesData!" || key == "!gameName!") {
+				continue;
+			}
+
+			vseTocke += parseInt(document.querySelector(".rezult_" + key).innerHTML);
+			lit.push(parseInt(document.querySelector(".rezult_" + key).innerHTML));
+			usr[lit.at(-1)] = key;
+		}
+
+		lit.sort((a, b) => b - a);
+
+		for (const key in lit) {
+			let lItem = addElement("md-list-item", list, "stat-item");
+			lItem.innerHTML = parseInt(i + 1) + "." + "     " + usr[lit[i]] + " (" + lit[i] + ")";
+			i++;
+		}
+		let flexer = addElement("div", newElement, "flexer");
+		let lItem2 = addElement("md-item", flexer, "stat-item");
+		lItem2.innerHTML =
+			'<p class="titleTxt" slot="trailing-supporting-text">Skupne točke</p><p style="margin:20px;margin-top:30px;font-size: larger;">' +
+			vseTocke +
+			"</p>";
+		let lItem3 = addElement("md-item", flexer, "stat-item");
+		lItem3.innerHTML =
+			'<p class="titleTxt" slot="trailing-supporting-text">Število iger</p><p style="margin:20px;margin-top:30px;font-size: larger;">' +
+			listOfPlayers["!gamesData!"].length +
+			"</p>";
+	}
+}

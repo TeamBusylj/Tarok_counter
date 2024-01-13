@@ -11,7 +11,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 import {
 	getAuth,
-	signInWithRedirect,
+	signInWithPopup,
 	GoogleAuthProvider,
 	signOut,
 	onAuthStateChanged
@@ -63,7 +63,7 @@ const userSignIn = async () => {
 	) {
 		userSignOut();
 	} else {
-		signInWithRedirect(auth, provider)
+		signInWithPopup(auth, provider)
 			.then((result) => {
 				const user = result.user;
 

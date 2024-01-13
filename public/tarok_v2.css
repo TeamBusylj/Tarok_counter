@@ -3,9 +3,15 @@ input[type="checkbox"] {
 	height: 20px;
 	margin: 5px;
 }
-
+div#bottomBar2 {
+	z-index: 3;
+	position: fixed;
+	width: 100%;
+	transition: all var(--transDur);
+	bottom: 0;
+}
 div#bottomBar {
-	z-index: 1;
+	z-index: 3;
 	position: fixed;
 	width: 100%;
 	transition: all var(--transDur);
@@ -1002,4 +1008,31 @@ md-fab {
 .gsi-material-button:not(:disabled):hover .gsi-material-button-state {
 	background-color: #001d35;
 	opacity: 8%;
+}
+
+.stat-list{
+	background: transparent;
+}
+.stat-item{
+	background: var(--md-sys-color-surface-container-high);
+	margin: 5px;
+	border-radius: 20px;
+text-align: center;
+}
+.flexer{
+	display: flex;
+    width: 90%;
+    flex-wrap: wrap;
+}
+.flexer > md-item{
+	background-color: var(--md-sys-color-on-primary-fixed);
+}
+.titleTxt{
+	position: absolute;
+    left: 10px;
+    top: 0;
+   
+}
+.sqe{
+	background-color: var(--md-sys-color-on-primary-fixed);
 }
