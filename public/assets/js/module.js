@@ -6,11 +6,15 @@ import("@material/web/menu/menu.js").then(() => {
 });
 
 import "@material/web/fab/fab.js";
+
 import "@material/web/progress/circular-progress.js";
 import "@material/web/button/filled-tonal-button.js";
 import "@material/web/button/filled-button.js";
 (async () => {
+	await import("@material/web/labs/segmentedbuttonset/outlined-segmented-button-set.js");
+	await import("@material/web/labs/segmentedbutton/outlined-segmented-button.js");
 	await import("@material/web/dialog/dialog.js");
+	await import("@material/web/labs/card/filled-card.js");
 	await import("@material/web/ripple/ripple.js");
 	await import("@material/web/button/outlined-button.js");
 	await import("@material/web/iconbutton/icon-button.js");

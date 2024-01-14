@@ -23,6 +23,8 @@ md-dialog [slot="headline"] {
 	font-size: 1.1rem;
 }
 
+
+
 #homescreen {
 	display: flex;
 	flex-direction: column;
@@ -171,7 +173,7 @@ md-list::-webkit-scrollbar {
 }
 
 md-filled-button,
-md-filled-tonal-button {
+md-filled-tonal-button, md-outlined-segmented-button-set {
 	transition: all var(--transDur);
 	margin: 7px;
 
@@ -495,7 +497,7 @@ html {
 	transition: all var(--transDur);
 
 	box-shadow: none, none;
-	height: calc(100svh - 210px);
+	height: calc(100svh - 235px);
 	margin-top: 60px;
 	margin-bottom: 50px;
 	border-radius: 30px;
@@ -720,6 +722,7 @@ md-outlined-button:active {
 	width: 100%;
 	box-shadow: none;
 	bottom: -19px;
+	margin-top: -26px;
 	position: relative;
 	justify-content: center;
 	align-items: top;
@@ -1022,10 +1025,14 @@ text-align: center;
 .flexer{
 	display: flex;
     width: 90%;
-    flex-wrap: wrap;
+	--_container-color: transparent;
+	flex-wrap: wrap;
+	flex-direction: row;
+  
 }
-.flexer > md-item{
-	background-color: var(--md-sys-color-on-primary-fixed);
+md-item{
+	background-color: var(--md-sys-color-secondary-container) !important;
+	flex: 100%;
 }
 .titleTxt{
 	position: absolute;

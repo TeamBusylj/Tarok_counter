@@ -566,10 +566,10 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 	addElement("div", newElement, "break");
 	var bonusi = {
 		/* "Ime igre": ["Koliko šteje igra","razlika","dobil true, ni dobil false", "s partnerjem, brez"]*/
-		Trula: [10, 20, null, false, false],
-		Kralji: [10, 20, null, false, false],
-		"Pagat ultimo": [25, 50, null, false, false],
-		"Kralj ultimo": [10, 20, null, false, false]
+		Trula: [10, 20, null, null, false],
+		Kralji: [10, 20, null, null, false],
+		"Pagat ultimo": [25, 50, null, null, false],
+		"Kralj ultimo": [10, 20, null, null, false]
 	};
 	var bonusTocke = 0;
 	if (!teamWork) {
@@ -602,72 +602,89 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 			btn.style.height = "45px";
 
 			btn.addEventListener("click", function () {
-				newElement.parentNode.removeAttribute("open");
-
-				var bonusDialoga = dialogBuilder("Izberite");
-				var bonusDialog = bonusDialoga[0];
-				var iks = bonusDialoga[1];
-
+				var save = $(newElement).children().detach();
+				let opis = newElement.parentNode
+					.querySelector('[slot="headline"]')
+					.getElementsByTagName("span")[0].innerHTML;
+				newElement.innerHTML = "";
+				var bonusDialog = newElement;
+				changeOpis(newElement, "Izberite");
+				$(".iksRight").hide();
 				var napovedanboolean = true;
 				var dobil = true;
-				let ninapoved = addElement("md-outlined-button", bonusDialog, null);
+				let sgset = addElement("md-outlined-segmented-button-set", bonusDialog, null);
+				let ninapoved = addElement("md-outlined-segmented-button", sgset, null);
 				ninapoved.setAttribute("type", "reset");
-				let napovedano = addElement("md-filled-tonal-button", bonusDialog, null);
+
+				let napovedano = addElement("md-outlined-segmented-button", sgset, null);
+				if (bonusi[key][3]) napovedano.selected = true;
+				if (bonusi[key][3] == false) ninapoved.selected = true;
 				let actions = document.createElement("div");
 				actions.setAttribute("slot", "actions");
 				bonusDialog.parentNode.appendChild(actions);
-				let deleteBonus = addElement("md-filled-button", actions, null);
+				let deleteBonus = addElement("md-text-button", actions, null);
 				deleteBonus.innerHTML = "Odstrani bonus";
 				deleteBonus.setAttribute("type", "reset");
-
+				btn.innerHTML = key;
 				deleteBonus.addEventListener("click", function () {
 					bonusi[key][2] = null;
-					bonusi[key][3] = false;
+					bonusi[key][3] = null;
 					bonusi[key][4] = false;
 					btn.innerHTML = key;
 
-					hideDialog(bonusDialog);
+					$(".iksRight").show();
+					$(newElement).empty().append(save);
+					changeOpis(newElement, opis);
+					actions.remove();
+				});
+				let koncaj = addElement("md-filled-tonal-button", actions, null);
+				koncaj.innerHTML = "Končano";
+				koncaj.setAttribute("type", "reset");
 
-					setTimeout(() => {
-						newElement.parentNode.setAttribute("open", "");
-					}, 100);
-				});
-				iks.addEventListener("click", function () {
-					deleteBonus.click();
-				});
-				napovedano.innerHTML = "Napovedano";
+				napovedano.label = "Napovedano";
 				napovedano.setAttribute("type", "reset");
 				ninapoved.addEventListener("click", function () {
 					napovedanboolean = false;
-					napovedano.click();
 				});
-				ninapoved.innerHTML = "Ne napovedano";
 				napovedano.addEventListener("click", function () {
-					bonusDialog.innerHTML = "";
-					btn.innerHTML = '<md-icon slot="icon">checkbox</md-icon>' + key;
-					let izgubil = addElement("md-outlined-button", bonusDialog, null);
-					izgubil.innerHTML = "Izgubljeno";
-					izgubil.addEventListener("click", function () {
-						dobil = false;
-						zmagal.click();
-					});
-					let zmagal = addElement("md-filled-tonal-button", bonusDialog, null);
-					zmagal.innerHTML = "Dobljeno";
-					zmagal.addEventListener("click", function () {
-						if (dobil) {
-							bonusi[key][2] = true;
-						} else {
-							bonusi[key][2] = false;
-						}
-						if (napovedanboolean) {
-							bonusi[key][3] = true;
-						} else {
-							bonusi[key][3] = false;
-						}
-						newElement.parentNode.show();
+					napovedanboolean = true;
+				});
+				ninapoved.label = "Tiho";
+				addElement("div", bonusDialog, "break").style.height = "20px";
+				let sgset2 = addElement("md-outlined-segmented-button-set", bonusDialog, null);
 
-						hideDialog(bonusDialog);
-					});
+				let izgubil = addElement("md-outlined-segmented-button", sgset2, null);
+				izgubil.label = "Izgubljeno";
+				izgubil.addEventListener("click", function () {
+					dobil = false;
+				});
+
+				let zmagal = addElement("md-outlined-segmented-button", sgset2, null);
+				zmagal.label = "Dobljeno";
+				zmagal.addEventListener("click", function () {
+					dobil = true;
+				});
+				if (bonusi[key][2]) zmagal.selected = true;
+				if (bonusi[key][2] == false) izgubil.selected = true;
+				koncaj.addEventListener("click", function () {
+					if (napovedanboolean) {
+						bonusi[key][3] = true;
+						btn.innerHTML += '<md-icon slot="icon">checkbox</md-icon>';
+					} else {
+						bonusi[key][3] = false;
+						btn.innerHTML += '<md-icon slot="icon">close</md-icon>';
+					}
+					if (dobil) {
+						bonusi[key][2] = true;
+						btn.innerHTML += '<md-icon slot="icon">checkbox</md-icon>';
+					} else {
+						bonusi[key][2] = false;
+						btn.innerHTML += '<md-icon slot="icon">close</md-icon>';
+					}
+					$(".iksRight").show();
+					$(newElement).empty().append(save);
+					changeOpis(newElement, opis);
+					actions.remove();
 				});
 			});
 			newElement.appendChild(btn);
@@ -692,31 +709,34 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 	var RekontraIf = false;
 
 	rekontra.addEventListener("click", function () {
-		newElement.removeAttribute("open");
+		var save = $(newElement).children().detach();
+		let opis = newElement.parentNode
+			.querySelector('[slot="headline"]')
+			.getElementsByTagName("span")[0].innerHTML;
+		newElement.innerHTML = "";
 		RekontraIf = true;
-		var contentWh = dialogBuilder("Izberite");
-		var kontraDialog = contentWh[0];
-		var iks = contentWh[1];
-
-		iks.addEventListener("click", function (e) {
-			setTimeout(() => {
-				newElement.parentNode.setAttribute("open", "");
-			}, 100);
-
-			hideDialog(kontraDialog);
+		//var contentWh = dialogBuilder("Izberite", false);
+		var kontraDialog = newElement;
+		changeOpis(newElement, "Izberite");
+		$(".iksRight").hide();
+		let actions = document.createElement("div");
+		actions.setAttribute("slot", "actions");
+		kontraDialog.parentNode.appendChild(actions);
+		let koncaj = addElement("md-text-button", actions, null);
+		koncaj.innerHTML = "Končano";
+		koncaj.addEventListener("click", function (e) {
+			$(".iksRight").show();
+			$(newElement).empty().append(save);
+			changeOpis(newElement, opis);
+			actions.remove();
 		});
+		var sgset = addElement("md-outlined-segmented-button-set", kontraDialog, null);
+		sgset.setAttribute("multiselect", "");
 
-		var chkbxw2 = addElement("label", newElement, null);
-		chkbxw2.setAttribute(
-			"style",
-			"align-items: center;display: flex;width: 100%;justify-content: start;"
-		);
-		addElement("input", chkbxw2, null).setAttribute("type", "checkbox");
-		chkbxw2.innerHTML += "Igra " + gameName.toLowerCase();
-
-		kontraDialog.appendChild(chkbxw2);
-		chkbxw2.getElementsByTagName("input")[0].addEventListener("click", function () {
-			if (chkbxw2.getElementsByTagName("input")[0].checked) {
+		let btn2 = addElement("md-outlined-segmented-button", sgset, null);
+		btn2.label += "Igra " + gameName.toLowerCase();
+		btn2.addEventListener("click", function () {
+			if (btn2.selected) {
 				IgraK2 = true;
 			} else {
 				IgraK2 = false;
@@ -724,17 +744,10 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 		});
 
 		if (bonusi["Kralji"][3]) {
-			let chkbxw = addElement("label", newElement, null);
-			chkbxw.setAttribute(
-				"style",
-				"align-items: center;display: flex;width: 100%;justify-content: start;"
-			);
-			addElement("input", chkbxw, null).setAttribute("type", "checkbox");
-			chkbxw.innerHTML += "Kralji";
-
-			kontraDialog.appendChild(chkbxw);
-			chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
-				if (chkbxw.getElementsByTagName("input")[0].checked) {
+			let btn = addElement("md-outlined-segmented-button", sgset, null);
+			btn.label += "Kralji";
+			btn.addEventListener("click", function () {
+				if (btn.selected) {
 					KraljiK2 = true;
 				} else {
 					KraljiK2 = false;
@@ -742,17 +755,10 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 			});
 		}
 		if (bonusi["Trula"][3]) {
-			let chkbxw = addElement("label", newElement, null);
-			chkbxw.setAttribute(
-				"style",
-				"align-items: center;display: flex;width: 100%;justify-content: start;"
-			);
-			addElement("input", chkbxw, null).setAttribute("type", "checkbox");
-			chkbxw.innerHTML += "Trula";
-
-			kontraDialog.appendChild(chkbxw);
-			chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
-				if (chkbxw.getElementsByTagName("input")[0].checked) {
+			let btn = addElement("md-outlined-segmented-button", sgset, null);
+			btn.label += "Trula";
+			btn.addEventListener("click", function () {
+				if (btn.selected) {
 					TrulaK2 = true;
 				} else {
 					TrulaK2 = false;
@@ -760,17 +766,10 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 			});
 		}
 		if (bonusi["Kralj ultimo"][3]) {
-			let chkbxw = addElement("label", newElement, null);
-			chkbxw.setAttribute(
-				"style",
-				"align-items: center;display: flex;width: 100%;justify-content: start;"
-			);
-			addElement("input", chkbxw, null).setAttribute("type", "checkbox");
-			chkbxw.innerHTML += "Kralj ultimo";
-
-			kontraDialog.appendChild(chkbxw);
-			chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
-				if (chkbxw.getElementsByTagName("input")[0].checked) {
+			let btn = addElement("md-outlined-segmented-button", sgset, null);
+			btn.label += "Kralj ultimo";
+			btn.addEventListener("click", function () {
+				if (btn.selected) {
 					KUltK2 = true;
 				} else {
 					KUltK2 = false;
@@ -778,17 +777,10 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 			});
 		}
 		if (bonusi["Pagat ultimo"][3]) {
-			let chkbxw = addElement("label", newElement, null);
-			chkbxw.setAttribute(
-				"style",
-				"align-items: center;display: flex;width: 100%;justify-content: start;"
-			);
-			addElement("input", chkbxw, null).setAttribute("type", "checkbox");
-			chkbxw.innerHTML += "Pagat ultimo";
-
-			kontraDialog.appendChild(chkbxw);
-			chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
-				if (chkbxw.getElementsByTagName("input")[0].checked) {
+			let btn = addElement("md-outlined-segmented-button", sgset, null);
+			btn.label += "Pagat ultimo";
+			btn.addEventListener("click", function () {
+				if (btn.selected) {
 					PUltK2 = true;
 				} else {
 					PUltK2 = false;
@@ -797,110 +789,80 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 		}
 	});
 	kontra.addEventListener("click", function () {
-		newElement.parentNode.close();
-		var contentWh = dialogBuilder("Izberite");
-		var kontraDialog = contentWh[0];
-		var iks = contentWh[1];
-
-		iks.addEventListener("click", function (e) {
-			setTimeout(() => {
-				newElement.parentNode.setAttribute("open", "");
-			}, 100);
-			hideDialog(kontraDialog);
+		var save = $(newElement).children().detach();
+		let opis = newElement.parentNode
+			.querySelector('[slot="headline"]')
+			.getElementsByTagName("span")[0].innerHTML;
+		newElement.innerHTML = "";
+		var kontraDialog = newElement;
+		changeOpis(newElement, "Izberite");
+		$(".iksRight").hide();
+		let actions = document.createElement("div");
+		actions.setAttribute("slot", "actions");
+		kontraDialog.parentNode.appendChild(actions);
+		let koncaj = addElement("md-text-button", actions, null);
+		koncaj.innerHTML = "Končano";
+		koncaj.addEventListener("click", function (e) {
+			$(".iksRight").show();
+			$(newElement).empty().append(save);
+			changeOpis(newElement, opis);
+			actions.remove();
 		});
+		var sgset = addElement("md-outlined-segmented-button-set", kontraDialog, null);
+		sgset.setAttribute("multiselect", "");
 
-		var chkbxw2 = addElement("label", newElement, null);
-		chkbxw2.setAttribute(
-			"style",
-			"align-items: center;display: flex;width: 100%;justify-content: start;"
-		);
-		addElement("input", chkbxw2, null).setAttribute("type", "checkbox");
-		chkbxw2.innerHTML += "Igra " + gameName.toLowerCase();
-
-		kontraDialog.appendChild(chkbxw2);
-		chkbxw2.getElementsByTagName("input")[0].addEventListener("click", function () {
-			if (chkbxw2.getElementsByTagName("input")[0].checked) {
+		let btn2 = addElement("md-outlined-segmented-button", sgset, null);
+		btn2.label += "Igra " + gameName.toLowerCase();
+		btn2.addEventListener("click", function () {
+			if (btn2.selected) {
 				IgraK = true;
 			} else {
 				IgraK = false;
 			}
-			if (RekontraIf) RekontraForMore = true;
 		});
 
 		if (bonusi["Kralji"][3]) {
-			let chkbxw = addElement("label", newElement, null);
-			chkbxw.setAttribute(
-				"style",
-				"align-items: center;display: flex;width: 100%;justify-content: start;"
-			);
-			addElement("input", chkbxw, null).setAttribute("type", "checkbox");
-			chkbxw.innerHTML += "Kralji";
-
-			kontraDialog.appendChild(chkbxw);
-			chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
-				if (chkbxw.getElementsByTagName("input")[0].checked) {
+			let btn = addElement("md-outlined-segmented-button", sgset, null);
+			btn.label += "Kralji";
+			btn.addEventListener("click", function () {
+				if (btn.selected) {
 					KraljiK = true;
 				} else {
 					KraljiK = false;
 				}
-				if (RekontraIf) RekontraForMore = true;
 			});
 		}
 		if (bonusi["Trula"][3]) {
-			let chkbxw = addElement("label", newElement, null);
-			chkbxw.setAttribute(
-				"style",
-				"align-items: center;display: flex;width: 100%;justify-content: start;"
-			);
-			addElement("input", chkbxw, null).setAttribute("type", "checkbox");
-			chkbxw.innerHTML += "Trula";
-
-			kontraDialog.appendChild(chkbxw);
-			chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
-				if (chkbxw.getElementsByTagName("input")[0].checked) {
+			let btn = addElement("md-outlined-segmented-button", sgset, null);
+			btn.label += "Trula";
+			btn.addEventListener("click", function () {
+				if (btn.selected) {
 					TrulaK = true;
 				} else {
 					TrulaK = false;
 				}
-				if (RekontraIf) RekontraForMore = true;
 			});
 		}
 		if (bonusi["Kralj ultimo"][3]) {
-			let chkbxw = addElement("label", newElement, null);
-			chkbxw.setAttribute(
-				"style",
-				"align-items: center;display: flex;width: 100%;justify-content: start;"
-			);
-			addElement("input", chkbxw, null).setAttribute("type", "checkbox");
-			chkbxw.innerHTML += "Kralj ultimo";
-
-			kontraDialog.appendChild(chkbxw);
-			chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
-				if (chkbxw.getElementsByTagName("input")[0].checked) {
+			let btn = addElement("md-outlined-segmented-button", sgset, null);
+			btn.label += "Kralj ultimo";
+			btn.addEventListener("click", function () {
+				if (btn.selected) {
 					KUltK = true;
 				} else {
 					KUltK = false;
 				}
-				if (RekontraIf) RekontraForMore = true;
 			});
 		}
 		if (bonusi["Pagat ultimo"][3]) {
-			let mchkbxw = addElement("label", newElement, null);
-			chkbxw.setAttribute(
-				"style",
-				"align-items: center;display: flex;width: 100%;justify-content: start;"
-			);
-			addElement("input", chkbxw, null).setAttribute("type", "checkbox");
-			chkbxw.innerHTML += "Pagat ultimo";
-
-			kontraDialog.appendChild(chkbxw);
-			chkbxw.getElementsByTagName("input")[0].addEventListener("click", function () {
-				if (chkbxw.getElementsByTagName("input")[0].checked) {
+			let btn = addElement("md-outlined-segmented-button", sgset, null);
+			btn.label += "Pagat ultimo";
+			btn.addEventListener("click", function () {
+				if (btn.selected) {
 					PUltK = true;
 				} else {
 					PUltK = false;
 				}
-				if (RekontraIf) RekontraForMore = true;
 			});
 		}
 	});
@@ -920,22 +882,40 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 		if (TrulaK2) bonusi["Trula"][1] *= 4;
 		if (KUltK2) bonusi["Kralj ultimo"][1] *= 4;
 		if (PUltK2) bonusi["Pagat ultimo"][1] *= 4;
+		let kontre = {
+			Kralji: KraljiK,
+			Trula: TrulaK,
+			"Pagat ultimo": PUltK,
+			"Kralj ultimo": KUltK,
+			Kralji2: KraljiK2,
+			Trula2: TrulaK2,
+			"Pagat ultimo2": PUltK2,
+			"Kralj ultimo2": KUltK2
+		};
 		for (const key in bonusi) {
 			if (bonusi[key][2] !== null) {
 				if (bonusi[key][2] !== false) {
 					if (bonusi[key][3] == true) {
-						bnsi[key] = [bonusi[key][1], true, true];
+						bnsi[key] = [bonusi[key][1], true, true, kontre[key], kontre[key + "2"]];
 						bonusTocke += bonusi[key][1];
 					} else {
-						bnsi[key] = [bonusi[key][0], false, true];
+						bnsi[key] = [bonusi[key][0], false, true, kontre[key], kontre[key + "2"]];
 						bonusTocke += bonusi[key][0];
 					}
 				} else {
 					if (bonusi[key][3] == true) {
-						bnsi[key] = [-Math.abs(bonusi[key][1]), true, false];
+						(bnsi[key] = [-Math.abs(bonusi[key][1]), true, false]),
+							kontre[key],
+							kontre[key + "2"];
 						bonusTocke -= bonusi[key][1];
 					} else {
-						bnsi[key] = [-Math.abs(bonusi[key][0]), false, false];
+						bnsi[key] = [
+							-Math.abs(bonusi[key][0]),
+							false,
+							false,
+							kontre[key],
+							kontre[key + "2"]
+						];
 						bonusTocke -= bonusi[key][0];
 					}
 				}
@@ -1042,29 +1022,45 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 		if (TrulaK2) bonusi["Trula"][1] *= 4;
 		if (KUltK2) bonusi["Kralj ultimo"][1] *= 4;
 		if (PUltK2) bonusi["Pagat ultimo"][1] *= 4;
-
+		let kontre = {
+			Kralji: KraljiK,
+			Trula: TrulaK,
+			"Pagat ultimo": PUltK,
+			"Kralj ultimo": KUltK,
+			Kralji2: KraljiK2,
+			Trula2: TrulaK2,
+			"Pagat ultimo2": PUltK2,
+			"Kralj ultimo2": KUltK2
+		};
 		for (const key in bonusi) {
 			if (bonusi[key][2] !== null) {
 				if (bonusi[key][2] !== false) {
 					if (bonusi[key][3] == true) {
-						bnsi[key] = [bonusi[key][1], true, true];
+						bnsi[key] = [bonusi[key][1], true, true, kontre[key], kontre[key + "2"]];
 						bonusTocke += bonusi[key][1];
 					} else {
-						bnsi[key] = [bonusi[key][0], false, true];
+						bnsi[key] = [bonusi[key][0], false, true, kontre[key], kontre[key + "2"]];
 						bonusTocke += bonusi[key][0];
 					}
 				} else {
 					if (bonusi[key][3] == true) {
-						bnsi[key] = [-Math.abs(bonusi[key][1]), true, false];
+						(bnsi[key] = [-Math.abs(bonusi[key][1]), true, false]),
+							kontre[key],
+							kontre[key + "2"];
 						bonusTocke -= bonusi[key][1];
 					} else {
-						bnsi[key] = [-Math.abs(bonusi[key][0]), false, false];
+						bnsi[key] = [
+							-Math.abs(bonusi[key][0]),
+							false,
+							false,
+							kontre[key],
+							kontre[key + "2"]
+						];
 						bonusTocke -= bonusi[key][0];
 					}
 				}
 			}
 		}
-
 		listOfPlayersCopy.push(JSON.stringify(listOfPlayers));
 		if (!navigator.onLine) {
 			localStorage.offlineChanges = true;
@@ -1811,7 +1807,7 @@ function count(animate, undoed) {
 				kkk.innerHTML = kkk.innerHTML + "*";
 			}
 			// kkk.setAttribute("onclick", 'gameData("' + stGame + '")');
-			kkk.classList.add("word_" + stGame);
+			kkk.classList.add(player + "_score");
 			if (playerPoints !== "") {
 				pointsList[player] = pointsList[player] + parseInt(playerPoints);
 			}
@@ -1858,30 +1854,26 @@ function count(animate, undoed) {
 		name.style.height = maxHeight + "px";
 	});
 	try {
-		var subCatContainer = $(".chl");
-		document.getElementsByClassName("chl")[0].scrollTop = 1;
-		document.getElementsByClassName("chl")[0].scrollTop = 0;
-		subCatContainer.scroll(function () {
-			let boxShadow = ""; // Initialize an empty string for the box shadow
-			if (Math.round(subCatContainer.scrollTop()) !== 0) {
-				boxShadow += "15px 15px ";
-			} else {
-				boxShadow += "30px 30px ";
-			}
-			if (
-				Math.round(subCatContainer.scrollTop()) !==
-				subCatContainer.prop("scrollHeight") - subCatContainer.prop("offsetHeight")
-			) {
-				boxShadow += "15px 15px";
-			} else {
-				boxShadow += "30px 30px";
-			}
-			subCatContainer.css("border-radius", boxShadow);
+		const divs = document.querySelectorAll(".chl");
+
+		// Function to synchronize scrolling
+		function scrollAll(event) {
+			// Get the scroll position of the currently scrolled div
+			const scrollTop = event.target.scrollTop;
+
+			// Loop through each div and set its scrollTop to match the first div
+			divs.forEach((div) => {
+				div.scrollTop = scrollTop;
+			});
+		}
+
+		// Bind the scroll event to each div
+		divs.forEach((div) => {
+			div.addEventListener("scroll", scrollAll);
 		});
-		subCatContainer.scroll(function () {
-			subCatContainer.scrollTop($(this).scrollTop());
-		});
-	} catch {}
+	} catch (error) {
+		console.log(error);
+	}
 	rezultLine.setAttribute("class", "crezultLine");
 	document
 		.getElementById("bottomBar")
@@ -2070,15 +2062,15 @@ function gameData(infom, number) {
 			};
 			for (const key in completePodatki["Bonusi"][1]) {
 				if (bonusObject[key][1]) {
-					if (tocke[key] * 2 == Math.abs(bonusObject[key][0])) {
+					if (bonusObject[key][3]) {
 						createTableData(
-							bonusObject[key][0] * 2,
+							bonusObject[key][0],
 							"Napovedano in kontrirano: <wbr>" + key,
 							data
 						);
-					} else if (tocke[key] * 4 == Math.abs(bonusObject[key][0])) {
+					} else if (bonusObject[key][4]) {
 						createTableData(
-							bonusObject[key][0] * 4,
+							bonusObject[key][0],
 							"Napovedano in rekontrirano: <wbr>" + key,
 							data
 						);
@@ -2188,7 +2180,7 @@ function gameData(infom, number) {
 	addElement("div", newElement, "break");
 	var actionsHold = addElement("span", newElement.parentNode, null);
 	actionsHold.setAttribute("slot", "actions");
-	var izbrisiIgro = document.createElement("md-outlined-button");
+	var izbrisiIgro = document.createElement("md-text-button");
 	izbrisiIgro.innerHTML =
 		' <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg> Izbriši';
 	actionsHold.appendChild(izbrisiIgro);
@@ -2223,7 +2215,7 @@ function gameData(infom, number) {
 		hideDialog(newElement);
 		count(true);
 	});
-	var iks = document.createElement("md-filled-button");
+	var iks = document.createElement("md-filled-tonal-button");
 	iks.innerHTML = "Končano";
 	iks.style.margin = "0";
 	actionsHold.appendChild(iks);
@@ -2377,7 +2369,7 @@ window.addEventListener("load", function () {
 		hideElement(document.querySelectorAll(".loader")[0]);
 	}
 	if (!localStorage.firstTime) {
-		localStorage.firstTime = true;
+		//localStorage.firstTime = true;
 	}
 	if (localStorage.firstTime == "true") {
 		localStorage.firstTime = false;
@@ -2485,7 +2477,7 @@ function settings() {
 		zaokrožuj = JSON.parse(localStorage.getItem("razlikaOkrozi"));
 	});
 }
-
+/*
 window.addEventListener("load", function () {
 	document.querySelector("#game").addEventListener("click", function () {
 		event.target.setAttribute("clicked", "");
@@ -2562,7 +2554,7 @@ window.addEventListener("load", function () {
 		});
 	}
 });
-
+*/
 function helpMe(dlg) {
 	if (!document.getElementById("pomoc")) {
 		var contentWh = dialogBuilder("Pomoč");
@@ -2774,54 +2766,3 @@ window.addEventListener("load", async function () {
 		installButton.style.display = "none";
 	}
 });
-
-function statistika() {
-	if (
-		!location.href.includes("https://tarock-counter--added-statistics-fw6szl24.web.app") &&
-		!location.href.includes("http://127.0.0.1:5500/public/")
-	) {
-		dlgNotif("Prihaja kmalu", "Statistika");
-	} else {
-		var contentWh = dialogBuilder("Statistika - " + listOfPlayers["!gameName!"]);
-		var newElement = contentWh[0];
-		var iks = contentWh[1];
-		newElement.parentNode.classList.add("fullscreen");
-		dlgFullscreen(newElement.parentNode);
-		iks.addEventListener("click", function (e) {
-			hideDialog(newElement);
-		});
-		let list = addElement("md-list", newElement, "stat-list");
-		let i = 0;
-		let vseTocke = 0;
-		let lit = [];
-		let usr = {};
-		for (const key in listOfPlayers) {
-			if (key == "!gamesData!" || key == "!gameName!") {
-				continue;
-			}
-
-			vseTocke += parseInt(document.querySelector(".rezult_" + key).innerHTML);
-			lit.push(parseInt(document.querySelector(".rezult_" + key).innerHTML));
-			usr[lit.at(-1)] = key;
-		}
-
-		lit.sort((a, b) => b - a);
-
-		for (const key in lit) {
-			let lItem = addElement("md-list-item", list, "stat-item");
-			lItem.innerHTML = parseInt(i + 1) + "." + "     " + usr[lit[i]] + " (" + lit[i] + ")";
-			i++;
-		}
-		let flexer = addElement("div", newElement, "flexer");
-		let lItem2 = addElement("md-item", flexer, "stat-item");
-		lItem2.innerHTML =
-			'<p class="titleTxt" slot="trailing-supporting-text">Skupne točke</p><p style="margin:20px;margin-top:30px;font-size: larger;">' +
-			vseTocke +
-			"</p>";
-		let lItem3 = addElement("md-item", flexer, "stat-item");
-		lItem3.innerHTML =
-			'<p class="titleTxt" slot="trailing-supporting-text">Število iger</p><p style="margin:20px;margin-top:30px;font-size: larger;">' +
-			listOfPlayers["!gamesData!"].length +
-			"</p>";
-	}
-}
