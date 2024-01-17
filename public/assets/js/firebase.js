@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js";
 import {
 	getDatabase,
 	ref,
@@ -33,7 +33,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const provider = new GoogleAuthProvider();
 const signInButton = document.getElementById("signInGoogle");
-
+const analytics = getAnalytics(app);
 const signInMessage = document.getElementById("signInMessage");
 var uid = null;
 

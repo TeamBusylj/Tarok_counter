@@ -21,7 +21,6 @@ async function addScore(firstPlayer) {
 	var contentWh = dialogBuilder("Oseba <b>" + firstPlayer + "</b> je igrala...");
 	var newElement = contentWh[0];
 	var iks = contentWh[1];
-
 	iks.addEventListener("click", function (e) {
 		hideDialog(newElement);
 	});
@@ -51,7 +50,7 @@ async function addScore(firstPlayer) {
 				poMeri(newElement, iks);
 			} else {
 				if (key == "Uredi radlce") {
-					radlciDodaj(true, newElement);
+					radlciDodaj(newElement);
 				} else {
 					calculate(key, games[key], newElement, firstPlayer);
 				}
@@ -68,7 +67,8 @@ function radlciDodajSamo() {
 		listOfPlayers[key][0] += "*";
 	}
 }
-function radlciDodaj(remove, newElement) {
+
+function radlciDodaj(newElement) {
 	changeOpis(newElement, "Uredi radlce");
 	newElement.innerHTML = "";
 	var divHolder = addElement("div", newElement, null);
@@ -1808,12 +1808,25 @@ function count(animate, undoed) {
 			}
 			// kkk.setAttribute("onclick", 'gameData("' + stGame + '")');
 			kkk.classList.add(player + "_score");
+			kkk.classList.add("score_" + stGame);
 			if (playerPoints !== "") {
 				pointsList[player] = pointsList[player] + parseInt(playerPoints);
 			}
+
 			if (kkk.innerHTML !== "&bbsp;") {
 				kkk.addEventListener("click", function () {
-					gameData(event.target.getAttribute("class").slice(5), stGame);
+					event.stopPropagation();
+					console.log(
+						event.target
+							.getAttribute("class")
+							.slice(event.target.getAttribute("class").lastIndexOf("_") + 1)
+					);
+					gameData(
+						event.target
+							.getAttribute("class")
+							.slice(event.target.getAttribute("class").lastIndexOf("_") + 1),
+						stGame
+					);
 				});
 			}
 			if (playerPoints == "") {
@@ -1905,7 +1918,7 @@ var completePodatki = {};
 function gameData(infom, number) {
 	/* gamename, prvi igralc, drug igralc, tocke, ima radlc, razlika, dobil zgubil, bonusi, bonusi Tocke*/
 	var info = listOfPlayers["!gamesData!"][parseInt(infom)];
-
+	console.log(info);
 	var contentWh = dialogBuilder("Igra", false);
 	var newElement = contentWh[0];
 

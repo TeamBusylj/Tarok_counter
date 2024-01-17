@@ -1,11 +1,9 @@
 function statistika() {
 	if (
-		!location.href.includes("https://tarock-counter--added-statistics-fw6szl24.web.app") &&
-		!location.href.includes("http://127.0.0.1:5500/public/") &&
-		!sessionStorage.uid == "b0fl1Itgx4WLrk2IUm55RlmQQXb2"
+		location.href.includes("https://tarock-counter--added-statistics-fw6szl24.web.app") ||
+		location.href.includes("http://127.0.0.1:5500/public/") ||
+		sessionStorage.uid == "b0fl1Itgx4WLrk2IUm55RlmQQXb2"
 	) {
-		dlgNotif("Prihaja kmalu", "Statistika");
-	} else {
 		var contentWh = dialogBuilder("Statistika - " + listOfPlayers["!gameName!"]);
 		var newElement = contentWh[0];
 		var iks = contentWh[1];
@@ -110,5 +108,7 @@ function statistika() {
 		makeCardItem("Zmage", maxWins);
 		let maxLoses = findKeysWithMaxValue(completeData, "steviloIzgub", "odstotekIzgub");
 		makeCardItem("Porazi", maxLoses);
+	} else {
+		dlgNotif("Prihaja kmalu", "Statistika");
 	}
 }

@@ -15,7 +15,6 @@ import "@material/web/button/filled-button.js";
 	await import("@material/web/labs/segmentedbutton/outlined-segmented-button.js");
 	await import("@material/web/dialog/dialog.js");
 	await import("@material/web/labs/card/filled-card.js");
-	await import("@material/web/ripple/ripple.js");
 	await import("@material/web/button/outlined-button.js");
 	await import("@material/web/iconbutton/icon-button.js");
 	await import("@material/web/dialog/dialog.js");
