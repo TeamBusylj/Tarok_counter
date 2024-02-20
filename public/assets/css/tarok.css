@@ -4,14 +4,14 @@ input[type="checkbox"] {
 	margin: 5px;
 }
 div#bottomBar2 {
-	z-index: 3;
+	z-index: 4;
 	position: fixed;
 	width: 100%;
 	transition: all var(--transDur);
 	bottom: 0;
 }
 div#bottomBar {
-	z-index: 3;
+	z-index: 4;
 	position: fixed;
 	width: 100%;
 	transition: all var(--transDur);

@@ -18,7 +18,7 @@ var games = {
 	"Uredi radlce": ["", false, "", true, "*"]
 };
 async function addScore(firstPlayer) {
-	var newElement = makeBottomheet()
+	var newElement = makeBottomheet("Kaj je oseba "+firstPlayer+" igrala?")
 	
 
 	let i = 0;
