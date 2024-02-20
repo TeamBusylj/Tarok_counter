@@ -39,7 +39,7 @@ md-dialog [slot="headline"] {
 #signInMessage {
 	margin-left: auto;
 	margin-right: auto;
-	color: var(--colorTxtDialog);
+	color: var(--_label-text-color);
 	display: block;
 	top: 70px;
 	position: relative;
@@ -58,9 +58,10 @@ md-dialog [slot="headline"] {
 	max-width: 101vw;
 	border-radius: 0;
 	animation: showScreen var(--transDur) forwards cubic-bezier(0.3, 0.5, 0, 1.3);
-	background: var(--md-sys-color-surface);
+
 	max-height: 101vh;
-	--_container-color: var(--md-sys-color-surface);
+	--md-dialog-container-color: var(--md-sys-color-surface);
+
 }
 
 .signInAnim {
@@ -78,7 +79,7 @@ md-dialog [slot="headline"] {
 
 #newapp {
     text-align: center;
-    color: var(--colorTxtDialog);
+    color: var(--_label-text-color);
    font-size: medium;
       display: block;
 
@@ -91,7 +92,7 @@ md-dialog [slot="headline"] {
 }
 
 a {
-	color: var(--colorTxtDialog);
+	color: var(--_label-text-color);
 }
 
 #actionBarStart {
@@ -104,18 +105,7 @@ a {
 	pointer-events: auto;
 }
 
-@keyframes signInAnimation {
-	50% {
-		scale: 2;
-	}
 
-	100% {
-		height: 100vh;
-		width: 100vw;
-		scale: 3;
-		border-radius: 0;
-	}
-}
 
 .menu-container {
 	position: absolute;
@@ -168,7 +158,34 @@ md-list {
 	-webkit-tap-highlight-color: transparent;
 }
 
+.confetti{
+	height: 10px;
+    width: 10px;
+  position: absolute;
+	animation: moveBox calc(var(--transDur) * 2) linear  forwards  ;
+	z-index: 50;
+}
+@keyframes moveBox {
+	0% {
+		opacity: 1;
+		transform:  translateX(0vmax) scale(0) ; 
+	}
+	
+	50%{
+		opacity: 1;
+		transform:  translateX(5vmax) scale(1) ; 
+		
+	}
+	100% {
+		opacity: 0;
+	  transform:  translateX(10vmax) scale(1); 
+	
+	}
+  }
 md-list::-webkit-scrollbar {
+	display: none;
+}
+.sheetContents::-webkit-scrollbar {
 	display: none;
 }
 
@@ -192,6 +209,7 @@ md-outlined-button {
 .iksRight {
 	right: 15px;
 	top: 15px;
+	z-index: 70;
 	position: absolute;
 }
 
@@ -203,11 +221,13 @@ md-outlined-button {
 	0% {
 		transform: translateX(0px);
 		opacity: 1;
+		display: block;
 	}
 
 	99% {
 		transform: translateX(-100px);
 		opacity: 0;
+		display: block;
 	}
 
 	100% {
@@ -254,7 +274,7 @@ md-outlined-button {
 	align-items: center;
 	justify-content: center;
 	background-color: white;
-	border: solid 3px var(--bgColor);
+
 	color: black;
 }
 
@@ -279,10 +299,10 @@ form {
 #actionBar {
 	-webkit-transform: translate3d(0, 0, 20px);
 	display: none;
-	background-color: var(--bgColor);
 	transition: all var(--transDur);
 	align-items: center;
 	justify-content: center;
+	animation: showScreen var(--transDur) forwards cubic-bezier(0.3, 0.5, 0, 1.3);
 	z-index: 66;
 	position: relative;
 	height: 50px;
@@ -359,7 +379,7 @@ i {
 
 .opis {
 	font-size: 1.2rem;
-	color: var(--colorTxtDialog);
+	color: var(--_label-text-color);
 	width: 80%;
 	text-align: center;
 }
@@ -391,23 +411,14 @@ span.ripple {
 	}
 }
 
-@keyframes ripple {
-	0% {
-		transform: scale(0) translate(-50%, -50%);
-		opacity: 0;
-	}
 
-	20% {
-		transform: scale(0.4) translate(-75%, -75%);
-		opacity: 1;
-	}
+*{
+	-webkit-user-select: none;
 
-	100% {
-		transform: scale(2) translate(-25%, -25%);
-		opacity: 0.4;
-	}
+	-ms-user-select: none;
+
+	user-select: none;
 }
-
 html {
 	scroll-behavior: smooth;
 	font-size: 1.2em;
@@ -475,7 +486,7 @@ html {
 	position: sticky;
 	top: 0px;
 	word-wrap: break-word;
-	background-color: var(--colorDialog);
+	background-color: var(--md-sys-color-secondary-container);
 	padding-top: 5px;
 	margin-top: -50px;
 	overflow: hidden;
@@ -495,19 +506,42 @@ html {
 .chl {
 	filter: saturate(0.6);
 	transition: all var(--transDur);
-
+	-webkit-overflow-scrolling: touch;
 	box-shadow: none, none;
-	height: calc(100svh - 235px);
+	height: calc(100svh - 210px);
 	margin-top: 60px;
 	margin-bottom: 50px;
 	border-radius: 30px;
-	background-color: var(--colorDialog);
-	color: var(--colorTxtDialog);
+	background-color: var(--md-sys-color-secondary-container);
+	color: var(--_label-text-color);
 	padding: 0px;
 	overflow: scroll;
 	flex: 1;
 	position: relative;
 	text-align: center;
+}
+.hueCard{
+	padding: 23px;
+	border-radius: 20px;
+}
+.colorTitle{
+	margin: calc(var(--md-slider-handle-width, 20px) / 2);
+
+}
+md-slider{
+	--md-slider-inactive-track-color: var(--md-sys-color-on-surface-variant);
+}
+.hue{
+	
+	
+	background:linear-gradient(to right, #e7007d 0%, #e90070 1%, #ea0064 2%, #eb0057 3%, #ec044a 4%, #ec0e3d 5%, #eb162f 6%, #ea1c1f 7%, #e92207 8%, #e03400 9%, #d84200 10%, #d04b00 11%, #ca5100 12%, #c45600 13%, #bf5b00 14%, #ba5e00 15%, #b56100 16%, #b16400 17%, #ad6600 18%, #a96800 19%, #a56a00 20%, #a26c00 21%, #9e6e00 22%, #9b7000 23%, #977100 24%, #937300 25%, #907400 26%, #8c7600 27%, #887700 28%, #847800 29%, #7f7a00 30%, #7a7b00 31%, #757d00 32%, #6f7e00 33%, #698000 34%, #618200 35%, #588300 36%, #4c8500 37%, #3d8700 38%, #238a00 39%, #008b18 40%, #008a2f 41%, #008a3d 42%, #008948 43%, #008951 44%, #008858 45%, #00885f 46%, #008865 47%, #00876a 48%, #00876f 49%, #008673 50%, #008677 51%, #00867b 52%, #00857f 53%, #008583 54%, #008586 55%, #00848a 56%, #00848d 57%, #008491 58%, #008394 59%, #008398 60%, #00829c 61%, #00829f 62%, #0081a3 63%, #0081a7 64%, #0080ac 65%, #007fb1 66%, #007fb6 67%, #007ebb 68%, #007dc1 69%, #007bc8 70%, #007ad0 71%, #0078da 72%, #0075e5 73%, #0072f2 74%, #126eff 75%, #326bff 76%, #4568ff 77%, #5365ff 78%, #5f62ff 79%, #695fff 80%, #735bff 81%, #7d57ff 82%, #8653ff 83%, #8e4eff 84%, #9748ff 85%, #a040ff 86%, #aa37ff 87%, #b329ff 88%, #be0dff 89%, #c400f6 90%, #ca00ea 91%, #ce00de 92%, #d300d2 93%, #d600c6 94%, #da00ba 95%, #dd00ad 96%, #e000a1 97%, #e20095 98%, #e50089 99%);
+}
+.clr{
+	
+	height: 24px;
+    border-radius: 12px;
+    border: 1px solid currentColor;
+	margin-inline: calc(var(--md-slider-handle-width, 20px) / 2);
 }
 
 .chl::-webkit-scrollbar {
@@ -515,8 +549,6 @@ html {
 }
 
 .chl {
-	-ms-overflow-style: none;
-
 	scrollbar-width: none;
 }
 role[name="tabpanel"] {
@@ -539,8 +571,12 @@ slot[name="content"]::slotted(*) {
 	z-index: 4;
 
 	overflow: scroll;
-	overflow-y: scroll;
+	
 	top: 10px;
+}
+#pomoc2{
+	height: calc(100vh - 80px);
+	margin-top: 45px;
 }
 
 #pomoc md-list-item,
@@ -558,7 +594,7 @@ slot[name="content"]::slotted(*) {
 .prnt {
 	-webkit-transform: translate3d(0, 0, 0px);
 	overflow-y: auto;
-	color: var(--colorTxtDialog);
+	color: var(--_label-text-color);
 	padding: 0px 10px 10px 10px;
 	min-height: calc(100vh - 60px);
 	height: calc(100vh - 60px);
@@ -576,12 +612,13 @@ slot[name="content"]::slotted(*) {
 	font-size: 1.2rem;
 	position: absolute;
 	bottom: 0;
+
 	border-right: 1px solid;
 }
 
 .whlScreen {
 	animation: showScreen var(--transDur) forwards;
-	color: var(--colorTxt);
+	color: var(--md-sys-color-on-surface);
 	z-index: 500000;
 	display: flex;
 	flex-direction: row;
@@ -598,11 +635,11 @@ slot[name="content"]::slotted(*) {
 	height: auto;
 	padding: 5px;
 	border-radius: 40px;
-	background: var(--colorDialog) 30%;
+	background: var(--md-sys-color-secondary-container) 30%;
 }
 
 button:not(.gsi-material-button) {
-	color: var(--colorTxt);
+	color: var(--md-sys-color-on-surface);
 	transition: all 0.05s;
 	overflow: hidden;
 	position: relative;
@@ -617,7 +654,7 @@ button:not(.gsi-material-button) {
 	align-items: center;
 	padding: 14px;
 	border-width: 0;
-	background-color: var(--colorBtn);
+	background-color: var(--md-sys-color-primary);
 	/* box-shadow: 5px 5px #888888; */
 	margin: 10px;
 	animation: showScreen var(--transDur) forwards;
@@ -656,20 +693,21 @@ input:not([type="color"]):not([type="checkbox"]) {
 	border-radius: 20px;
 	padding: 7px;
 	transition: all 0.1s;
-	outline: var(--colorBtn) solid 0px;
+	outline: var(--md-sys-color-primary) solid 0px;
 	animation: showScreen var(--transDur) forwards;
 }
 
 input:focus-visible {
-	outline: var(--colorBtn) solid 3px;
+	outline: var(--md-sys-color-primary) solid 3px;
 }
 
 .cntScreen {
-	color: var(--colorTxt);
+	color: var(--md-sys-color-on-surface);
 	display: flex;
 	flex-direction: row;
 	width: 100%;
-	z-index: 2;
+	z-index: 4;
+	
 	position: relative;
 	transition: all var(--transDur);
 	justify-content: center;
@@ -713,7 +751,7 @@ md-outlined-button:active {
 
 .crezultLine {
 	transition: all var(--transDur);
-	color: var(--colorTxt);
+	color: var(--md-sys-color-on-surface);
 	z-index: 40;
 	overflow: hidden;
 	display: flex;
@@ -738,6 +776,7 @@ span.btnIcon {
 	text-align: center;
 	padding: 3px;
 	font-size: 90%;
+	width: 20px;
 	color: var(--md-sys-color-on-surface);
 	border-radius: 5px;
 	display: flex;
@@ -758,27 +797,20 @@ span.btnIcon {
 		--transDur: 0s !important;
 	}
 }
-
+.noShowScreen{
+	animation:none;
+}
 @media (prefers-color-scheme: dark) {
 	body {
 		height: 100%;
-		--transDur: 0.3s;
-		--bgColor: var(--md-sys-color-surface);
-		--colorDialog: var(--md-sys-color-secondary-container);
-		--colorTxtDialog: var(--_label-text-color);
-		--colorTxt: var(--md-sys-color-on-surface);
-		--colorBtn: var(--md-sys-color-primary);
-		color: var(--colorTxt);
+		--transDur: 0.4s;
+		color: var(--md-sys-color-on-surface);
 		margin: 0;
 		overflow: hidden;
-		background-color: var(--bgColor);
+	
 	}
 
-	.gsi-material-button {
-		background-color: #131314;
-		border: 1px solid #747775;
-		color: #e3e3e3;
-	}
+	
 
 	.loader {
 		z-index: 400;
@@ -786,21 +818,28 @@ span.btnIcon {
 		width: 100vw;
 		height: 100vh;
 
-		background-color: var(--md-sys-color-surface, black);
+		background-color: black;
 		color: white;
 		top: 0;
 		text-align: center;
 	}
 }
-
+.strtThm{
+	position: absolute;top: 100px;left: 50%;transform: translate(-50%, 0%)
+}
+#panel-two{
+	height: calc(100vh - 80px);
+	overflow: scroll;
+	background-color: var(--md-sys-color-surface);
+}
 #firstTime {
 	z-index: 300;
 	position: absolute;
 	width: 100vw;
-	height: 100vh;
-	display: none;
-	color: var(--colorTxt);
-	background-color: var(--md-sys-color-surface, black);
+	height: 100dvh;
+display: none;
+	color: var(--md-sys-color-on-surface);
+	background-color: var(--md-sys-color-surface);
 
 	top: 0;
 	text-align: center;
@@ -820,33 +859,26 @@ md-outlined-text-field {
 	margin: 10px;
 }
 
-@media (prefers-reduced-motion) {
-	body {
-		--transDur: 0s !important;
-	}
+body{
+	background-color: var(--md-sys-color-surface);
 }
 
 @media (prefers-color-scheme: light) {
 	body {
 		height: 100%;
-		--transDur: 0.3s;
-		--bgColor: var(--md-sys-color-surface);
-		--colorDialog: var(--md-sys-color-secondary-container);
-		--colorTxtDialog: var(--_label-text-color);
-		--colorTxt: var(--md-sys-color-on-surface);
-		--colorBtn: var(--md-sys-color-primary);
-		color: var(--colorTxt);
+		--transDur: 0.4s;
+	
+
+
+		
+		
+		color: var(--md-sys-color-on-surface);
 		margin: 0;
 		overflow: hidden;
-		background-color: var(--bgColor);
+	
 	}
 
-	.gsi-material-button {
-		background-color: WHITE;
-		background-image: none;
-		border: 1px solid #747775;
-		color: #1f1f1f;
-	}
+	
 
 	.loader {
 		z-index: 400;
@@ -854,17 +886,32 @@ md-outlined-text-field {
 		width: 100vw;
 		height: 100vh;
 
-		background-color: var(--md-sys-color-surface, white);
+		background-color:  white;
 		color: black;
 		top: 0;
 		text-align: center;
 	}
 }
-
+.conffi{
+	
+	animation: showScreen2 calc(var(--transDur) * 1) forwards cubic-bezier(.13,1.68,.5,2.57);
+}
 p {
 	transition: all var(--transDur);
 }
+@keyframes showScreen2 {
+	0% {
+		opacity: 0;
+		transform: scale(0);
+	
+	}
 
+	100% {
+	
+		opacity: 1;
+		transform: scale(1);
+	}
+}
 @keyframes showScreen {
 	0% {
 		opacity: 0;
@@ -880,13 +927,14 @@ p {
 @keyframes hideScreen {
 	0% {
 		opacity: 1;
-		scale: 1;
+		transform: scale(1);
 	}
-
 	100% {
 		opacity: 0;
-		scale: 0.9;
+		transform: scale(0.9);
 	}
+
+	
 }
 
 #nextTab {
@@ -909,13 +957,16 @@ md-fab {
 	--fabHeight: var(--_container-height);
 	-webkit-tap-highlight-color: transparent;
 }
+.gsi-material-button {
+	background-color: var(--md-sys-color-surface);
+	border: 1px solid #747775;
+	color: var(--_label-text-color);
+}
 
 .gsi-material-button {
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	-ms-user-select: none;
+	
 	-webkit-appearance: none;
-	-webkit-tap-highlight-color: transparent;
+	
 	background-image: none;
 
 	-webkit-border-radius: 20px;
@@ -1040,6 +1091,86 @@ md-item{
     top: 0;
    
 }
+.titleFull{
+	top :120px !important;
+	position : fixed !important;
+}
 .sqe{
 	background-color: var(--md-sys-color-on-primary-fixed);
+}
+.bottomSheetTitle{
+	position: absolute;
+    margin-top: -100px;
+    top: 20px;
+    border-radius: 30px;
+	transition: all var(--transDur) cubic-bezier(0.05, 0.7, 0.1, 1.0);
+    background: var(--md-sys-color-surface-container);
+    text-align: center;
+    padding: 20px 40px 20px 40px;
+}
+.bottomSheet {
+    position: fixed;
+    width: 100%;
+	transition: all var(--transDur);
+    background-color: var(--md-sys-color-surface-container);
+    bottom: 0;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+	z-index: 99;
+}
+.bottomSheetHandle{
+	transition: all var(--transDur);
+	margin-top: 7px;
+    background: var(--md-sys-color-on-surface);
+    width: 10%;
+    height: 3px;
+    border-radius: 50px;
+   
+}
+.handleHolder{
+	left: 50%;
+    transform: translateX(-50%);
+	position: absolute;
+    top: 0px;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	height:30px;
+}
+.sheetContents:not(.not-selectable){
+	transition: all var(--transDur) cubic-bezier(0.05, 0.7, 0.1, 1.0);
+}
+.sheetContents{
+	display: flex;
+    align-items: center;
+overflow: hidden;
+justify-content: center;
+}
+.escapingSheet{
+	opacity: .9;
+    transform: scale(.9,1);
+}
+.bottomSheetScrim{
+	position: absolute;
+	height: 100vh;
+	width: 100vw;
+	top: 0;
+	transition: all var(--transDur) ease-out;
+	
+	background-color: black;
+	opacity: 0;
+	z-index: 98;
+}
+
+.mainSheet{
+	display: flex;
+
+	padding: 30px 5vw 30px 5vw;
+    flex-wrap: wrap;
+    justify-content: center;
+align-items: center;
+
+}
+.fullscreenSheet{
+	border-radius: 0;
 }

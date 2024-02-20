@@ -13,32 +13,30 @@ var games = {
 	"Odprti Berač": [90, false, "", false, "OB"],
 	Klop: ["", false, "", true, "K"],
 	Renons: [0, false, "", true, "R"],
-	Mondfang: [-21, false, "", false, "R"],
+	Mondfang: [-21, false, "", false, "M"],
 	"Po meri": [0, false, "", true, "+"],
 	"Uredi radlce": ["", false, "", true, "*"]
 };
 async function addScore(firstPlayer) {
-	var contentWh = dialogBuilder("Oseba <b>" + firstPlayer + "</b> je igrala...");
-	var newElement = contentWh[0];
-	var iks = contentWh[1];
-	iks.addEventListener("click", function (e) {
-		hideDialog(newElement);
-	});
+	var newElement = makeBottomheet()
+	
 
 	let i = 0;
 	for (const key in games) {
 		if (i == 3 || i == 7 || i == 11)
-			addElement("md-divider", newElement, null).style.margin = "5px";
-		i++;
-		let btn = document.createElement("md-outlined-button");
-		btn.innerHTML = key;
-		btn.style.height = "45px";
-		btn.classList.add("gameChose");
-		btn.setAttribute("type", "reset");
-		var icon = addElement("span", null, "btnIcon");
-		icon.setAttribute("slot", "icon");
-		icon.innerHTML = games[key][4];
+		addElement("md-divider", newElement, null).style.margin = "5px";
+	i++;
+	let btn = document.createElement("md-outlined-button");
+	btn.innerHTML = key;
+	btn.style.height = "45px";
+	btn.classList.add("gameChose");
+	btn.setAttribute("type", "reset");
+	var icon = addElement("span", null, "btnIcon");
+	icon.setAttribute("slot", "icon");
+	icon.innerHTML = games[key][4];
 		btn.addEventListener("click", function () {
+			document.querySelector(".sheetContents").style.display ="flex"
+		document.querySelector(".sheetContents").style.overflow ="hidden"
 			newElement.innerHTML = "";
 			if (key == "Mondfang") {
 				mondfang(newElement);
@@ -47,7 +45,7 @@ async function addScore(firstPlayer) {
 			} else if (key == "Klop") {
 				klop(newElement);
 			} else if (key == "Po meri") {
-				poMeri(newElement, iks);
+				poMeri(newElement);
 			} else {
 				if (key == "Uredi radlce") {
 					radlciDodaj(newElement);
@@ -123,19 +121,15 @@ function radlciDodaj(newElement) {
 			let rld = document.getElementsByName(user)[0].value;
 			listOfPlayers[user] = rld.replace(/[^*]/g, "");
 		}
-		hideDialog(newElement);
-		count(true);
+		document.querySelector(".bottomSheetScrim").click()
+		count(false)
 	});
 }
 var showIks = '<md-icon>close</md-icon><md-ripple for="touch" class="unbounded"></md-ripple>';
 
-function poMeri(newElement, iks) {
+function poMeri(newElement) {
 	changeOpis(newElement, "Vpišite toče");
-	iks.addEventListener("click", function (e) {
-		document.getElementById("game").style.animation = "none";
-		hideDialog(newElement);
-	});
-
+	
 	var vls = [];
 	for (const user in listOfPlayers) {
 		if (user == "!gamesData!" || user == "!gameName!") {
@@ -186,9 +180,9 @@ function poMeri(newElement, iks) {
 			false,
 			Date.now()
 		]);
-		hideDialog(newElement);
+		document.querySelector(".bottomSheetScrim").click()
 
-		count(true);
+		count(false, true)
 	});
 }
 var zaokrožuj = JSON.parse(localStorage.getItem("razlikaOkrozi"));
@@ -236,13 +230,11 @@ async function klop(newElement) {
 					false,
 					Date.now()
 				]);
-				hideDialog(newElement);
-				removeElement(
-					document.querySelector(".cntScreen"),
-					document.querySelector(".crezultLine")
-				);
+				document.querySelector(".bottomSheetScrim").click()
 
-				count(true);
+				setTimeout(() => {
+					count(false, true)
+				}, 200);
 			});
 		}
 	});
@@ -276,13 +268,11 @@ async function klop(newElement) {
 					false,
 					Date.now()
 				]);
-				hideDialog(newElement);
-				removeElement(
-					document.querySelector(".cntScreen"),
-					document.querySelector(".crezultLine")
-				);
+				document.querySelector(".bottomSheetScrim").click()
 
-				count(true);
+				setTimeout(() => {
+					count(false, true)
+				}, 200);
 			});
 		}
 	});
@@ -342,13 +332,9 @@ async function klop(newElement) {
 		]);
 		radlciDodajSamo();
 		if (isfull) {
-			hideDialog(newElement);
-			removeElement(
-				document.querySelector(".cntScreen"),
-				document.querySelector(".crezultLine")
-			);
+			document.querySelector(".bottomSheetScrim").click()
 
-			count(true);
+			count(false, true)
 		}
 	});
 }
@@ -392,10 +378,11 @@ async function mondfang(newElement) {
 		false,
 		Date.now()
 	]);
-	hideDialog(newElement);
-	removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"));
+	document.querySelector(".bottomSheetScrim").click()
 
-	count(true);
+
+
+	count(false, true)
 }
 
 async function renons(newElement) {
@@ -448,9 +435,9 @@ async function renons(newElement) {
 			false,
 			Date.now()
 		]);
-		hideDialog(newElement);
+		document.querySelector(".bottomSheetScrim").click()
 
-		count(true);
+		count(false, true)
 	});
 }
 async function calculate(gameName, properties, newElement, firstPlayer) {
@@ -603,26 +590,33 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 
 			btn.addEventListener("click", function () {
 				var save = $(newElement).children().detach();
-				let opis = newElement.parentNode
-					.querySelector('[slot="headline"]')
-					.getElementsByTagName("span")[0].innerHTML;
+				let opis = newElement.parentNode.parentNode.querySelector(".bottomSheetTitle").innerHTML
 				newElement.innerHTML = "";
 				var bonusDialog = newElement;
-				changeOpis(newElement, "Izberite");
+				changeOpis(newElement, "Izberite ");
 				$(".iksRight").hide();
 				var napovedanboolean = true;
 				var dobil = true;
 				let sgset = addElement("md-outlined-segmented-button-set", bonusDialog, null);
 				let ninapoved = addElement("md-outlined-segmented-button", sgset, null);
 				ninapoved.setAttribute("type", "reset");
-
+				let sgset2 = addElement("md-outlined-segmented-button-set", bonusDialog, null);
+				let izgubil = addElement("md-outlined-segmented-button", sgset2, null);
+				izgubil.label = "Izgubljeno";
+				izgubil.addEventListener("click", function () {
+					dobil = false;
+				});
+				
+				let zmagal = addElement("md-outlined-segmented-button", sgset2, null);
+				zmagal.label = "Dobljeno";
+				zmagal.addEventListener("click", function () {
+					dobil = true;
+				});
 				let napovedano = addElement("md-outlined-segmented-button", sgset, null);
 				if (bonusi[key][3]) napovedano.selected = true;
 				if (bonusi[key][3] == false) ninapoved.selected = true;
-				let actions = document.createElement("div");
-				actions.setAttribute("slot", "actions");
-				bonusDialog.parentNode.appendChild(actions);
-				let deleteBonus = addElement("md-text-button", actions, null);
+				addElement("div", bonusDialog, "break").style.height = "10px"
+				let deleteBonus = addElement("md-text-button", bonusDialog, null);
 				deleteBonus.innerHTML = "Odstrani bonus";
 				deleteBonus.setAttribute("type", "reset");
 				btn.innerHTML = key;
@@ -635,9 +629,9 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 					$(".iksRight").show();
 					$(newElement).empty().append(save);
 					changeOpis(newElement, opis);
-					actions.remove();
+					
 				});
-				let koncaj = addElement("md-filled-tonal-button", actions, null);
+				let koncaj = addElement("md-filled-tonal-button", bonusDialog, null);
 				koncaj.innerHTML = "Končano";
 				koncaj.setAttribute("type", "reset");
 
@@ -651,19 +645,9 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 				});
 				ninapoved.label = "Tiho";
 				addElement("div", bonusDialog, "break").style.height = "20px";
-				let sgset2 = addElement("md-outlined-segmented-button-set", bonusDialog, null);
+				
 
-				let izgubil = addElement("md-outlined-segmented-button", sgset2, null);
-				izgubil.label = "Izgubljeno";
-				izgubil.addEventListener("click", function () {
-					dobil = false;
-				});
-
-				let zmagal = addElement("md-outlined-segmented-button", sgset2, null);
-				zmagal.label = "Dobljeno";
-				zmagal.addEventListener("click", function () {
-					dobil = true;
-				});
+				
 				if (bonusi[key][2]) zmagal.selected = true;
 				if (bonusi[key][2] == false) izgubil.selected = true;
 				koncaj.addEventListener("click", function () {
@@ -710,26 +694,16 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 
 	rekontra.addEventListener("click", function () {
 		var save = $(newElement).children().detach();
-		let opis = newElement.parentNode
-			.querySelector('[slot="headline"]')
-			.getElementsByTagName("span")[0].innerHTML;
+		
+		let opis = newElement.parentNode.parentNode.querySelector(".bottomSheetTitle").innerHTML
 		newElement.innerHTML = "";
 		RekontraIf = true;
 		//var contentWh = dialogBuilder("Izberite", false);
 		var kontraDialog = newElement;
 		changeOpis(newElement, "Izberite");
 		$(".iksRight").hide();
-		let actions = document.createElement("div");
-		actions.setAttribute("slot", "actions");
-		kontraDialog.parentNode.appendChild(actions);
-		let koncaj = addElement("md-text-button", actions, null);
-		koncaj.innerHTML = "Končano";
-		koncaj.addEventListener("click", function (e) {
-			$(".iksRight").show();
-			$(newElement).empty().append(save);
-			changeOpis(newElement, opis);
-			actions.remove();
-		});
+		
+		
 		var sgset = addElement("md-outlined-segmented-button-set", kontraDialog, null);
 		sgset.setAttribute("multiselect", "");
 
@@ -742,7 +716,15 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 				IgraK2 = false;
 			}
 		});
-
+		addElement("div", kontraDialog, "break").style.height = "20px";
+		let koncaj = addElement("md-text-button", kontraDialog, null);
+		koncaj.innerHTML = "Končano";
+		koncaj.addEventListener("click", function (e) {
+			$(".iksRight").show();
+			$(newElement).empty().append(save);
+			changeOpis(newElement, opis);
+		
+		});
 		if (bonusi["Kralji"][3]) {
 			let btn = addElement("md-outlined-segmented-button", sgset, null);
 			btn.label += "Kralji";
@@ -790,24 +772,13 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 	});
 	kontra.addEventListener("click", function () {
 		var save = $(newElement).children().detach();
-		let opis = newElement.parentNode
-			.querySelector('[slot="headline"]')
-			.getElementsByTagName("span")[0].innerHTML;
+		let opis = newElement.parentNode.parentNode.querySelector(".bottomSheetTitle").innerHTML
 		newElement.innerHTML = "";
 		var kontraDialog = newElement;
 		changeOpis(newElement, "Izberite");
 		$(".iksRight").hide();
-		let actions = document.createElement("div");
-		actions.setAttribute("slot", "actions");
-		kontraDialog.parentNode.appendChild(actions);
-		let koncaj = addElement("md-text-button", actions, null);
-		koncaj.innerHTML = "Končano";
-		koncaj.addEventListener("click", function (e) {
-			$(".iksRight").show();
-			$(newElement).empty().append(save);
-			changeOpis(newElement, opis);
-			actions.remove();
-		});
+		
+		
 		var sgset = addElement("md-outlined-segmented-button-set", kontraDialog, null);
 		sgset.setAttribute("multiselect", "");
 
@@ -820,7 +791,16 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 				IgraK = false;
 			}
 		});
+		addElement("div", kontraDialog, "break").style.height = "20px";
 
+		let koncaj = addElement("md-text-button", kontraDialog, null);
+		koncaj.innerHTML = "Končano";
+		koncaj.addEventListener("click", function (e) {
+			$(".iksRight").show();
+			$(newElement).empty().append(save);
+			changeOpis(newElement, opis);
+		
+		});
 		if (bonusi["Kralji"][3]) {
 			let btn = addElement("md-outlined-segmented-button", sgset, null);
 			btn.label += "Kralji";
@@ -925,8 +905,9 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 		if (!navigator.onLine) {
 			localStorage.offlineChanges = true;
 		}
+		if(Object.keys(bnsi).length === 0) bnsi = null
 		if (slct2 !== "" || teamWork) {
-			this.remove();
+			
 			if (properties[1]) {
 				if (teamWork) {
 					listOfPlayers["!gamesData!"].push([
@@ -1003,12 +984,16 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 		if (IgraK) listOfPlayers["!gamesData!"].at(-1)[9] = true;
 		if (IgraK2) listOfPlayers["!gamesData!"].at(-1)[10] = true;
 
-		hideDialog(newElement);
+		document.querySelector(".bottomSheetScrim").click()
+
+
 		if (gameName.includes("Valat") || gameName.includes("Berač")) {
 			radlciDodajSamo();
 		}
-
-		count(true);
+setTimeout(() => {
+	count(false, true)
+}, 200);
+	
 	});
 
 	btn23.addEventListener("click", function () {
@@ -1065,6 +1050,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 		if (!navigator.onLine) {
 			localStorage.offlineChanges = true;
 		}
+		if(Object.keys(bnsi).length === 0) bnsi = null
 		if (properties[1]) {
 			if (teamWork) {
 				listOfPlayers["!gamesData!"].push([
@@ -1140,12 +1126,15 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 		if (IgraK) listOfPlayers["!gamesData!"].at(-1)[9] = true;
 		if (IgraK2) listOfPlayers["!gamesData!"].at(-1)[10] = true;
 
-		hideDialog(newElement);
+		document.querySelector(".bottomSheetScrim").click()
+
 		if (gameName.includes("Valat") || gameName.includes("Berač")) {
 			radlciDodajSamo();
 		}
 
-		count(true);
+		setTimeout(() => {
+			count(false, true)
+		}, 200);
 	});
 }
 
@@ -1292,8 +1281,15 @@ function hideElement(newElement) {
 }
 
 function changeOpis(dlg, desc) {
-	dlg.parentNode.querySelector('[slot="headline"]').getElementsByTagName("span")[0].innerHTML =
+
+	if(dlg.className == "mainSheet"){
+		dlg.parentNode.parentNode.querySelector(".bottomSheetTitle").innerHTML =
 		desc;
+	}else{
+		dlg.parentNode.querySelector('[slot="headline"]').getElementsByTagName("span")[0].innerHTML =
+		desc;
+	}
+	
 }
 
 /**
@@ -1382,12 +1378,13 @@ function Game(already) {
 							let divider = addElement("md-divider", slct2, null);
 							divider.setAttribute(
 								"style",
-								"height:5px;--_color: var(--md-sys-color-surface-container-high)"
+								"height:5px;--md-divider-color: var(--md-sys-color-surface-container-high)"
 							);
 						}
 						listItem.innerHTML += user;
 						listItem.addEventListener("click", function () {
 							clickedUser(user, full);
+							hideDialog(dialog);
 						});
 						let Btn = addElement("md-icon-button", listItem, null);
 						Btn.setAttribute("slot", "end");
@@ -1412,11 +1409,13 @@ function Game(already) {
 							let divider = addElement("md-divider", slct, null);
 							divider.setAttribute(
 								"style",
-								"height:5px;--_color: var(--md-sys-color-surface-container-high)"
+								"height:5px;--md-divider-color: var(--md-sys-color-surface-container-high)"
 							);
 						}
 						listItem.innerHTML += user;
 						listItem.addEventListener("click", function () {
+							hideDialog(dialog);
+
 							clickedUser(user, full);
 						});
 						let Btn = addElement("md-icon-button", listItem, null);
@@ -1462,9 +1461,6 @@ function hideDialog(dlg) {
 }
 
 async function clickedUser(slcta, fulla) {
-	try {
-		hideDialog(document.getElementById("dlgSlct"));
-	} catch {}
 	let full = decodeURIComponent(fulla);
 	if (slcta !== full) {
 		if (navigator.onLine) {
@@ -1528,7 +1524,7 @@ function undo() {
 		listOfPlayers = JSON.parse(listOfPlayersCopy[listOfPlayersCopy.length - 1]);
 		listOfPlayersCopy.pop();
 
-		count(true, false);
+		count(true)
 	}
 
 	if (listOfPlayersCopy.length == 0) {
@@ -1540,16 +1536,11 @@ var listOfPlayers = {};
 var listOfPlayersCopy = [];
 
 function newGame() {
-	var contentWh = dialogBuilder("Vpišite člane");
-	var content = contentWh[0];
-	var iks = contentWh[1];
-	iks.addEventListener("click", function (e) {
-		hideDialog(content);
-	});
+	var content = makeBottomheet("Vpišite člane")
+	
 
 	listOfPlayers = {};
-	var endHolder = addElement("div", content.parentNode, null);
-	endHolder.setAttribute("slot", "actions");
+let index = 1
 	var onePl = document.createElement("md-outlined-text-field");
 	var newPl = document.createElement("md-text-button");
 	var endPl = document.createElement("md-filled-tonal-button");
@@ -1565,17 +1556,23 @@ function newGame() {
 	content.appendChild(onePl);
 	onePl.focus();
 	let lnbrk = addElement("div", content, "break");
-	lnbrk.setAttribute("slot", "content");
-	endHolder.appendChild(newPl);
-	endHolder.appendChild(endPl);
+	lnbrk.style.height ="10px"
+	
+	content.appendChild(newPl);
+	content.appendChild(endPl);
 
 	newPl.addEventListener("click", function () {
 		let onePl2 = addElement("md-outlined-text-field", content, null);
 		onePl2.style.borderRadius = "4px";
 		onePl2.label = "Ime";
 		onePl2.style.marginBottom = "10px";
-		content.appendChild(onePl2);
+		content.insertBefore( onePl2,lnbrk);
+		
 		onePl2.focus;
+		index++
+		if (index==5) {
+		newPl.disabled = true			
+		}
 	});
 	endPl.addEventListener("click", async function () {
 		let nicist = false;
@@ -1630,8 +1627,9 @@ function newGame() {
 			if (!navigator.onLine) {
 				localStorage.offlineChanges = true;
 			}
-			hideDialog(content);
-			count(true);
+			document.querySelector(".bottomSheetScrim").click()
+		
+			count(false, true)
 		}
 	});
 }
@@ -1644,13 +1642,25 @@ function loclStrg() {
 	}
 }
 
-function count(animate, undoed) {
+async function count(animate, newcScore = null) {
+	try {if(animate){
+		document.querySelector(".cntScreen").style.animation= "hideScreen var(--transDur) forwards cubic-bezier(.3,.5,0,1.3)";
+		document.querySelector(".crezultLine").style.animation= "hideScreen var(--transDur) forwards cubic-bezier(.3,.5,0,1.3)";
+	}
+	} catch (error) {console.log(error);}
+let timeTo
+if(animate) timeTo = 30; else timeTo = 0
+
+await new Promise(resolve => setTimeout(resolve, timeTo));
 	if (!listOfPlayers["!gamesData!"]) {
 		listOfPlayers["!gamesData!"] = [];
 	}
-	try {
-		removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"));
-	} catch (error) {}
+	
+			try {
+			removeElement(document.querySelector(".cntScreen"), document.querySelector(".crezultLine"));
+		} catch (error) {}
+		
+	
 	setTimeout(() => {
 		let dlgs = document.getElementsByTagName("md-dialog");
 
@@ -1734,7 +1744,7 @@ function count(animate, undoed) {
 		pointView.setAttribute("class", "rezult_" + name.replace(/ /g, "_"));
 		pointView.setAttribute(
 			"style",
-			"flex: 1; color: var(--colorTxtDialog); background-color:var(--colorDialog); padding-top: 15px; padding-bottom: 15px; border-top-left-radius: 30px; border-top-right-radius: 30px; margin-left:10px;margin-right:10px;"
+			"flex: 1; color: var(--_label-text-color); background-color:var(--md-sys-color-secondary-container); padding-top: 15px; padding-bottom: 15px; border-top-left-radius: 30px; border-top-right-radius: 30px; margin-left:10px;margin-right:10px;"
 		);
 		pointView.innerHTML = "";
 
@@ -1757,6 +1767,7 @@ function count(animate, undoed) {
 			pointsList[key] = parseInt(0);
 		}
 	}
+	
 	if (!listOfPlayers["!gamesData!"]) listOfPlayers["!gamesData!"] = [];
 	for (var ia = 0; ia < listOfPlayers["!gamesData!"].length; ia++) {
 		let game = ia;
@@ -1816,11 +1827,7 @@ function count(animate, undoed) {
 			if (kkk.innerHTML !== "&bbsp;") {
 				kkk.addEventListener("click", function () {
 					event.stopPropagation();
-					console.log(
-						event.target
-							.getAttribute("class")
-							.slice(event.target.getAttribute("class").lastIndexOf("_") + 1)
-					);
+					
 					gameData(
 						event.target
 							.getAttribute("class")
@@ -1831,6 +1838,15 @@ function count(animate, undoed) {
 			}
 			if (playerPoints == "") {
 				kkk.innerHTML = "&nbsp;";
+			}
+			
+			if(ia == listOfPlayers["!gamesData!"].length-1 && newcScore){
+				let eee = kkk
+				kkk.classList.add("conffi")
+				setTimeout(() => {
+					confetti(eee, ".chlName_" + player)
+
+				}, 400);
 			}
 			// document.querySelector(".chlName_" + player).innerHTML += '<md-divider style="--_color: var(--md-sys-color-surface);height: 5px;"></md-divider>'
 			addElement(
@@ -1891,18 +1907,62 @@ function count(animate, undoed) {
 	document
 		.getElementById("bottomBar")
 		.insertBefore(rezultLine, document.getElementById("actionBar"));
+		if(animate) document.querySelector(".crezultLine").style.animation = "showScreen var(--transDur) forwards cubic-bezier(0.3, 0.5, 0, 1.3)";
+
 	for (const key in listOfPlayers) {
 		if (key == "!gamesData!" || key == "!gameName!") {
 			continue;
 		}
 		document.querySelector(".rezult_" + key.replace(/ /g, "_")).innerHTML = pointsList[key];
 	}
-	setTimeout(() => {
+	if(animate){
+		setTimeout(() => {
+			var $target = $('.chl');
+			$target.animate({ scrollTop: [$target.prop('scrollHeight'), 'swing'] }, {
+				duration: $target.prop('scrollHeight')/2  ,easing: 'swing' 
+			});
+		}, 1);
+	} else{
 		var objDiv = document.getElementsByClassName("chl")[0];
 		objDiv.scrollTo(0, objDiv.scrollHeight + 100);
-	}, 1);
+	}
+	
+	
+	
+
 }
 
+async function confetti(element2, chl){
+	
+	var referenceElement = element2;
+	var dv = document.createElement('div');
+
+
+	var referenceRect = referenceElement.getBoundingClientRect();
+
+	
+
+	dv.style.position = 'fixed';
+	dv.style.top = (referenceRect.top +20 ) + 'px';
+	dv.style.left = ( referenceRect.left+20 ) + 'px';
+	dv.style.zIndex = "66"
+
+document.getElementById("cntScreen").appendChild(dv)
+	for (let i = 0; i < 100; i++) {
+		const element = document.createElement("div");
+		element.classList.add("confetti");
+		var randomColor = Math.floor(Math.random()*16777215).toString(16);
+		element.style.backgroundColor = "#" + randomColor;
+		var randomDir = Math.floor(Math.random() * 361);
+		element.style.rotate =  randomDir+"deg";
+		dv.appendChild(element)
+
+		var randomScaleX = 0.2 + Math.random() * (3.2 - 0.2);
+		var randomScaleY = 0.2 + Math.random() * (3.2 - 0.2);
+		element.style.scale=  randomScaleX+","+randomScaleY;
+		await new Promise(resolve => setTimeout(resolve, 5));
+	}
+}
 function addElement(tag, parent, className) {
 	var element = document.createElement(tag);
 	if (className) {
@@ -2171,9 +2231,7 @@ function gameData(infom, number) {
 	//Tocke
 	if (
 		!completePodatki["Igra"][1].toLowerCase().includes("po meri") &&
-		!completePodatki["Igra"][1].toLowerCase().includes("klop") &&
-		!completePodatki["Igra"][1].toLowerCase().includes("renons") &&
-		!completePodatki["Igra"][1].toLowerCase().includes("mondfang")
+		!completePodatki["Igra"][1].toLowerCase().includes("klop")
 	) {
 		data = "Točke";
 		element1 = data;
@@ -2226,7 +2284,7 @@ function gameData(infom, number) {
 
 		updateUserData();
 		hideDialog(newElement);
-		count(true);
+		count(true)
 	});
 	var iks = document.createElement("md-filled-tonal-button");
 	iks.innerHTML = "Končano";
@@ -2381,13 +2439,10 @@ window.addEventListener("load", function () {
 	if (sessionStorage.uid == "null") {
 		hideElement(document.querySelectorAll(".loader")[0]);
 	}
-	if (!localStorage.firstTime) {
-		//localStorage.firstTime = true;
-	}
-	if (localStorage.firstTime == "true") {
-		localStorage.firstTime = false;
-		//document.getElementById("firstTime").style.display = "block"
-	}
+	/*if (!localStorage.firstTime) {
+		document.getElementById("firstTime").style.display = "block";
+	}*/
+
 	queryAnim = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 	try {
@@ -2407,12 +2462,6 @@ window.addEventListener("load", function () {
 			updateUserData();
 			localStorage.offlineChanges = undefined;
 		}
-	}
-
-	try {
-		changeTheme(localStorage.themeColor);
-	} catch (error) {
-		console.log(error);
 	}
 
 	if (
@@ -2446,23 +2495,6 @@ function settings() {
 	dlgFullscreen(dialog.parentNode);
 
 	var holder = addElement("md-list", dialog, null);
-	var tema = addElement("md-list-item", holder, null);
-
-	tema.innerHTML = "Tema aplikacije";
-	addElement("md-ripple", tema, null);
-	var colPick = document.createElement("input");
-	tema.addEventListener("click", function () {
-		colPick.click();
-	});
-	colPick.setAttribute("slot", "end");
-	colPick.setAttribute("type", "color");
-	colPick.value = localStorage.getItem("themeColor");
-	colPick.addEventListener("change", function () {
-		localStorage.themeColor = colPick.value;
-		changeTheme(event.target.value);
-	});
-	tema.appendChild(colPick);
-	addElement("md-divider", holder, null);
 	var razlikaOkroz = addElement("md-list-item", holder, null);
 	razlikaOkroz.setAttribute("style", "display: flex;align-items: center;");
 	razlikaOkroz.innerHTML = "Zaokroževanje razlike&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -2489,17 +2521,80 @@ function settings() {
 		}
 		zaokrožuj = JSON.parse(localStorage.getItem("razlikaOkrozi"));
 	});
+
+	var tema = makeThemeChanger();
+	holder.appendChild(tema);
 }
-/*
-window.addEventListener("load", function () {
-	document.querySelector("#game").addEventListener("click", function () {
-		event.target.setAttribute("clicked", "");
+
+function makeThemeChanger() {
+	let clr = localStorage["seed-color"].split(",");
+	var tema = addElement("md-filled-card", null, "hueCard");
+	addElement("p", tema, "colorTitle").innerHTML = "Barva aplikacije";
+	let slider1 = addElement("md-slider", tema, null);
+	slider1.max = "360";
+	slider1.value = clr[0];
+	addElement("div", tema, "hue").classList.add("clr");
+	let brk = addElement("div", tema, null);
+	brk.style.height = "15px";
+	brk.style.width = "3px";
+	addElement("p", tema, "colorTitle").innerHTML = "Nasičenost";
+
+	let slider2 = addElement("md-slider", tema, null);
+	slider2.value = clr[1];
+	let divGradient = addElement("div", tema, "clr");
+	slider1.addEventListener("input", function () {
+		localStorage["seed-color"] = slider1.value + "," + slider2.value;
+		divGradient.style.background = changeTheme(slider1.value, slider2.value);
 	});
+	divGradient.style.background = changeTheme(slider1.value, slider2.value);
+	slider2.addEventListener("input", function () {
+		localStorage["seed-color"] = slider1.value + "," + slider2.value;
+		changeTheme(slider1.value, slider2.value);
+	});
+	let brk2 = addElement("div", tema, null);
+	brk2.style.height = "15px";
+	brk2.style.width = "3px";
+	addElement("p", tema, "colorTitle").innerHTML = "Tema";
+	let themeSwitch = addElement("md-outlined-segmented-button-set", tema, "noShowScreen");
+
+	let light = addElement("md-outlined-segmented-button", themeSwitch, null);
+	let system = addElement("md-outlined-segmented-button", themeSwitch, null);
+	let dark = addElement("md-outlined-segmented-button", themeSwitch, null);
+	let lightI = addElement("md-icon", light, null);
+	let systemI = addElement("md-icon", system, null);
+	let darkI = addElement("md-icon", dark, null);
+	lightI.setAttribute("slot", "icon");
+	systemI.setAttribute("slot", "icon");
+	darkI.setAttribute("slot", "icon");
+	lightI.innerHTML = "light_mode";
+	systemI.innerHTML = "brightness_medium";
+	darkI.innerHTML = "dark_mode";
+	light.addEventListener("click", function () {
+		localStorage.mode = "light";
+		changeTheme(slider1.value, slider2.value);
+	});
+	dark.addEventListener("click", function () {
+		localStorage.mode = "dark";
+		changeTheme(slider1.value, slider2.value);
+	});
+	system.addEventListener("click", function () {
+		localStorage.mode = "sys";
+		changeTheme(slider1.value, slider2.value);
+	});
+
+	if (localStorage.mode == "dark") dark.selected = true;
+	else if (localStorage.mode == "light") light.selected = true;
+	else if (localStorage.mode == "sys") system.selected = true;
+	return tema;
+}
+
+/*window.addEventListener("load", function () {
+	
 	const tabs = document.getElementById("tabsi");
-	let currentPanel = null;
-	const panelIda = tabs.activeTab?.getAttribute("aria-controls");
-	const roota = tabs.getRootNode();
-	currentPanel = roota.querySelector(`#${panelIda}`);
+	let currentPanel;
+	const panelId2 = tabs.activeTab?.getAttribute("aria-controls");
+	const root2 = tabs.getRootNode();
+	currentPanel = root2.querySelector(`#${panelId2}`);
 	setTimeout(() => {
 		const next = tabs.activeTab.nextElementSibling;
 
@@ -2507,12 +2602,13 @@ window.addEventListener("load", function () {
 			tabs.activeTab.active = false;
 			next.active = true;
 		}
-	}, 300);
-
+	}, 301);
+	console.log();
 	setTimeout(() => {
 		document.querySelector("#nextTab").addEventListener("click", function () {
 			currentPanel.hidden = true;
 			currentPanel.style.animation = "hideTab var(--transDur) forwards";
+
 			const panelId = tabs.activeTab?.getAttribute("aria-controls");
 			const root = tabs.getRootNode();
 			const nexta = tabs.activeTab.nextElementSibling;
@@ -2523,6 +2619,12 @@ window.addEventListener("load", function () {
 			currentPanel = root.querySelector(`#${panelId}`);
 
 			if (currentPanel && currentPanel.id !== "panel-four") {
+				if (currentPanel && currentPanel.id == "panel-two") {
+					console.log("tema");
+					let thmCh = makeThemeChanger();
+					thmCh.classList.add("strtThm");
+					currentPanel.appendChild(thmCh);
+				}
 				setTimeout(() => {
 					currentPanel.style.animation = "showTab var(--transDur) forwards";
 
@@ -2534,6 +2636,7 @@ window.addEventListener("load", function () {
 					"hideTab var(--transDur) forwards";
 				localStorage.firstTime = false;
 				setTimeout(() => {
+					localStorage.firstTime = false;
 					document.getElementById("firstTime").remove();
 					document.getElementById("nextTab").remove();
 				}, 300);
@@ -2541,17 +2644,11 @@ window.addEventListener("load", function () {
 		});
 	}, 300);
 
-	document.getElementById("colorTrigger").addEventListener("click", function () {
-		document.getElementById("colPickStart").click();
-	});
-	document.getElementById("colPickStart").addEventListener("change", function () {
-		localStorage.themeColor = event.target.value;
-
-		changeTheme(event.target.value);
-	});
 	document.getElementById("panel-three").innerHTML = pomoc;
 	document.getElementById("pomoc").id = "pomoc2";
 	document.getElementById("pomoc2").style.position = "absolute";
+	document.getElementById("pomoc2").style.height = " calc(100vh - 80px);";
+
 	var lst = document.getElementById("pomoc2").getElementsByTagName("md-list-item");
 	for (const item of lst) {
 		item.addEventListener("click", function () {
@@ -2575,7 +2672,7 @@ function helpMe(dlg) {
 		var iks = contentWh[1];
 		dialog.parentNode.classList.add("fullscreen");
 		if (dlg) {
-			dlg.removeAttribute("open");
+			//dlg.removeAttribute("open");
 		}
 		iks.addEventListener("click", function (e) {
 			if (!dlg) {
@@ -2593,7 +2690,7 @@ function helpMe(dlg) {
 
 				setTimeout(() => {
 					hideDialog(dialog);
-					dlg.setAttribute("open", "");
+					//dlg.setAttribute("open", "");
 				}, 1);
 			}
 		});
@@ -2708,7 +2805,8 @@ const registerServiceWorker = async () => {
 registerServiceWorker();
 
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
-	changeTheme(localStorage.themeColor);
+	let clr = localStorage["seed-color"].split(",");
+	changeTheme(clr[0], clr[1]);
 });
 window.addEventListener("popstate", function (event) {
 	console.log("BACK");
@@ -2716,6 +2814,7 @@ window.addEventListener("popstate", function (event) {
 });
 
 window.addEventListener("load", async function () {
+
 	let installPrompt = null;
 	const installButton = document.querySelector("#pwa");
 	let ifitis = false;
@@ -2779,3 +2878,165 @@ window.addEventListener("load", async function () {
 		installButton.style.display = "none";
 	}
 });
+
+function makeBottomheet(title) {
+	let bottomSheet = addElement("div", document.body, "bottomSheet");
+	let sheetContents = addElement("div", bottomSheet, "sheetContents");
+	let draggableArea = addElement("div", bottomSheet, "handleHolder");
+	var btTitle
+	if(title !== ""){
+
+	
+	 btTitle = addElement("div", draggableArea, "bottomSheetTitle");
+	btTitle.innerHTML = title
+}
+	let handle = addElement("div", draggableArea, "bottomSheetHandle");
+	let scrim = addElement("div", document.body, "bottomSheetScrim");setTimeout(() => {
+		scrim.style.opacity = ".32"
+	}, 10);
+	scrim.addEventListener('click', function() {
+		sheetHeight = 24
+		onDragEnd()
+	});
+	let toolbarColor = document.querySelector('meta[name="theme-color"]').getAttribute('content');
+	let sheetHeight; // in vh
+	const setSheetHeight = (value) => {
+		sheetHeight = Math.max(0, Math.min(100, value));
+		
+			sheetContents.style.height = `${sheetHeight}dvh`;
+	
+
+		if (sheetHeight === 100) {
+			bottomSheet.classList.add("fullscreenSheet");
+			document.querySelector('meta[name="theme-color"]').setAttribute('content',  getComputedStyle(document.body).getPropertyValue('--md-sys-color-surface-container'));
+		} else {
+			bottomSheet.classList.remove("fullscreenSheet");
+			document.querySelector('meta[name="theme-color"]').setAttribute('content',toolbarColor)
+		}
+	};
+	setSheetHeight(0);
+
+	const touchPosition = (event) =>
+  event.touches ? event.touches[0] : event
+
+let dragPosition
+
+const onDragStart = (event) => {
+  dragPosition = touchPosition(event).pageY
+  sheetContents.classList.add("not-selectable")
+
+}
+
+const onDragMove = (event) => {
+  if (dragPosition === undefined || (sheetContents.innerHTML.includes("md-list") &&event.target.className !== "handleHolder")) return
+
+
+
+
+  const y = touchPosition(event).pageY
+  const deltaY = dragPosition - y
+  const deltaHeight = deltaY / window.innerHeight * 100
+
+  setSheetHeight(sheetHeight + deltaHeight)
+	if(sheetHeight<25){if(title !== "") {btTitle.style.transform = "scale(1,0)";}bottomSheet.classList.add("escapingSheet");scrim.style.opacity = "0"} else {if(title !== "") {btTitle.style.transform = "scale(1,1)";}bottomSheet.classList.remove("escapingSheet");scrim.style.opacity = ".32"}
+  dragPosition = y
+
+  const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+
+  if(sheetHeight  >  (((vh-52) / vh) * 100)  ) {
+	
+	  btTitle.classList.add("titleFull")
+  } else{
+	btTitle.classList.remove("titleFull")
+  }
+}
+let already = false
+const onDragEnd = () => {
+	setTimeout(() => {
+	if(dragPosition) already = true
+
+  dragPosition = undefined
+  sheetContents.classList.remove("not-selectable")
+
+ var sheetHeight3
+  
+	const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+const mainContentHeight = Math.min(mainContent.clientHeight, mainContent.scrollHeight)
+sheetHeight3 = (mainContentHeight / vh) * 100;
+
+
+if (sheetHeight < 25) {
+    setIsSheetShown(false)
+	setSheetHeight(0)
+
+  } else if (sheetHeight > sheetHeight3+(100-sheetHeight3)/2) {
+    setSheetHeight(100)
+  } else{
+	setSheetHeight(Math.max(Math.min(sheetHeight3+5, 75), 25))
+} 
+
+
+if(sheetHeight  >  (((vh-26) / vh) * 100)  ) {
+  
+	btTitle.classList.add("titleFull")
+} else{
+  btTitle.classList.remove("titleFull")
+}
+}, 6);
+  
+}
+const setIsSheetShown = (isShown) => {
+	bottomSheet.setAttribute("aria-hidden", String(!isShown))
+	scrim.style.opacity = "0"
+	if(title !== "") {btTitle.style.transform = "scale(1,0)";}
+	setTimeout(() => {
+		bottomSheet.remove()
+		scrim.remove()
+	}, 600);
+	
+}
+  
+window.addEventListener("mousedown", onDragStart)
+window.addEventListener("touchstart", onDragStart)
+
+window.addEventListener("mousemove", onDragMove)
+window.addEventListener("touchmove", onDragMove)
+
+window.addEventListener("mouseup", onDragEnd)
+window.addEventListener("touchend", onDragEnd)
+ let mainContent = addElement("main", sheetContents, "mainSheet")
+
+	setSheetHeight(Math.min(sheetContents.offsetHeight,50, (720 / window.innerHeight) * 100));
+ 
+	const observer = new MutationObserver(mutations =>
+		mutations.forEach(mutation => {
+			
+			if (mutation.type === 'childList' && sheetHeight < 100) {
+				setTimeout(() => {
+					const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+
+				// Get the height of the main content element
+				const mainContentHeight = Math.min(mainContent.clientHeight, mainContent.scrollHeight) // Adding 60px for padding or margin
+				
+				// Calculate the percentage height of mainContent relative to the viewport height
+				const sheetHeight2 = (mainContentHeight / vh) * 100;
+				
+				// Set the height of .mainSheet using the calculated percentage height
+				setSheetHeight(Math.max(Math.min(sheetHeight2+5, 75), 25));
+				if(sheetHeight  >  (((vh-52) / vh) * 100)  ) {
+	
+					btTitle.classList.add("titleFull")
+				} else{
+				  btTitle.classList.remove("titleFull")
+				}
+				}, 10);
+				
+				
+			}
+		})
+	);
+	
+	observer.observe(mainContent, { childList: true });
+
+return mainContent
+}

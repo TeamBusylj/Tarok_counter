@@ -201,9 +201,24 @@ export async function updateSharedRemote() {
 export async function watchChanges() {
 	var starCountRef = ref(database, "users/" + sessionStorage.uid);
 	onValue(starCountRef, async (snapshot) => {
-		let result = snapshot.val()["games"];
+		var result = snapshot.val()["games"];
 
 		var gamesObject = JSON.parse(localStorage.getItem("games")) || {};
+		function sortObjectKeys(obj) {
+			// Get the keys of the object and sort them alphabetically
+			const sortedKeys = Object.keys(obj).sort();
+		
+			// Create a new object with sorted keys
+			const sortedObject = {};
+			sortedKeys.forEach(key => {
+				sortedObject[key] = obj[key];
+			});
+		
+			return sortedObject;
+		}
+		
+		if(decodeURIComponent(JSON.stringify(sortObjectKeys(result))) !== decodeURIComponent(JSON.stringify(sortObjectKeys(gamesObject)))){
+			console.log("change");
 		gamesObject = result;
 		for (const key in gamesObject) {
 			if (gamesObject.hasOwnProperty(key) && key.includes("%2Fusers%2F")) {
@@ -225,6 +240,8 @@ export async function watchChanges() {
 				count(false);
 			}
 		}, 500);
+			
+	}
 	});
 }
 window.watchChanges = watchChanges;
