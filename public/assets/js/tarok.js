@@ -1283,7 +1283,7 @@ function hideElement(newElement) {
 function changeOpis(dlg, desc) {
 
 	if(dlg.className == "mainSheet"){
-		dlg.parentNode.parentNode.querySelector(".bottomSheetTitle").innerHTML =
+		dlg.parentNode.parentNode.querySelector("p").innerHTML =
 		desc;
 	}else{
 		dlg.parentNode.querySelector('[slot="headline"]').getElementsByTagName("span")[0].innerHTML =
@@ -1621,7 +1621,8 @@ let index = 1
 				.replace(/,/g, ", ");
 			koncajIme.innerHTML = "Končano";
 			content.appendChild(imeIgre);
-			endHolder.appendChild(koncajIme);
+			addElement("div", content, "break").style.height = "10px";
+			content.appendChild(koncajIme);
 			await waitForButtonClick([koncajIme]);
 			listOfPlayers["!gameName!"] = imeIgre.value;
 			if (!navigator.onLine) {
@@ -2527,7 +2528,9 @@ function settings() {
 }
 
 function makeThemeChanger() {
-	let clr = localStorage["seed-color"].split(",");
+	const seedColor = localStorage["seed-color"] || "267,100";
+	let clr = seedColor.split(",");
+
 	var tema = addElement("md-filled-card", null, "hueCard");
 	addElement("p", tema, "colorTitle").innerHTML = "Barva aplikacije";
 	let slider1 = addElement("md-slider", tema, null);
@@ -2888,7 +2891,9 @@ function makeBottomheet(title) {
 
 	
 	 btTitle = addElement("div", draggableArea, "bottomSheetTitle");
-	btTitle.innerHTML = title
+	btTitle.innerHTML ='<p style="margin:0;">' +title+"</p>"
+	addElement("md-elevation", btTitle)
+	btTitle.style.margin = "-"+(btTitle.offsetHeight+34)+"px"
 }
 	let handle = addElement("div", draggableArea, "bottomSheetHandle");
 	let scrim = addElement("div", document.body, "bottomSheetScrim");setTimeout(() => {
@@ -2924,9 +2929,9 @@ let dragPosition
 const onDragStart = (event) => {
   dragPosition = touchPosition(event).pageY
   sheetContents.classList.add("not-selectable")
-
+  vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
 }
-
+var vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
 const onDragMove = (event) => {
   if (dragPosition === undefined || (sheetContents.innerHTML.includes("md-list") &&event.target.className !== "handleHolder")) return
 
@@ -2938,10 +2943,10 @@ const onDragMove = (event) => {
   const deltaHeight = deltaY / window.innerHeight * 100
 
   setSheetHeight(sheetHeight + deltaHeight)
-	if(sheetHeight<25){if(title !== "") {btTitle.style.transform = "scale(1,0)";}bottomSheet.classList.add("escapingSheet");scrim.style.opacity = "0"} else {if(title !== "") {btTitle.style.transform = "scale(1,1)";}bottomSheet.classList.remove("escapingSheet");scrim.style.opacity = ".32"}
-  dragPosition = y
+  
+	
 
-  const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+  
 
   if(sheetHeight  >  (((vh-52) / vh) * 100)  ) {
 	
@@ -2949,6 +2954,13 @@ const onDragMove = (event) => {
   } else{
 	btTitle.classList.remove("titleFull")
   }
+  var sheetHeight3
+
+const mainContentHeight = Math.min(mainContent.clientHeight, mainContent.scrollHeight)
+sheetHeight3 = (mainContentHeight / vh) * 100;
+
+if(sheetHeight < sheetHeight3/2){if(title !== "") {btTitle.style.transform = "scale(1,0)";}bottomSheet.classList.add("escapingSheet");scrim.style.opacity = "0"} else {if(title !== "") {btTitle.style.transform = "scale(1,1)";}bottomSheet.classList.remove("escapingSheet");scrim.style.opacity = ".32"}
+  dragPosition = y
 }
 let already = false
 const onDragEnd = () => {
@@ -2960,12 +2972,12 @@ const onDragEnd = () => {
 
  var sheetHeight3
   
-	const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+	
 const mainContentHeight = Math.min(mainContent.clientHeight, mainContent.scrollHeight)
 sheetHeight3 = (mainContentHeight / vh) * 100;
 
 
-if (sheetHeight < 25) {
+if (sheetHeight < sheetHeight3/2) {
     setIsSheetShown(false)
 	setSheetHeight(0)
 
@@ -2989,11 +3001,11 @@ const setIsSheetShown = (isShown) => {
 	bottomSheet.setAttribute("aria-hidden", String(!isShown))
 	scrim.style.opacity = "0"
 	if(title !== "") {btTitle.style.transform = "scale(1,0)";}
-	setTimeout(() => {
+	
+	bottomSheet.addEventListener('transitionend', function(event) {
 		bottomSheet.remove()
 		scrim.remove()
-	}, 600);
-	
+	}, false );
 }
   
 window.addEventListener("mousedown", onDragStart)
@@ -3013,9 +3025,7 @@ window.addEventListener("touchend", onDragEnd)
 			
 			if (mutation.type === 'childList' && sheetHeight < 100) {
 				setTimeout(() => {
-					const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
-
-				// Get the height of the main content element
+				
 				const mainContentHeight = Math.min(mainContent.clientHeight, mainContent.scrollHeight) // Adding 60px for padding or margin
 				
 				// Calculate the percentage height of mainContent relative to the viewport height
@@ -3029,6 +3039,7 @@ window.addEventListener("touchend", onDragEnd)
 				} else{
 				  btTitle.classList.remove("titleFull")
 				}
+				btTitle.style.margin = "-"+(btTitle.offsetHeight+34)+"px"
 				}, 10);
 				
 				

@@ -1092,8 +1092,10 @@ md-item{
    
 }
 .titleFull{
-	top :120px !important;
+	top :20px !important;
 	position : fixed !important;
+	margin: 0 !important;
+	--md-elevation-level: 0 !important;
 }
 .sqe{
 	background-color: var(--md-sys-color-on-primary-fixed);
@@ -1102,6 +1104,8 @@ md-item{
 	position: absolute;
     margin-top: -100px;
     top: 20px;
+	--md-elevation-level: 2;
+	max-width: 70vw;
     border-radius: 30px;
 	transition: all var(--transDur) cubic-bezier(0.05, 0.7, 0.1, 1.0);
     background: var(--md-sys-color-surface-container);
