@@ -590,7 +590,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 
 			btn.addEventListener("click", function () {
 				var save = $(newElement).children().detach();
-				let opis = newElement.parentNode.parentNode.querySelector(".bottomSheetTitle").innerHTML
+				let opis = newElement.parentNode.parentNode.querySelector(".bottomSheetTitle").innerText
 				newElement.innerHTML = "";
 				var bonusDialog = newElement;
 				changeOpis(newElement, "Izberite ");
@@ -695,7 +695,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 	rekontra.addEventListener("click", function () {
 		var save = $(newElement).children().detach();
 		
-		let opis = newElement.parentNode.parentNode.querySelector(".bottomSheetTitle").innerHTML
+		let opis = newElement.parentNode.parentNode.querySelector(".bottomSheetTitle").innerText
 		newElement.innerHTML = "";
 		RekontraIf = true;
 		//var contentWh = dialogBuilder("Izberite", false);
@@ -772,7 +772,7 @@ async function partner(newElement, gameName, properties, teamWork, firstPlayer, 
 	});
 	kontra.addEventListener("click", function () {
 		var save = $(newElement).children().detach();
-		let opis = newElement.parentNode.parentNode.querySelector(".bottomSheetTitle").innerHTML
+		let opis = newElement.parentNode.parentNode.querySelector(".bottomSheetTitle").innerText
 		newElement.innerHTML = "";
 		var kontraDialog = newElement;
 		changeOpis(newElement, "Izberite");
@@ -2896,11 +2896,12 @@ function makeBottomheet(title) {
 	btTitle.style.margin = "-"+(btTitle.offsetHeight+34)+"px"
 }
 	let handle = addElement("div", draggableArea, "bottomSheetHandle");
-	let scrim = addElement("div", document.body, "bottomSheetScrim");setTimeout(() => {
+	let scrim = addElement("div", document.body, "bottomSheetScrim");
+	setTimeout(() => {
 		scrim.style.opacity = ".32"
 	}, 10);
 	scrim.addEventListener('click', function() {
-		sheetHeight = 24
+		sheetHeight =0
 		onDragEnd()
 	});
 	let toolbarColor = document.querySelector('meta[name="theme-color"]').getAttribute('content');
@@ -2959,7 +2960,7 @@ const onDragMove = (event) => {
 const mainContentHeight = Math.min(mainContent.clientHeight, mainContent.scrollHeight)
 sheetHeight3 = (mainContentHeight / vh) * 100;
 
-if(sheetHeight < sheetHeight3/2){if(title !== "") {btTitle.style.transform = "scale(1,0)";}bottomSheet.classList.add("escapingSheet");scrim.style.opacity = "0"} else {if(title !== "") {btTitle.style.transform = "scale(1,1)";}bottomSheet.classList.remove("escapingSheet");scrim.style.opacity = ".32"}
+if(sheetHeight < sheetHeight3/2){if(title !== "") {btTitle.style.transform = "scale(1,0)";}bottomSheet.classList.add("escapingSheet");scrim.style.opacity = "0"} else {if(title !== "") {btTitle.style.transform = "scale(1)";}bottomSheet.classList.remove("escapingSheet");scrim.style.opacity = ".32"}
   dragPosition = y
 }
 let already = false
