@@ -179,7 +179,23 @@ export async function updateSharedRemote() {
 		let result = snapshot.val();
 
 		let name = listOfPlayers["!gameName!"];
+		function sortObjectKeys(obj) {
+			// Get the keys of the object and sort them alphabetically
+			const sortedKeys = Object.keys(obj).sort();
+		
+			// Create a new object with sorted keys
+			const sortedObject = {};
+			sortedKeys.forEach(key => {
+				sortedObject[key] = obj[key];
+			});
+		
+			return sortedObject;
+		}
 		const gamesObject = JSON.parse(localStorage.getItem("games")) || {};
+
+		if(decodeURIComponent(JSON.stringify(sortObjectKeys(result))).replace(/\/users\/.*\/games\//, "") !== decodeURIComponent(JSON.stringify(sortObjectKeys(listOfPlayers))).replace(/\/users\/.*\/games\//, "")){
+		console.log(decodeURIComponent(JSON.stringify(sortObjectKeys(result))));
+		console.log(decodeURIComponent(JSON.stringify(sortObjectKeys(listOfPlayers))));
 		gamesObject[listOfPlayers["!gameName!"]] = result;
 
 		gamesObject[listOfPlayers["!gameName!"]]["!gameName!"] = name;
@@ -195,6 +211,7 @@ export async function updateSharedRemote() {
 				count(false);
 			}
 		}, 500);
+	}
 	});
 }
 
@@ -247,6 +264,7 @@ export async function watchChanges() {
 window.watchChanges = watchChanges;
 
 export function loadDataFromWeb() {
+	console.log("loading data");
 	const dbRef = ref(getDatabase());
 	get(child(dbRef, `users/${sessionStorage.uid}`))
 		.then((snapshot) => {

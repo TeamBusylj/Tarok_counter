@@ -1344,13 +1344,8 @@ function Game(already) {
 	if (already) {
 		clickedUser(already.toString(), already.toString());
 	} else {
-		var contentWh = dialogBuilder("Izberite skupino");
-		var dialog = contentWh[0];
-		var iks = contentWh[1];
-		iks.addEventListener("click", function (e) {
-			document.getElementById("game").style.animation = "none";
-			hideDialog(dialog);
-		});
+		var dialog =makeBottomheet("Izberite skupino");
+	
 		dialog.setAttribute("id", "dlgSlct");
 
 		var slct = document.createElement("md-list");
@@ -1383,8 +1378,32 @@ function Game(already) {
 						}
 						listItem.innerHTML += user;
 						listItem.addEventListener("click", function () {
+							document.querySelector(".mainSheet").style.opacity = "0";
+							
+							document.querySelector(".bottomSheetScrim").style.opacity = "0";
+							document.querySelector(".handleHolder").style.opacity = "0";
+							
+							document.querySelector(".bottomSheet").style.transition = "none";
+							addElement("div", document.querySelector(".mainSheet"), "makAnmFrSht")
 							clickedUser(user, full);
-							hideDialog(dialog);
+							setTimeout(() => {
+								document.querySelector(".bottomSheetScrim").remove()
+								document.querySelector(".bottomSheet").style.zIndex = "0";
+								
+							}, 50);
+							
+						
+							
+							setTimeout(() => {
+								document.querySelector(".bottomSheet").style.transition = "all var(--transDur)";
+								document.querySelector(".bottomSheet").style.opacity = "0";
+							}, 100);
+							setTimeout(() => {
+								
+								document.querySelector(".bottomSheet").remove()
+							}, 400);
+							
+							
 						});
 						let Btn = addElement("md-icon-button", listItem, null);
 						Btn.setAttribute("slot", "end");
@@ -1394,7 +1413,7 @@ function Game(already) {
 							listOfPlayers = await loadDataPath(full);
 							listOfPlayers["!gameName!"] = full;
 
-							dialog.parentNode.close();
+							document.querySelector(".bottomSheetScrim").click()
 							deleteGame();
 						});
 						slct2.appendChild(listItem);
@@ -1414,9 +1433,34 @@ function Game(already) {
 						}
 						listItem.innerHTML += user;
 						listItem.addEventListener("click", function () {
-							hideDialog(dialog);
-
+							
+							document.querySelector(".mainSheet").style.opacity = "0";
+							
+							document.querySelector(".bottomSheetScrim").style.opacity = "0";
+							document.querySelector(".handleHolder").style.opacity = "0";
+							
+							document.querySelector(".bottomSheet").style.transition = "none";
+							addElement("div", document.querySelector(".mainSheet"), "makAnmFrSht")
 							clickedUser(user, full);
+							setTimeout(() => {
+								document.querySelector(".bottomSheetScrim").remove()
+								document.querySelector(".bottomSheet").style.zIndex = "0";
+								
+							}, 50);
+							
+						
+							
+							setTimeout(() => {
+								document.querySelector(".bottomSheet").style.transition = "all var(--transDur)";
+								document.querySelector(".bottomSheet").style.opacity = "0";
+							}, 100);
+							setTimeout(() => {
+								
+								document.querySelector(".bottomSheet").remove()
+							}, 400);
+							
+
+							
 						});
 						let Btn = addElement("md-icon-button", listItem, null);
 						Btn.setAttribute("slot", "end");
@@ -1424,7 +1468,7 @@ function Game(already) {
 						Btn.addEventListener("click", function () {
 							event.stopPropagation();
 							listOfPlayers = JSON.parse(localStorage.games)[full.toString()];
-							dialog.parentNode.close();
+							document.querySelector(".bottomSheetScrim").click()
 							deleteGame();
 						});
 						slct.appendChild(listItem);
@@ -1716,7 +1760,7 @@ await new Promise(resolve => setTimeout(resolve, timeTo));
 	newElement.id = "cntScreen";
 	if (animate) {
 		newElement.style.animation =
-			"showScreen var(--transDur) forwards cubic-bezier(.3,.5,0,1.3)";
+			"showScreenGame var(--transDur) forwards cubic-bezier(0.05, 0.7, 0.1, 1.0)";
 	}
 	var rezultLine = document.createElement("div");
 	rezultLine.id = "crezultLine";
@@ -2319,9 +2363,9 @@ function deleteGame(elem) {
 	var newElement;
 	if (!elem) {
 		if (listOfPlayers["!gameName!"].includes("/users/")) {
-			newElement = dialogBuilder("Ali želite zapustiti to deljeno skupino?", false)[0];
+			newElement = dialogBuilder("Ali želite zapustiti deljeno skupino "+listOfPlayers["!gameName!"]+"?", false)[0];
 		} else {
-			newElement = dialogBuilder("Ali želite izbrisati to skupino?", false)[0];
+			newElement = dialogBuilder("Ali želite izbrisati skupino "+listOfPlayers["!gameName!"]+"?", false)[0];
 		}
 	} else {
 		newElement = elem;
@@ -2350,12 +2394,14 @@ function deleteGame(elem) {
 		if (!navigator.onLine) {
 			localStorage.offlineChanges = true;
 		}
+		listOfPlayers = []
 		localStorage.setItem("games", JSON.stringify(gamesObject));
 		updateUserData();
 		document.querySelector(".homeBtn").click();
 		hideDialog(newElement);
 	});
 	copyButton.addEventListener("click", function () {
+		listOfPlayers = []
 		hideDialog(newElement);
 	});
 }
@@ -2927,21 +2973,32 @@ function makeBottomheet(title) {
 
 let dragPosition
 
+
 const onDragStart = (event) => {
   dragPosition = touchPosition(event).pageY
   sheetContents.classList.add("not-selectable")
   vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
 }
 var vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+var mouseDown = 0;
+window.onmousedown = function() { 
+  ++mouseDown;
+}
+window.onmouseup = function() {
+  --mouseDown;
+}
 const onDragMove = (event) => {
-  if (dragPosition === undefined || (sheetContents.innerHTML.includes("md-list") &&event.target.className !== "handleHolder")) return
-
-
-
+ 
+	if(mouseDown || event.type =="touchmove"){
 
   const y = touchPosition(event).pageY
-  const deltaY = dragPosition - y
+  var deltaY = dragPosition - y
+
+  if (mainContent.innerHTML.includes("md-list") && sheetContents.scrollHeight > sheetContents.clientHeight && sheetHeight > 75) deltaY = 0
+	if(mainContent.innerHTML.includes("md-list") && sheetContents.scrollHeight > sheetContents.clientHeight && sheetContents.scrollTop !== 0 ) deltaY = 0
+if(mainContent.innerHTML.includes("md-list") && sheetContents.scrollHeight > sheetContents.clientHeight && deltaY<0 ) sheetContents.scrollTop = 0
   const deltaHeight = deltaY / window.innerHeight * 100
+
 
   setSheetHeight(sheetHeight + deltaHeight)
   
@@ -2960,13 +3017,13 @@ const onDragMove = (event) => {
 const mainContentHeight = Math.min(mainContent.clientHeight, mainContent.scrollHeight)
 sheetHeight3 = (mainContentHeight / vh) * 100;
 
-if(sheetHeight < sheetHeight3/2){if(title !== "") {btTitle.style.transform = "scale(1,0)";}bottomSheet.classList.add("escapingSheet");scrim.style.opacity = "0"} else {if(title !== "") {btTitle.style.transform = "scale(1)";}bottomSheet.classList.remove("escapingSheet");scrim.style.opacity = ".32"}
+if((sheetHeight < sheetHeight3/2 && !mainContent.innerHTML.includes("md-list")) || (mainContent.innerHTML.includes("md-list") && sheetHeight < 25)){if(title !== "") {btTitle.style.transform = "scale(1,0)";}bottomSheet.classList.add("escapingSheet");scrim.style.opacity = "0"} else {if(title !== "") {btTitle.style.transform = "scale(1)";}bottomSheet.classList.remove("escapingSheet");scrim.style.opacity = ".32"}
   dragPosition = y
 }
-let already = false
+}
 const onDragEnd = () => {
 	setTimeout(() => {
-	if(dragPosition) already = true
+	
 
   dragPosition = undefined
   sheetContents.classList.remove("not-selectable")
@@ -2977,8 +3034,18 @@ const onDragEnd = () => {
 const mainContentHeight = Math.min(mainContent.clientHeight, mainContent.scrollHeight)
 sheetHeight3 = (mainContentHeight / vh) * 100;
 
-
-if (sheetHeight < sheetHeight3/2) {
+if(mainContent.innerHTML.includes("md-list")){
+	if(sheetHeight > 95){
+		setSheetHeight(100)
+	} else if(sheetHeight > 25){
+		setSheetHeight(Math.min(sheetHeight3+5, 75))
+	} else{
+		setIsSheetShown(false)
+		setSheetHeight(0)
+	}
+	
+}
+else if (sheetHeight < sheetHeight3/2) {
     setIsSheetShown(false)
 	setSheetHeight(0)
 
@@ -3017,7 +3084,9 @@ window.addEventListener("touchmove", onDragMove)
 
 window.addEventListener("mouseup", onDragEnd)
 window.addEventListener("touchend", onDragEnd)
+
  let mainContent = addElement("main", sheetContents, "mainSheet")
+
 
 	setSheetHeight(Math.min(sheetContents.offsetHeight,50, (720 / window.innerHeight) * 100));
  
@@ -3033,7 +3102,12 @@ window.addEventListener("touchend", onDragEnd)
 				const sheetHeight2 = (mainContentHeight / vh) * 100;
 				
 				// Set the height of .mainSheet using the calculated percentage height
-				setSheetHeight(Math.max(Math.min(sheetHeight2+5, 75), 25));
+				if(mainContent.innerHTML.includes("makAnmFrSht")){
+					setSheetHeight(100)
+				}else{
+					setSheetHeight(Math.max(Math.min(sheetHeight2+5, 75), 25));
+				}
+				
 				if(sheetHeight  >  (((vh-52) / vh) * 100)  ) {
 	
 					btTitle.classList.add("titleFull")
@@ -3042,6 +3116,11 @@ window.addEventListener("touchend", onDragEnd)
 				}
 				btTitle.style.margin = "-"+(btTitle.offsetHeight+34)+"px"
 				}, 10);
+				if(mainContent.innerHTML.includes("md-list")&& sheetContents.scrollHeight > sheetContents.clientHeight){
+					sheetContents.style.overflow = "scroll"
+					sheetContents.style.display = "block"
+					
+				}
 				
 				
 			}

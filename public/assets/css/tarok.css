@@ -4,14 +4,18 @@ input[type="checkbox"] {
 	margin: 5px;
 }
 div#bottomBar2 {
-	z-index: 4;
+	z-index: 3;
 	position: fixed;
 	width: 100%;
 	transition: all var(--transDur);
 	bottom: 0;
 }
+.makAnmFrSht{
+	height: 100px;
+	width: 50px;
+}
 div#bottomBar {
-	z-index: 4;
+	z-index: 3;
 	position: fixed;
 	width: 100%;
 	transition: all var(--transDur);
@@ -601,6 +605,7 @@ slot[name="content"]::slotted(*) {
 	position: relative;
 	flex: 1;
 	overflow-x: hidden;
+	touch-action: none;
 	text-align: center;
 	z-index: 1;
 	background: transparent;
@@ -706,7 +711,7 @@ input:focus-visible {
 	display: flex;
 	flex-direction: row;
 	width: 100%;
-	z-index: 4;
+	z-index: 2;
 	
 	position: relative;
 	transition: all var(--transDur);
@@ -923,7 +928,17 @@ p {
 		transform: scale(1);
 	}
 }
+@keyframes showScreenGame {
+	0% {
+		opacity: 0;
+		transform: translateY(20vh);
+	}
 
+	100% {
+		opacity: 1;
+		transform: translateY(0vh);
+	}
+}
 @keyframes hideScreen {
 	0% {
 		opacity: 1;
@@ -1178,7 +1193,7 @@ justify-content: center;
 
 .mainSheet{
 	display: flex;
-
+	transition: all calc(var(--transDur) - 0.1s);
 	padding: 30px 5vw 30px 5vw;
     flex-wrap: wrap;
     justify-content: center;

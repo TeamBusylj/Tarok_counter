@@ -3,6 +3,8 @@ const CACHE_NAME = 'my-module-cache-v1';
 
 // List of URLs to cache
 const urlsToCache = [
+	"https://fonts.gstatic.com/s/materialsymbolsoutlined/v164/kJF1BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzByHX9rA6RzaxHMPdY43zj-jCxv3fzvRNU22ZXGJpEpjC_1v-p_4MrImHCIJIZrDCvHOej.woff2",
+	"https://www.googletagmanager.com/gtag/js",
 	 "@material/web/icon/icon.js",
 	"@material/web/menu/menu-item.js",
 	"@material/web/menu/menu.js",
@@ -13,7 +15,7 @@ const urlsToCache = [
 	 "@material/web/button/filled-button.js",
 	 "@material/web/iconbutton/icon-button.js",
 	"@material/web/labs/segmentedbuttonset/outlined-segmented-button-set.js",
-	"@material/web/labs/navigationdrawer/navigation-drawer.js",
+	
 	"@material/web/labs/segmentedbutton/outlined-segmented-button.js",
 	"@material/web/labs/card/filled-card.js",
 	"@material/web/button/outlined-button.js",
@@ -28,7 +30,8 @@ const urlsToCache = [
 	"@material/web/field/outlined-field.js",
     "@material/material-color-utilities/index.js",
 	'/assets/js/longvars.js',
-	
+	"https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js",
+	"https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js"
 
 ];
 
