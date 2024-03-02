@@ -1019,6 +1019,9 @@ md-fab {
 	min-width: 20px;
 	width: 20px;
 }
+.gsi-material-button-icon svg{
+	color:var(--md-sys-color-primary);
+}
 
 .gsi-material-button .gsi-material-button-content-wrapper {
 	-webkit-align-items: center;
