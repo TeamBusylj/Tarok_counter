@@ -14,7 +14,8 @@ import {
 	signInWithPopup,
 	GoogleAuthProvider,
 	signOut,
-	onAuthStateChanged
+	onAuthStateChanged,
+	signInWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -55,6 +56,12 @@ export function deleteAllDataF() {
 window.deleteAllDataF = deleteAllDataF;
 
 const userSignIn = async () => {
+
+	$('.dot').show();
+	$('#signInTxt').hide();
+	$('#gIcon').hide();
+		
+	console.log(signInWithPopup);
 	if (
 		sessionStorage.uid !== null &&
 		sessionStorage.uid !== undefined &&
@@ -63,7 +70,14 @@ const userSignIn = async () => {
 	) {
 		userSignOut();
 	} else {
-		signInWithPopup(auth, provider)
+		
+			
+			try {
+				AndroidInt.signInInterface()
+				console.log("android")
+			} catch (error) {
+				console.log("android_no")
+				signInWithPopup(auth, provider)
 			.then((result) => {
 				const user = result.user;
 
@@ -76,6 +90,13 @@ const userSignIn = async () => {
 			.catch((error) => {
 				signInMessage.innerHTML = "Nekaj je šlo narobe pri prijavi";
 			});
+			}
+			
+		
+			
+		
+		
+		
 	}
 };
 
@@ -92,16 +113,14 @@ const userSignOut = async () => {
 
 onAuthStateChanged(auth, (user) => {
 	try {
-		hideElement(document.getElementById("login-loader"));
+		$('.dot').hide();
+		$('#signInTxt').show();
+		$('#gIcon').show();
 	} catch {}
 
 	if (user) {
-		setTimeout(() => {
-			if (location.pathname.includes("users")) {
-				upload();
-			}
-		}, 200);
-		document.querySelector(".gsi-material-button-contents").innerHTML = "Odjava";
+		
+		document.getElementById("signInTxt").innerHTML = "Odjava";
 
 		sessionStorage.uid = user.uid;
 		if (localStorage.offlineChanges == undefined) {
@@ -124,7 +143,7 @@ onAuthStateChanged(auth, (user) => {
 		userk = user;
 		signInMessage.innerHTML = "Pozdravljeni, " + user.displayName.split(" ")[0];
 	} else {
-		document.querySelector(".gsi-material-button-contents").innerHTML = "Google prijava";
+		document.getElementById("signInTxt").innerHTML = "Google prijava";
 
 		sessionStorage.uid = null;
 		signInMessage.innerHTML = "Za dodatne funkcije se prijavite";
@@ -303,6 +322,24 @@ export async function loadDataPath(path) {
 		});
 	return result;
 }
+
+async function signInWithIdAndroid(name) {
+
+	
+	
+	try {
+		$('.dot').hide();
+		$('#signInTxt').show();
+		$('#gIcon').show();
+	} catch {}
+	document.getElementById("signInTxt").innerHTML = "Odjava";
+console.log(uid)
+		sessionStorage.uid = uid;
+		userk = name;
+		signInMessage.innerHTML = "Pozdravljeni, " + name.split(" ")[0]
+}
+
+window.signInWithIdAndroid = signInWithIdAndroid;
 window.loadDataFromWeb = loadDataFromWeb;
 window.loadDataPath = loadDataPath;
 window.updateSharedRemote = updateSharedRemote;
