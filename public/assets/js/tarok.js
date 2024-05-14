@@ -2702,23 +2702,28 @@ function makeThemeChanger() {
 
   var tema = addElement("md-filled-card", null, "hueCard");
   addElement("p", tema, "colorTitle").innerHTML = "Barva aplikacije";
-  let slider1 = addElement("md-slider", tema, null);
+  let slider1 = addElement("md-slider", tema, "colorGradient");
+  slider1.classList.add("sliderStyle")
   slider1.max = "360";
   slider1.value = clr[0];
-  addElement("div", tema, "hue").classList.add("clr");
+
   let brk = addElement("div", tema, null);
   brk.style.height = "15px";
   brk.style.width = "3px";
   addElement("p", tema, "colorTitle").innerHTML = "Nasičenost";
 
-  let slider2 = addElement("md-slider", tema, null);
+  let slider2 = addElement("md-slider", tema, "sliderStyle");
   slider2.value = clr[1];
-  let divGradient = addElement("div", tema, "clr");
+
   slider1.addEventListener("input", function () {
     localStorage["seed-color"] = slider1.value + "," + slider2.value;
-    divGradient.style.background = changeTheme(slider1.value, slider2.value);
+    slider2.style.setProperty('--_active-track-color', changeTheme(slider1.value, slider2.value));
+    slider2.style.setProperty('--_inactive-track-color', changeTheme(slider1.value, slider2.value));
+
   });
-  divGradient.style.background = changeTheme(slider1.value, slider2.value);
+  slider2.style.setProperty('--_active-track-color', changeTheme(slider1.value, slider2.value));
+  slider2.style.setProperty('--_inactive-track-color', changeTheme(slider1.value, slider2.value));
+
   slider2.addEventListener("input", function () {
     localStorage["seed-color"] = slider1.value + "," + slider2.value;
     changeTheme(slider1.value, slider2.value);
