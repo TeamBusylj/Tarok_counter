@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
 import {
 	getDatabase,
 	ref,
@@ -8,7 +8,7 @@ import {
 	get,
 	update,
 	onValue
-} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
 import {
 	getAuth,
 	signInWithPopup,
@@ -16,7 +16,7 @@ import {
 	signOut,
 	onAuthStateChanged,
 	signInWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
 const firebaseConfig = {
 	apiKey: "AIzaSyBrxvJ-fs7wtfnsLzOy6WI_1J_CMHPXpoU",
@@ -61,7 +61,6 @@ const userSignIn = async () => {
 	$('#signInTxt').hide();
 	$('#gIcon').hide();
 		
-	console.log(signInWithPopup);
 	if (
 		sessionStorage.uid !== null &&
 		sessionStorage.uid !== undefined &&
@@ -76,7 +75,7 @@ const userSignIn = async () => {
 				AndroidInt.signInInterface()
 				console.log("android")
 			} catch (error) {
-				console.log("android_no")
+				
 				signInWithPopup(auth, provider)
 			.then((result) => {
 				const user = result.user;
@@ -103,6 +102,7 @@ const userSignIn = async () => {
 const userSignOut = async () => {
 	signOut(auth)
 		.then((result) => {
+			document.getElementById("dlgSlct").innerHTML = ""
 			let clr = localStorage.themeColor;
 			localStorage.clear();
 			localStorage.themeColor = clr;
@@ -119,12 +119,19 @@ onAuthStateChanged(auth, (user) => {
 	} catch {}
 
 	if (user) {
+
+		setTimeout(() => {
+			if (location.pathname.includes("users")) {
+			  upload();
+			}
+		  }, 10);
 		
 		document.getElementById("signInTxt").innerHTML = "Odjava";
 
 		sessionStorage.uid = user.uid;
 		if (localStorage.offlineChanges == undefined) {
-			window.loadDataFromWeb();
+			
+		loadDataFromWeb();
 		} else {
 			if (navigator.onLine) {
 				console.log("update");
@@ -132,21 +139,23 @@ onAuthStateChanged(auth, (user) => {
 				localStorage.offlineChanges = undefined;
 			}
 		}
-		if (
-			sessionStorage.uid !== null &&
-			sessionStorage.uid !== undefined &&
-			sessionStorage.uid !== "null" &&
-			sessionStorage.uid !== "undefined"
-		) {
-			watchChanges();
+		if (!navigator.onLine) {
+			Game()
 		}
+			watchChanges();
+		
 		userk = user;
 		signInMessage.innerHTML = "Pozdravljeni, " + user.displayName.split(" ")[0];
 	} else {
-		document.getElementById("signInTxt").innerHTML = "Google prijava";
+		setTimeout(() => {
+			if (location.pathname.includes("users")) {
+			  upload();
+			}
+		  }, 10);
+		document.getElementById("signInTxt").innerHTML = "Prijava";
 
 		sessionStorage.uid = null;
-		signInMessage.innerHTML = "Za dodatne funkcije se prijavite";
+		signInMessage.innerHTML = "Niste prijavljeni";
 	}
 });
 
@@ -213,8 +222,7 @@ export async function updateSharedRemote() {
 		const gamesObject = JSON.parse(localStorage.getItem("games")) || {};
 
 		if(decodeURIComponent(JSON.stringify(sortObjectKeys(result))).replace(/\/users\/.*\/games\//, "") !== decodeURIComponent(JSON.stringify(sortObjectKeys(listOfPlayers))).replace(/\/users\/.*\/games\//, "")){
-		console.log(decodeURIComponent(JSON.stringify(sortObjectKeys(result))));
-		console.log(decodeURIComponent(JSON.stringify(sortObjectKeys(listOfPlayers))));
+
 		gamesObject[listOfPlayers["!gameName!"]] = result;
 
 		gamesObject[listOfPlayers["!gameName!"]]["!gameName!"] = name;
@@ -273,7 +281,7 @@ export async function watchChanges() {
 					document.querySelector(".cntScreen"),
 					document.querySelector(".crezultLine")
 				);
-				count(false);
+				count(true);
 			}
 		}, 500);
 			
@@ -283,7 +291,6 @@ export async function watchChanges() {
 window.watchChanges = watchChanges;
 
 export function loadDataFromWeb() {
-	console.log("loading data");
 	const dbRef = ref(getDatabase());
 	get(child(dbRef, `users/${sessionStorage.uid}`))
 		.then((snapshot) => {
@@ -296,6 +303,8 @@ export function loadDataFromWeb() {
 					localStorage.setItem("games", JSON.stringify(gamesObject));
 				}
 				updateUserData();
+				
+				Game()
 				return true;
 			} else {
 				return false;
@@ -338,8 +347,22 @@ console.log(uid)
 		userk = name;
 		signInMessage.innerHTML = "Pozdravljeni, " + name.split(" ")[0]
 }
+export async function registerCredential() {
+
+	// TODO: Add an ability to create a passkey: Obtain the challenge and other options from the server endpoint.
+  
+	// TODO: Add an ability to create a passkey: Create a credential.
+  
+	// TODO: Add an ability to create a passkey: Register the credential to the server endpoint.
+  
+  };
 
 window.signInWithIdAndroid = signInWithIdAndroid;
 window.loadDataFromWeb = loadDataFromWeb;
 window.loadDataPath = loadDataPath;
 window.updateSharedRemote = updateSharedRemote;
+
+
+
+
+

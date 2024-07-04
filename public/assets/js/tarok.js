@@ -18,7 +18,14 @@ var games = {
   "Uredi radlce": ["", false, "", true, "*"],
 };
 async function addScore(firstPlayer) {
-  var newElement = makeBottomheet("Kaj je oseba " + firstPlayer + " igrala?");
+  let ttl = "Kaj je oseba " + firstPlayer + " igrala?";
+  if (listOfPlayers[firstPlayer][1] == "Z") {
+    ttl = "Kaj je " + firstPlayer + " igrala?";
+  } else if (listOfPlayers[firstPlayer][1] == "M") {
+    ttl = "Kaj je " + firstPlayer + " igral?";
+  }
+
+  var newElement = makeBottomheet(ttl);
 
   let i = 0;
   for (const key in games) {
@@ -101,10 +108,6 @@ function radlciDodaj(newElement) {
       radlciPLayer.name = user;
       radlciPLayer.setAttribute("min", "0");
       radlciPLayer.setAttribute("type", "text");
-      if (!Array.isArray(listOfPlayers[user])) {
-        const set = new Set([listOfPlayers[user]]);
-        listOfPlayers[user] = Array.from(set);
-      }
       radlciPLayer.value = listOfPlayers[user][0];
       if (zaokrožuj) radlciPLayer.setAttribute("step", "5");
       radlciPLayer.setAttribute("pattern", "[\\*]");
@@ -122,7 +125,7 @@ function radlciDodaj(newElement) {
         continue;
       }
       let rld = document.getElementsByName(user)[0].value;
-      listOfPlayers[user] = rld.replace(/[^*]/g, "");
+      listOfPlayers[user][0] = rld.replace(/[^*]/g, "");
     }
     document.querySelector(".bottomSheetScrim").click();
     count(false);
@@ -176,7 +179,7 @@ function poMeri(newElement) {
       false,
       null,
       true,
-      [],
+      null,
       0,
       false,
       false,
@@ -226,14 +229,14 @@ async function klop(newElement) {
           listOfPlayers[player.innerHTML][0].length > 0,
           null,
           true,
-          [],
+          null,
           0,
           false,
           false,
           Date.now(),
         ]);
         document.querySelector(".bottomSheetScrim").click();
-
+        gameAnimation()
         setTimeout(() => {
           count(false, true);
         }, 200);
@@ -264,14 +267,14 @@ async function klop(newElement) {
           listOfPlayers[player.innerHTML][0].length > 0,
           null,
           true,
-          [],
+          null,
           0,
           false,
           false,
           Date.now(),
         ]);
         document.querySelector(".bottomSheetScrim").click();
-
+        gameAnimation()
         setTimeout(() => {
           count(false, true);
         }, 200);
@@ -326,7 +329,7 @@ async function klop(newElement) {
       null,
       null,
       null,
-      [],
+      null,
       false,
       false,
       false,
@@ -335,7 +338,7 @@ async function klop(newElement) {
     radlciDodajSamo();
     if (isfull) {
       document.querySelector(".bottomSheetScrim").click();
-
+    
       count(false, true);
     }
   });
@@ -374,14 +377,14 @@ async function mondfang(newElement) {
     listOfPlayers[playerWho.innerHTML][0].length > 0,
     null,
     true,
-    [],
+    null,
     0,
     false,
     false,
     Date.now(),
   ]);
   document.querySelector(".bottomSheetScrim").click();
-
+  gameAnimation()
   count(false, true);
 }
 
@@ -429,14 +432,14 @@ async function renons(newElement) {
       false,
       null,
       true,
-      [],
+      null,
       0,
       false,
       false,
       Date.now(),
     ]);
     document.querySelector(".bottomSheetScrim").click();
-
+    gameAnimation()
     count(false, true);
   });
 }
@@ -446,10 +449,14 @@ async function calculate(gameName, properties, newElement, firstPlayer) {
   } else {
     var btn = addElement("md-filled-button", null, null);
     var teamWork = properties[3];
-    changeOpis(
-      newElement,
-      "Je oseba <b>" + firstPlayer + "</b> igrala solo ali s partnerjem?"
-    );
+    let ttl =
+      "Je oseba <b>" + firstPlayer + "</b> igrala solo ali s partnerjem?";
+    if (listOfPlayers[firstPlayer][1] == "Z") {
+      ttl = "Je <b>" + firstPlayer + "</b> igrala sama ali s partnerjem?";
+    } else if (listOfPlayers[firstPlayer][1] == "M") {
+      ttl = "Je <b>" + firstPlayer + "</b> igral sam ali s partnerjem?";
+    }
+    changeOpis(newElement, ttl);
     btn.setAttribute("type", "reset");
     var dv = [];
     btn.addEventListener("click", function () {
@@ -573,30 +580,119 @@ async function partner(
     slct2 = "partnerigralcakimuniimenic";
     if (!properties[1]) {
       slct2 = "partnerigralcakimuniimenic";
-      changeOpis(newElement, "Igrala je oseba " + firstPlayer + ".");
+      let ttl =
+        "Oseba " +
+        firstPlayer +
+        " je igrala igro " +
+        gameName.toLowerCase() +
+        ".";
+      if (listOfPlayers[firstPlayer][1] == "Z") {
+        ttl = firstPlayer + " je igrala igro " + gameName.toLowerCase() + ".";
+      } else if (listOfPlayers[firstPlayer][1] == "M") {
+        ttl = firstPlayer + " je igral igro " + gameName.toLowerCase() + ".";
+      }
+      changeOpis(newElement, ttl);
     } else {
-      changeOpis(
-        newElement,
-        "Igrala je oseba " + firstPlayer + ", z razliko " + razlika + "."
-      );
+      let ttl =
+        "Oseba " +
+        firstPlayer +
+        " je igrala igro " +
+        gameName.toLowerCase() +
+        ", z razliko " +
+        razlika +
+        ".";
+      if (listOfPlayers[firstPlayer][1] == "Z") {
+        ttl =
+          firstPlayer +
+          " je igrala igro " +
+          gameName.toLowerCase() +
+          ", z razliko " +
+          razlika +
+          ".";
+      } else if (listOfPlayers[firstPlayer][1] == "M") {
+        ttl =
+          firstPlayer +
+          " je igral igro " +
+          gameName.toLowerCase() +
+          ", z razliko " +
+          razlika +
+          ".";
+      }
+      changeOpis(newElement, ttl);
     }
   } else {
     if (!properties[1]) {
-      changeOpis(
-        newElement,
-        "Igrali sta osebi " + firstPlayer + " in " + slct2 + "."
-      );
-    } else {
-      changeOpis(
-        newElement,
-        "Igrali sta osebi " +
+      let ttl =
+        "Osebi " +
+        firstPlayer +
+        " in " +
+        slct2 +
+        " sta igrali igro " +
+        gameName.toLowerCase() +
+        ".";
+      if (
+        listOfPlayers[firstPlayer][1] == "Z" &&
+        listOfPlayers[slct2][1] == "Z"
+      ) {
+        ttl =
           firstPlayer +
           " in " +
           slct2 +
-          ", z razliko " +
+          " sta igrali igro " +
+          gameName.toLowerCase() +
+          ".";
+      } else if (
+        listOfPlayers[firstPlayer][1] !== "N" &&
+        listOfPlayers[slct2][1] !== "N"
+      ) {
+        ttl =
+          firstPlayer +
+          " in " +
+          slct2 +
+          " sta igrala igro " +
+          gameName.toLowerCase() +
+          ".";
+      }
+      changeOpis(newElement, ttl);
+    } else {
+      let ttl =
+        "Osebi " +
+        firstPlayer +
+        " in " +
+        slct2 +
+        " sta igrali igro " +
+        gameName.toLowerCase() +
+        " z razliko " +
+        razlika +
+        ".";
+      if (
+        listOfPlayers[firstPlayer][1] == "Z" &&
+        listOfPlayers[slct2][1] == "Z"
+      ) {
+        ttl =
+          firstPlayer +
+          " in " +
+          slct2 +
+          " sta igrali igro " +
+          gameName.toLowerCase() +
+          " z razliko " +
           razlika +
-          "."
-      );
+          ".";
+      } else if (
+        listOfPlayers[firstPlayer][1] !== "N" &&
+        listOfPlayers[slct2][1] !== "N"
+      ) {
+        ttl =
+          firstPlayer +
+          " in " +
+          slct2 +
+          " sta igrala igro " +
+          gameName.toLowerCase() +
+          " z razliko " +
+          razlika +
+          ".";
+      }
+      changeOpis(newElement, ttl);
     }
   }
 
@@ -699,7 +795,7 @@ async function partner(
           $(".iksRight").show();
           $(newElement).empty().append(save);
           changeOpis(newElement, opis);
-          actions.remove();
+         
         });
       });
       newElement.appendChild(btn);
@@ -1044,6 +1140,8 @@ async function partner(
     if (gameName.includes("Valat") || gameName.includes("Berač")) {
       radlciDodajSamo();
     }
+
+    gameAnimation()
     setTimeout(() => {
       count(false, true);
     }, 200);
@@ -1199,13 +1297,70 @@ async function partner(
     if (gameName.includes("Valat") || gameName.includes("Berač")) {
       radlciDodajSamo();
     }
-
+    gameAnimation()
     setTimeout(() => {
       count(false, true);
     }, 200);
   });
 }
 
+function gameAnimation() {
+  let score = listOfPlayers["!gamesData!"].at(-1)[3]
+  if (listOfPlayers["!gamesData!"].at(-1)[9]) {
+   score =((games[listOfPlayers["!gamesData!"].at(-1)[0]][0]+listOfPlayers["!gamesData!"].at(-1)[5]) * 2)+listOfPlayers["!gamesData!"].at(-1)[8]
+  }
+  if (listOfPlayers["!gamesData!"].at(-1)[10]) {
+    score =((games[listOfPlayers["!gamesData!"].at(-1)[0]][0]+listOfPlayers["!gamesData!"].at(-1)[5]) * 4)+listOfPlayers["!gamesData!"].at(-1)[8]
+  }
+  if (listOfPlayers["!gamesData!"].at(-1)[4]) {
+   score = score*2
+    }
+  let scrim = addElement("div", document.body, "bottomSheetScrim");
+  let holder = addElement("div", document.body, "bottomSheetScrim");
+  holder.classList.add("scoreAnimHolder");
+  let scoreAnimation = addElement("div", holder, "scoreAnimation");
+  let scoreTxt = addElement("span", holder, "scoreTxt");
+  scoreAnimation.style.width = ((score > 0 ? "+" : "") + score).length + "ch";
+  setTimeout(() => {
+    scrim.style.opacity = ".5";
+    scoreAnimation.style.scale = "1";
+    scoreTxt.style.fontSize = "4rem";
+  }, 200);
+  scoreTxt.innerHTML = (score > 0 ? "+" : "") + score;
+  setTimeout(() => {
+    setTimeout(() => {
+      scoreTxt.style.maxWidth = ((score > 0 ? "+" : "") + score).length + "ch";
+    }, 200);
+    const emojis =score > 0 ? ["😂", "🤣", "😁", "😀", "😎", "😆", "😅", "😃"] : ['😒','😥','😣','😫','😖','🤬','😭','😧'];
+    for (let i = 0; i < 20; i++) {
+      let emoji = addElement("span", holder, "emoji");
+      emoji.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+      emoji.style.animationDelay = `.${i}s`;
+      emoji.style.left = i * 5 + "vw";
+      emoji.style.fontSize = getRandomNumber(1, 2) + "rem";
+
+      emoji.style.setProperty(
+        "--initial-bottom",
+        getRandomNumber(-10, -47) + "vh"
+      );
+    }
+  }, 600);
+  setTimeout(() => {
+    scoreAnimation.style.scale = "0";
+    scoreTxt.style.fontSize = "0rem";
+    scoreTxt.style.transition = "all .4s";
+    scrim.style.opacity = "0";
+    setTimeout(() => {
+      holder.remove();
+      scrim.remove();
+    }, 1000);
+  }, 3000);
+}
+function getRandomNumber(min, max, nofloor = false) {
+  return nofloor
+    ? Math.random() * (max - min + 1) + min
+    : Math.floor(Math.random() * (max - min + 1)) + min;
+}
 function download() {
   var text = JSON.stringify(listOfPlayers);
   // if (sessionStorage.uid !== null && sessionStorage.uid !== undefined && sessionStorage.uid !== 'null') {
@@ -1420,12 +1575,13 @@ function Game(already) {
   if (already) {
     clickedUser(already.toString(), already.toString());
   } else {
-    var dialog = makeBottomheet("Izberite skupino");
-
-    dialog.setAttribute("id", "dlgSlct");
+    //var dialog = makeBottomheet("Izberite skupino");
+    var dialog = document.getElementById("dlgSlct");
+    dialog.innerHTML = "";
 
     var slct = document.createElement("md-list");
     var slct2 = document.createElement("md-list");
+    slct2.style.marginBottom = "30px";
     dialog.style.borderRadius = "15px";
 
     const gamesObject = JSON.parse(localStorage.getItem("games")) || {};
@@ -1449,23 +1605,20 @@ function Game(already) {
               let divider = addElement("md-divider", slct2, null);
               divider.setAttribute(
                 "style",
-                "height:5px;--md-divider-color: var(--md-sys-color-surface-container)"
+                "height:5px;--md-divider-color: var(--md-sys-color-surface)"
               );
             }
             listItem.innerHTML += user;
-            listItem.addEventListener("click", function () {
-              document.querySelector(".mainSheet").style.opacity = "0";
-
+            listItem.addEventListener("click", async function () {
+              await clickedUser(user, full);
+              /*document.querySelector(".mainSheet").style.opacity = "0";
+             
               document.querySelector(".bottomSheetScrim").style.opacity = "0";
               document.querySelector(".handleHolder").style.opacity = "0";
-
+             
               document.querySelector(".bottomSheet").style.transition = "none";
-              addElement(
-                "div",
-                document.querySelector(".mainSheet"),
-                "makAnmFrSht"
-              );
-              clickedUser(user, full);
+              addElement( "div",  document.querySelector(".mainSheet"),      "makAnmFrSht"    );
+              
               setTimeout(() => {
                 document.querySelector(".bottomSheetScrim").remove();
                 document.querySelector(".bottomSheet").style.zIndex = "0";
@@ -1479,6 +1632,7 @@ function Game(already) {
               setTimeout(() => {
                 document.querySelector(".bottomSheet").remove();
               }, 400);
+              */
             });
             let Btn = addElement("md-icon-button", listItem, null);
             Btn.setAttribute("slot", "end");
@@ -1488,7 +1642,7 @@ function Game(already) {
               listOfPlayers = await loadDataPath(full);
               listOfPlayers["!gameName!"] = full;
 
-              document.querySelector(".bottomSheetScrim").click();
+              //document.querySelector(".bottomSheetScrim").click();
               deleteGame();
             });
             slct2.appendChild(listItem);
@@ -1503,23 +1657,24 @@ function Game(already) {
               let divider = addElement("md-divider", slct, null);
               divider.setAttribute(
                 "style",
-                "height:5px;--md-divider-color: var(--md-sys-color-surface-container)"
+                "height:5px;--md-divider-color: var(--md-sys-color-surface)"
               );
             }
             listItem.innerHTML += user;
-            listItem.addEventListener("click", function () {
-              document.querySelector(".mainSheet").style.opacity = "0";
-
+            listItem.addEventListener("click", async function () {
+              await clickedUser(user, full);
+              /* document.querySelector(".mainSheet").style.opacity = "0";
+             
               document.querySelector(".bottomSheetScrim").style.opacity = "0";
               document.querySelector(".handleHolder").style.opacity = "0";
-
+              
               document.querySelector(".bottomSheet").style.transition = "none";
               addElement(
                 "div",
                 document.querySelector(".mainSheet"),
                 "makAnmFrSht"
               );
-              clickedUser(user, full);
+             
               setTimeout(() => {
                 document.querySelector(".bottomSheetScrim").remove();
                 document.querySelector(".bottomSheet").style.zIndex = "0";
@@ -1532,7 +1687,9 @@ function Game(already) {
               }, 100);
               setTimeout(() => {
                 document.querySelector(".bottomSheet").remove();
-              }, 400);
+                document
+                
+              }, 400);*/
             });
             let Btn = addElement("md-icon-button", listItem, null);
             Btn.setAttribute("slot", "end");
@@ -1540,7 +1697,7 @@ function Game(already) {
             Btn.addEventListener("click", function () {
               event.stopPropagation();
               listOfPlayers = JSON.parse(localStorage.games)[full.toString()];
-              document.querySelector(".bottomSheetScrim").click();
+              //document.querySelector(".bottomSheetScrim").click();
               deleteGame();
             });
             slct.appendChild(listItem);
@@ -1562,6 +1719,9 @@ function Game(already) {
         dialog.appendChild(slct2);
       }
     }
+
+    dialog.style.setProperty("--wipe-position", "100%");
+    dialog.style.transform = "translateY(0px)";
   }
 }
 
@@ -1605,8 +1765,10 @@ async function clickedUser(slcta, fulla) {
     if (!listOfPlayers["!gamesData!"]) {
       listOfPlayers["!gamesData!"] = [];
     }
+    getGenders();
     if (listOfPlayers["!gameName!"].includes("/users/")) {
       updateSharedRemote();
+
       count(true);
     } else {
       count(true);
@@ -1700,7 +1862,7 @@ function newGame() {
     ) {
       let inpute = document.getElementsByTagName("md-outlined-text-field")[i];
 
-      if (inpute.value.length == 0) {
+      if (inpute.value.length == 0 || inpute.value.includes("/")) {
         inpute.style.outline = "7px red solid";
         setTimeout(() => {
           inpute.style.outline = "0px red solid";
@@ -1745,18 +1907,49 @@ function newGame() {
       content.appendChild(imeIgre);
       addElement("div", content, "break").style.height = "10px";
       content.appendChild(koncajIme);
-      await waitForButtonClick([koncajIme]);
-      listOfPlayers["!gameName!"] = imeIgre.value;
-      if (!navigator.onLine) {
-        localStorage.offlineChanges = true;
-      }
-      document.querySelector(".bottomSheetScrim").click();
+      console.log(listOfPlayers);
+      getGenders();
+      koncajIme.addEventListener("click", function () {
+        if (imeIgre.value.length == 0 || imeIgre.value.includes("/")) {
+          imeIgre.style.outline = "7px red solid";
+          setTimeout(() => {
+            imeIgre.style.outline = "0px red solid";
+          }, 200);
+        } else {
+          listOfPlayers["!gameName!"] = imeIgre.value;
+          if (!navigator.onLine) {
+            localStorage.offlineChanges = true;
+          }
+          document.querySelector(".bottomSheetScrim").click();
 
-      count(false, true);
+          count(false, true);
+        }
+      });
     }
   });
 }
-
+async function getGenders() {
+  for (const key in listOfPlayers) {
+    if (key == "!gamesData!" || key == "!gameName!") {
+      continue;
+    }
+    const response = await fetch(
+      "https://pxweb.stat.si/SiStatData/api/v1/sl/Data/?query=" +
+        encodeURIComponent(key)
+    );
+    const movies = await response.json();
+    if (typeof listOfPlayers[key] == "string") {
+      listOfPlayers[key] = [listOfPlayers[key]];
+    }
+    if (JSON.stringify(movies).includes("Ženska imena")) {
+      listOfPlayers[key][1] = "Z";
+    } else if (JSON.stringify(movies).includes("Moška imena")) {
+      listOfPlayers[key][1] = "M";
+    } else {
+      listOfPlayers[key][1] = "N";
+    }
+  }
+}
 function loclStrg() {
   var inputPr = prompt("Input");
   var data = JSON.parse(inputPr.toString());
@@ -1773,8 +1966,8 @@ async function count(animate, newcScore = null) {
       document.querySelector(".crezultLine").style.animation =
         "hideScreen var(--transDur) forwards cubic-bezier(.3,.5,0,1.3)";
     }
-  } catch (error) {
-    console.log(error);
+  } catch {
+   
   }
   let timeTo;
   if (animate) timeTo = 30;
@@ -1861,11 +2054,11 @@ async function count(animate, newcScore = null) {
     var prnt = document.createElement("div");
     if (!Array.isArray(listOfPlayers[key])) {
       const set = new Set([listOfPlayers[key]]);
-      listOfPlayers[key] = Array.from(set);
+      listOfPlayers[key][0] = Array.from(set);
     }
     prnt.innerHTML =
       '<p class="namePlayers"> ' +
-      listOfPlayers[key].toString() +
+      listOfPlayers[key][0].toString() +
       "<br>" +
       name +
       " </p>";
@@ -1925,18 +2118,20 @@ async function count(animate, newcScore = null) {
       let playerPoints = points[nameOne.indexOf(player)];
       var kkk = document.createElement("md-text-button");
       if (playerPoints !== "") {
+       
+        if (listOfPlayers["!gamesData!"][game][9]) {
+          playerPoints =((games[listOfPlayers["!gamesData!"][game][0]][0]+listOfPlayers["!gamesData!"][game][5]) * 2)+listOfPlayers["!gamesData!"][game][8]
+          kkk.innerHTML = parseInt(playerPoints);
+        }
+        if (listOfPlayers["!gamesData!"][game][10]) {
+          playerPoints =((games[listOfPlayers["!gamesData!"][game][0]][0]+listOfPlayers["!gamesData!"][game][5]) * 4)+listOfPlayers["!gamesData!"][game][8]
+          ;
+          kkk.innerHTML = parseInt(playerPoints);
+        }
         if (listOfPlayers["!gamesData!"][game][4]) {
           playerPoints = parseInt(playerPoints) * 2;
           kkk.innerHTML = parseInt(playerPoints);
         } else {
-          kkk.innerHTML = parseInt(playerPoints);
-        }
-        if (listOfPlayers["!gamesData!"][game][9]) {
-          playerPoints = parseInt(kkk.innerHTML) * 2;
-          kkk.innerHTML = parseInt(playerPoints);
-        }
-        if (listOfPlayers["!gamesData!"][game][10]) {
-          playerPoints = parseInt(kkk.innerHTML) * 4;
           kkk.innerHTML = parseInt(playerPoints);
         }
       }
@@ -1979,13 +2174,6 @@ async function count(animate, newcScore = null) {
         kkk.innerHTML = "&nbsp;";
       }
 
-      if (ia == listOfPlayers["!gamesData!"].length - 1 && newcScore) {
-        let eee = kkk;
-        kkk.classList.add("conffi");
-        setTimeout(() => {
-          confetti(eee, ".chlName_" + player);
-        }, 400);
-      }
       // document.querySelector(".chlName_" + player).innerHTML += '<md-divider style="--_color: var(--md-sys-color-surface);height: 5px;"></md-divider>'
       addElement(
         "div",
@@ -2048,12 +2236,10 @@ async function count(animate, newcScore = null) {
       div.addEventListener("scroll", scrollAll);
     });
   } catch (error) {
-    console.log(error);
+    
   }
   rezultLine.setAttribute("class", "crezultLine");
-  document
-    .getElementById("bottomBar")
-    .insertBefore(rezultLine, document.getElementById("actionBar"));
+  document.getElementById("bottomBar").appendChild(rezultLine);
   if (animate)
     document.querySelector(".crezultLine").style.animation =
       "showScreen var(--transDur) forwards cubic-bezier(0.3, 0.5, 0, 1.3)";
@@ -2082,33 +2268,6 @@ async function count(animate, newcScore = null) {
   }
 }
 
-async function confetti(element2, chl) {
-  var referenceElement = element2;
-  var dv = document.createElement("div");
-
-  var referenceRect = referenceElement.getBoundingClientRect();
-
-  dv.style.position = "fixed";
-  dv.style.top = referenceRect.top + 20 + "px";
-  dv.style.left = referenceRect.left + 20 + "px";
-  dv.style.zIndex = "66";
-
-  document.getElementById("cntScreen").appendChild(dv);
-  for (let i = 0; i < 100; i++) {
-    const element = document.createElement("div");
-    element.classList.add("confetti");
-    var randomColor = Math.floor(Math.random() * 16777215).toString(16);
-    element.style.backgroundColor = "#" + randomColor;
-    var randomDir = Math.floor(Math.random() * 361);
-    element.style.rotate = randomDir + "deg";
-    dv.appendChild(element);
-
-    var randomScaleX = 0.2 + Math.random() * (3.2 - 0.2);
-    var randomScaleY = 0.2 + Math.random() * (3.2 - 0.2);
-    element.style.scale = randomScaleX + "," + randomScaleY;
-    await new Promise((resolve) => setTimeout(resolve, 5));
-  }
-}
 function addElement(tag, parent, className) {
   var element = document.createElement(tag);
   if (className) {
@@ -2265,6 +2424,47 @@ function gameData(infom, number) {
     }
     createTableData(element, element1, data);
   }
+  
+  //Kontra
+  try {
+    if (
+      !completePodatki["Igra"][1].toLowerCase().includes("po meri") &&
+      !completePodatki["Igra"][1].toLowerCase().includes("klop") &&
+      !completePodatki["Igra"][1].toLowerCase().includes("mondfang") &&
+      completePodatki["Kontra"][1]
+    ) {
+      data = "Kontra";
+      element1 = data;
+
+      if (completePodatki["Kontra"][1]) {
+       
+          element = (completePodatki["Igra"][2]+completePodatki["Razlika"][1])
+
+        
+      }
+
+      if (element !== false) createTableData(element, element1, data);
+    }
+  } catch {}
+
+  //Rekontra
+  try {
+    if (
+      !completePodatki["Igra"][1].toLowerCase().includes("po meri") &&
+      !completePodatki["Igra"][1].toLowerCase().includes("klop") &&
+      !completePodatki["Igra"][1].toLowerCase().includes("mondfang") &&
+      completePodatki["Rekontra"][1]
+    ) {
+      data = "Rekontra";
+      element1 = data;
+
+      if (completePodatki["Rekontra"][1]) {
+        element = (completePodatki["Igra"][2]+completePodatki["Razlika"][1])
+      }
+
+      if (element !== false) createTableData(element, element1, data);
+    }
+  } catch {}
   //Bonusi
   if (
     !completePodatki["Igra"][1].toLowerCase().includes("po meri") &&
@@ -2297,7 +2497,7 @@ function gameData(infom, number) {
             );
           } else {
             createTableData(
-              bonusObject[key][0] * 2,
+              tocke[key],
               "Napovedano: <wbr>" + key,
               data
             );
@@ -2318,68 +2518,30 @@ function gameData(infom, number) {
       createTableData(element, element1, data);
     }
   }
-  //Radlc
-  if (
-    !completePodatki["Igra"][1].toLowerCase().includes("po meri") &&
-    !completePodatki["Igra"][1].toLowerCase().includes("klop")
-  ) {
-    data = "Radlc";
-    element1 = data;
-    element = completePodatki[data][1];
+  
 
-    if (completePodatki["Radlc"][1]) {
-      element = completePodatki["Točke"][1];
+//Radlc
+if (
+  !completePodatki["Igra"][1].toLowerCase().includes("po meri") &&
+  !completePodatki["Igra"][1].toLowerCase().includes("klop")
+) {
+  data = "Radlc";
+  element1 = data;
+  element = completePodatki[data][1];
+
+  if (completePodatki["Radlc"][1]) {
+    element = completePodatki["Točke"][1];
+    
+    if (completePodatki["Kontra"][1]) {
+      element = ((completePodatki["Igra"][2]+completePodatki["Razlika"][1]) * 2)+completePodatki["Bonus Točke"][1];
     }
-
-    if (element !== false) createTableData(element, element1, data);
+    if (completePodatki["Rekontra"][1]) {
+      element = ((completePodatki["Igra"][2]+completePodatki["Razlika"][1]) * 4)+completePodatki["Bonus Točke"][1];
+    }
   }
 
-  //Kontra
-  try {
-    if (
-      !completePodatki["Igra"][1].toLowerCase().includes("po meri") &&
-      !completePodatki["Igra"][1].toLowerCase().includes("klop") &&
-      !completePodatki["Igra"][1].toLowerCase().includes("mondfang") &&
-      completePodatki["Kontra"][1]
-    ) {
-      data = "Kontra";
-      element1 = data;
-
-      if (completePodatki["Kontra"][1]) {
-        if (completePodatki["Radlc"][1]) {
-          element = completePodatki["Točke"][1] * 2;
-        } else {
-          element = completePodatki["Točke"][1];
-        }
-      }
-
-      if (element !== false) createTableData(element, element1, data);
-    }
-  } catch {}
-
-  //Rekontra
-  try {
-    if (
-      !completePodatki["Igra"][1].toLowerCase().includes("po meri") &&
-      !completePodatki["Igra"][1].toLowerCase().includes("klop") &&
-      !completePodatki["Igra"][1].toLowerCase().includes("mondfang") &&
-      completePodatki["Rekontra"][1]
-    ) {
-      data = "Rekontra";
-      element1 = data;
-
-      if (completePodatki["Rekontra"][1]) {
-        if (completePodatki["Radlc"][1]) {
-          element = completePodatki["Točke"][1] * 4;
-        } else {
-          element = completePodatki["Točke"][1] * 2;
-        }
-      }
-
-      if (element !== false) createTableData(element, element1, data);
-    }
-  } catch {}
-
+  if (element !== false) createTableData(element, element1, data);
+}
   //Tocke
   if (
     !completePodatki["Igra"][1].toLowerCase().includes("po meri") &&
@@ -2388,14 +2550,15 @@ function gameData(infom, number) {
     data = "Točke";
     element1 = data;
     element = completePodatki[data][1];
-    if (completePodatki["Radlc"][1]) {
-      element = element * 2;
-    }
+   
     if (completePodatki["Kontra"][1]) {
-      element = element * 2;
+      element = ((completePodatki["Igra"][2]+completePodatki["Razlika"][1]) * 2)+completePodatki["Bonus Točke"][1];
     }
     if (completePodatki["Rekontra"][1]) {
-      element = element * 4;
+      element = ((completePodatki["Igra"][2]+completePodatki["Razlika"][1]) * 4)+completePodatki["Bonus Točke"][1];
+    }
+    if (completePodatki["Radlc"][1]) {
+      element = element * 2;
     }
     createTableData(element, element1, data);
   }
@@ -2419,8 +2582,10 @@ function gameData(infom, number) {
       completePodatki["Igralec"][1] = Array.from(set);
     }
 
-    if (completePodatki["Radlc"][1] && completePodatki["Točke"][1] > -1);
-    {
+    if (
+      completePodatki["Radlc"][1] === true &&
+      completePodatki["Točke"][1] > -1
+    ) {
       if (!Array.isArray(listOfPlayers[completePodatki["Igralec"][1][0]])) {
         const set = new Set([listOfPlayers[completePodatki["Igralec"][1][0]]]);
         listOfPlayers[completePodatki["Igralec"][1][0]] = Array.from(set);
@@ -2472,7 +2637,9 @@ function deleteGame(elem) {
     if (listOfPlayers["!gameName!"].includes("/users/")) {
       newElement = dialogBuilder(
         "Ali želite zapustiti deljeno skupino " +
-          listOfPlayers["!gameName!"] +
+          listOfPlayers["!gameName!"].slice(
+            listOfPlayers["!gameName!"].lastIndexOf("/")
+          ) +
           "?",
         false
       )[0];
@@ -2514,6 +2681,7 @@ function deleteGame(elem) {
     updateUserData();
     document.querySelector(".homeBtn").click();
     hideDialog(newElement);
+    Game();
   });
   copyButton.addEventListener("click", function () {
     listOfPlayers = [];
@@ -2540,10 +2708,7 @@ function privacy() {
   var iks = contentWh[1];
   newElement.parentNode.classList.add("fullscreen");
   iks.addEventListener("click", function (e) {
-    document.getElementById("game").style.animation = "none";
-
-    document.getElementById("homeContainer").style.animation = "none";
-	$('#homeContainer').hide();
+    $("#homeContainer").show();
 
     setTimeout(() => {
       hideDialog(newElement);
@@ -2598,16 +2763,21 @@ function feedback() {
     );
   });
 }
+var isLoaded = false;
+
+setTimeout(() => {
+  if (!isLoaded) document.querySelector(".loaderInner").style.opacity = "1";
+}, 500);
+
 var queryAnim = false;
 window.addEventListener("load", function () {
-  if (sessionStorage.uid == "null") {
-    hideElement(document.querySelectorAll(".loader")[0]);
-  }
-
+  isLoaded = true;
   queryAnim = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
   try {
-    hideElement(document.querySelectorAll(".loader")[0]);
+    document.querySelector(".loader").style.opacity = "0";
+    setTimeout(() => {
+      document.querySelector(".loader").remove();
+    }, 400);
   } catch {}
   if (
     !location.pathname.includes("users") &&
@@ -2619,14 +2789,8 @@ window.addEventListener("load", function () {
   if (location.pathname.includes("privacy")) {
     privacy();
   }
-  setTimeout(() => {
-    if (location.pathname.includes("users")) {
-      upload();
-    }
-  }, 10);
 
   if (localStorage.offlineChanges == undefined) {
-    window.loadDataFromWeb();
   } else {
     if (navigator.onLine) {
       updateUserData();
@@ -2655,7 +2819,7 @@ function settings() {
     document.getElementById("game").style.animation = "none";
 
     document.getElementById("homeContainer").style.animation = "none";
-	$('#homeContainer').show();
+    $("#homeContainer").show();
 
     setTimeout(() => {
       hideDialog(dialog);
@@ -2694,6 +2858,18 @@ function settings() {
 
   var tema = makeThemeChanger();
   holder.appendChild(tema);
+  var polit = addElement("md-text-button", holder);
+  polit.innerHTML = "Politika <md-icon slot='icon'>policy</md-icon>";
+  polit.addEventListener("click", privacy);
+  polit.setAttribute("style", "margin-top: 10px;");
+  var dltDt = addElement("md-filled-button", holder);
+  dltDt.innerHTML =
+    "Izbriši račun <md-icon slot='icon' style='color:var(--md-sys-color-on-error-container)'>delete</md-icon>";
+  dltDt.addEventListener("click", deleteAllData);
+  dltDt.setAttribute(
+    "style",
+    "margin-top: 10px;--_container-color: var(--md-sys-color-error-container);--_label-text-color:var(--md-sys-color-on-error-container);"
+  );
 }
 
 function makeThemeChanger() {
@@ -2703,7 +2879,7 @@ function makeThemeChanger() {
   var tema = addElement("md-filled-card", null, "hueCard");
   addElement("p", tema, "colorTitle").innerHTML = "Barva aplikacije";
   let slider1 = addElement("md-slider", tema, "colorGradient");
-  slider1.classList.add("sliderStyle")
+  slider1.classList.add("sliderStyle");
   slider1.max = "360";
   slider1.value = clr[0];
 
@@ -2717,12 +2893,23 @@ function makeThemeChanger() {
 
   slider1.addEventListener("input", function () {
     localStorage["seed-color"] = slider1.value + "," + slider2.value;
-    slider2.style.setProperty('--_active-track-color', changeTheme(slider1.value, slider2.value));
-    slider2.style.setProperty('--_inactive-track-color', changeTheme(slider1.value, slider2.value));
-
+    slider2.style.setProperty(
+      "--_active-track-color",
+      changeTheme(slider1.value, slider2.value)
+    );
+    slider2.style.setProperty(
+      "--_inactive-track-color",
+      changeTheme(slider1.value, slider2.value)
+    );
   });
-  slider2.style.setProperty('--_active-track-color', changeTheme(slider1.value, slider2.value));
-  slider2.style.setProperty('--_inactive-track-color', changeTheme(slider1.value, slider2.value));
+  slider2.style.setProperty(
+    "--_active-track-color",
+    changeTheme(slider1.value, slider2.value)
+  );
+  slider2.style.setProperty(
+    "--_inactive-track-color",
+    changeTheme(slider1.value, slider2.value)
+  );
 
   slider2.addEventListener("input", function () {
     localStorage["seed-color"] = slider1.value + "," + slider2.value;
@@ -2934,6 +3121,7 @@ window.addEventListener("load", async function () {
     installPrompt = event;
 
     installButton.style.display = "flex";
+    document.querySelector(".bubble").style.visibility = "visible";
   });
   if (window.matchMedia("(display-mode: standalone)").matches) {
     disableInAppInstallPrompt();
@@ -2948,8 +3136,7 @@ window.addEventListener("load", async function () {
   try {
     relatedApps = await navigator.getInstalledRelatedApps();
     if (relatedApps.length !== 0 && !ifitis) {
-      installButton.innerHTML =
-        'Nadaljuj v aplikaciji<md-icon slot="icon">open_in_new</md-icon>';
+      installButton.innerHTML = "<md-icon>open_in_new</md-icon>";
       installButton.style.display = "flex";
     }
   } catch {}
@@ -3017,14 +3204,16 @@ function makeBottomheet(title) {
 
     if (sheetHeight === 100) {
       bottomSheet.classList.add("fullscreenSheet");
-      document
-        .querySelector('meta[name="theme-color"]')
-        .setAttribute(
-          "content",
-          getComputedStyle(document.body).getPropertyValue(
-            "--md-sys-color-surface-container"
-          )
-        );
+      if (!sheetContents.innerHTML.includes("makAnmFrSht")) {
+        document
+          .querySelector('meta[name="theme-color"]')
+          .setAttribute(
+            "content",
+            getComputedStyle(document.body).getPropertyValue(
+              "--md-sys-color-surface-container"
+            )
+          );
+      }
     } else {
       bottomSheet.classList.remove("fullscreenSheet");
       document
@@ -3227,4 +3416,146 @@ function makeBottomheet(title) {
   observer.observe(mainContent, { childList: true });
 
   return mainContent;
+}
+
+function pravila() {
+  var contentWh = dialogBuilder("Pravila");
+  var newElement = contentWh[0];
+  var iks = contentWh[1];
+  newElement.parentNode.classList.add("fullscreen");
+  iks.addEventListener("click", function (e) {
+    $("#homeContainer").show();
+
+    setTimeout(() => {
+      hideDialog(newElement);
+      document.getElementById("homeContainer").style.animation = "";
+    }, 1);
+  });
+  try {
+    dlgFullscreen(newElement.parentNode);
+  } catch {}
+  newElement.innerHTML = pravilaText;
+}
+function statistika() {
+	
+  var contentWh = dialogBuilder("Statistika - " + listOfPlayers["!gameName!"].slice(listOfPlayers["!gameName!"].lastIndexOf("/")+1));
+  var newElement = contentWh[0];
+  var iks = contentWh[1];
+  newElement.parentNode.classList.add("fullscreen");
+  dlgFullscreen(newElement.parentNode);
+  iks.addEventListener("click", function (e) {
+    hideDialog(newElement);
+  });
+
+  let list = addElement("md-list", newElement, "stat-list");
+  let i = 0;
+
+  let lit = [];
+  let usr = {};
+  var completeData = {};
+  function calculatePlayerScore(gamesPlayed, wins, losses, totalGames) {
+    const winPercentage = (wins / gamesPlayed) * 100;
+    // Adjust games played weight to penalize fewer games played with a gentler gradient
+    const gamesPlayedWeight = ((1 - (gamesPlayed / totalGames)) / 0.5) * 10;
+    // Impact of losses
+    const lossImpact = (losses / gamesPlayed) * 100;
+    // Final score calculation
+    const score = winPercentage - gamesPlayedWeight - lossImpact;
+    return Math.round(score);
+  }
+  let zaIgrat = ["Klop", "Renons", "Mondfang", "Po Meri"];
+  for (const key in listOfPlayers) {
+    if (key == "!gamesData!" || key == "!gameName!") {
+      continue;
+    }
+    completeData[key] = {};
+    completeData[key]["steviloIgranih"] = 0;
+    completeData[key]["steviloSlepanih"] = 0;
+    completeData[key]["steviloZmag"] = 0;
+    completeData[key]["steviloIzgub"] = 0;
+    completeData[key]["seznamTock"] = [];
+    lit.push(parseInt(document.querySelector(".rezult_" + key).innerHTML));
+    usr[lit.at(-1)] = key;
+    let seznamTock = document.querySelectorAll("." + key + "_score");
+    for (const tocka of seznamTock) {
+      completeData[key]["seznamTock"].push(tocka.innerHTML);
+    }
+    
+      
+  
+  }
+  
+  
+  lit.sort((a, b) => b - a);
+  let containerCard = addElement("div", newElement, "flexer");
+  function makeCardItem(title, text) {
+    let lItem3 = addElement("md-item", containerCard, "stat-item");
+    lItem3.innerHTML =
+      '<p class="titleTxt" slot="trailing-supporting-text">' +
+      title +
+      '</p><table style="width: 100%;margin-top:30px;">' +
+      text +
+      "</table>";
+  }
+  function findKeysWithMaxValue(obj, keyName, k2) {
+    const sortedKeys = Object.keys(obj).sort((a, b) => obj[b][keyName] - obj[a][keyName]);
+
+    var resultStrings;
+    
+      resultStrings = sortedKeys.map(
+        (key) =>
+          `<tr style="margin-bottom: -10px "><td>${key}</td><td style='text-align: center'>${obj[key][keyName]}</td></tr>`
+      );
+    
+
+    return resultStrings.join("");
+  }
+
+  for (const key in lit) {
+    let lItem = addElement("md-list-item", list, "stat-item");
+    lItem.innerHTML ="<span style='font-weight: bold;font-size: larger' slot='start' >" +  parseInt(i + 1) + "." + "</span>" + usr[lit[i]] + " (" + lit[i] + ")";
+    i++;
+  }
+
+  makeCardItem("ŠTEVILO VSEH IGER", '<tr style="margin-bottom: -10px;font-size:2rem;text-align:center; "><td>'+listOfPlayers["!gamesData!"].length+'</td></tr>');
+
+  for (const game of listOfPlayers["!gamesData!"]) {
+    if (!zaIgrat.includes(game[0])) {
+      completeData[game[1][0]]["steviloIgranih"] += 1;
+      if (game[6]) completeData[game[1][0]]["steviloZmag"] += 1;
+      else completeData[game[1][0]]["steviloIzgub"] += 1;
+
+      if (game[1].length == 2) completeData[game[1][1]]["steviloSlepanih"] += 1;
+    }
+  }
+  for (const key in listOfPlayers) {
+    if (key == "!gamesData!" || key == "!gameName!") {
+      continue;
+    }
+    completeData[key].odstotekZmag = Math.round(
+      (completeData[key].steviloZmag / completeData[key].steviloIgranih) * 100
+    );
+    completeData[key].odstotekIzgub = Math.round(
+      (completeData[key].steviloIzgub / completeData[key].steviloIgranih) * 100
+    );
+  }
+  for (const key in listOfPlayers) {
+    if (key == "!gamesData!" || key == "!gameName!") {
+      continue;
+    }
+      const score = calculatePlayerScore(completeData[key]["steviloIgranih"], completeData[key]["steviloZmag"], completeData[key]["steviloIzgub"],listOfPlayers["!gamesData!"].length);
+      completeData[key]["steviloProcentov"] = score
+  }
+  let maxGames = findKeysWithMaxValue(completeData, "steviloIgranih");
+  makeCardItem("NAJVEČ ODIGRANIG IGER", maxGames);
+  let maxCalls = findKeysWithMaxValue(completeData, "steviloSlepanih");
+  makeCardItem("NAJVEČKRAT KLICANI IGRALCI", maxCalls);
+  let maxWins = findKeysWithMaxValue(completeData, "steviloZmag", "odstotekZmag");
+
+  makeCardItem("ZMAGE", maxWins);
+  let maxLoses = findKeysWithMaxValue(completeData, "steviloIzgub", "odstotekIzgub");
+  makeCardItem("PORAZI", maxLoses);
+  let percenti = findKeysWithMaxValue(completeData, "steviloProcentov");
+  makeCardItem("POVPREČJE (RATING)", percenti);
+
 }
