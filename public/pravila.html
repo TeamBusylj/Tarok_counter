@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Števec taroka - pravila</title>
+    <meta name="theme-color" content="#000" />
+    <link rel="stylesheet" href="./assets/css/tarok.css?v=9">
+    <link rel="stylesheet" href="./assets/css/theme.css">
+</head>
+<body  style="overflow: scroll;padding: 20px !important;;background-color: var(--md-sys-color-surface);">
+    <div class="pravilaSeznam">
+        <a href="#uvod">1. Uvod</a>
+        <a href="#karte">2. Karte</a>
+       
+        <a  href="#deljenje">3. Deljenje kart</a>
+        <a  href="#napoved">4. Napoved igre</a>
+        <a href="#kralj">5. Klicanje kralja</a>
+        <a href="#izmenjava">6. Izmenjava s talonom</a>
+        <a href="#bonusi">7. Bonusi</a>
+        <a href="#igra">8. Igra</a>
+        <a href="#tockovanje">9. Točkovanje</a>
+    </div>
+    <div class="pravilaContainer" id="uvod">
+        <p class=pravilaTitle>Uvod</p>
+        <md-divider></md-divider>
+        <span>
+        Tarok je igra za 3 ali 4 igralce. Ta pravila so prevod pravil iz <a href="https://valat.si/pravila">te spletne strani</a>, z manjšimi spremembami.<br>
+
+        To je najbolj priljubljena družabna igra. Številni resni igralci imajo raje zahtevnejšo igro za tri igralce, v kateri je manj raznolikosti, a več prostora za strateško igro.<br><br>
+Taroka se ni težko naučiti, ima pa veliko različnih iger, ki si jih je treba zapomniti. 
+
+</span> </div>
+    </div>
+    <div class="pravilaContainer" id="karte">
+        <p class=pravilaTitle>Karte</p>
+        <md-divider></md-divider>
+        <span>
+            Igro tarok se igra s 54 kartami, od teg je 22 tarokov in 34 platelcev. Karte imajo različne vrednosti in zato različno vplivajo na končni razultat.
+          <br><br>  <b>Taroki</b> so karte, ki imajo na sebi rimsko številko. Te so razporejene od <span style="font-family: ui-sans-serif;">I</span> do <span style="font-family: ui-sans-serif;">XXI</span>, torej od 1 do 21. Zadnji in najvišji tarok se imenuje Škis, na sebi nima nobenega simbola, le človeka.
+          <br><br>  <b>Platelci</b> so karte, ki so razdeljene na 4 barve- srce, kara, križ in pik.<br> Vsaka barva ima 8 kart, od tega 4 figure in 4 ostale platelce. Pri figurah imamo kranja, kraljico, kavala in fanta. Kavala in fanta najlažje ločimo po tem, da ima kaval konja, fant pa ne. <br>Platelci se točkujejo tako: kralj šteje 5 pik, kraljica 4, kaval 3, fant 2 in ostali placelci 1.
+</span> </div>
+    <div class="pravilaContainer" id="deljenje">
+        <p class=pravilaTitle>Deljenje kart</p>
+        <md-divider></md-divider>
+        <span>
+            Igralci se usedejo v krog, eden izmed njih začne kot delilec. Vsako rundo se vloga delilca premakne za eno mesto naprej.
+
+            Ali boste igrali v smeri urinega kazalca ali v nasprotni smeri, se dogovorite sami.
+            
+            Igra je zelo preprosta, saj vsaka runda sledi točno določenemu zaporedju korakov, ki bodo opisani v nadaljevanju.
+            <br><br>Delilec najprej dobro premeša karte. Potem iz kupčka vzame 6 kart in jih položi na posebno mesto na mizi, ne da bi jih kdo videl. Ta kupček se imenuje <b>talon</b>.<br>
+            Preostale karte enakomerno razdeli med igralce - če igrajo trije, dobi vsak 16 kart, sicer pa vsak 12.<br> Po deljenju lahko igralci pogledajo svoje karte. Če je kateri igralec brez tarokov, se karte ponovno delijo (pregovor: <b>BREZ TAROKA NI TAROKA</b>).
+</span> </div>
+    <div class="pravilaContainer" id="napoved">
+        <p class=pravilaTitle>Napoved igre</p>
+        <md-divider></md-divider>
+        <span>
+            Ko igralci pregledajo svoje karte, se morajo dogovoriti, katero izmed različnih iger bodo igrali. To imenujemo <b>licitacija igre</b>. Nekatere igre niso na voljo pri treh igralcih ali pa prinesejo manj točk.
+
+           <br><br><b style="font-size: 1.1rem;">Vrste iger pri taroku</b><br>
+            Poznamo <b>pozitivne</b> in <b>negativne</b> igre. Pri negativnih igrah je cilj pobrati čim manj kart, poleg tega pa imajo še nekaj dodatnih pravil.
+            
+            Obstajajo <b>solo igre</b> in <b>igre s partnerjem</b>. Pri solo igrah je igralec sam in igra proti ostalim igralcem. Če igrajo le trije, so vse igre solo.
+            
+            Nekatere igre omogočajo napoved <a style="text-decoration: underline;" href="#bonusi">dodatnih bonusov</a>. Pri teh igrah šteje tudi osvojitev brez napovedi (tiha osvojitev).            
+            <br><br>Za boljšo predstavo je spodaj tabela vseh možnih iger:
+            <br>
+            <table class="vseIgre">
+                <tbody><tr >
+                    <th style="border-top-left-radius: 20px;">Igra</th>
+                    <th>Vred&shy;nost v 4</th>
+                    <th>Vred&shy;nost v 3</th>
+                    <th>Ne&shy;ga&shy;ti&shy;vna igra</th><th>S par&shy;tner&shy;jem</th><th style="border-top-right-radius: 20px;">Ima bo&shy;nu&shy;se</th>
+                </tr>
+               
+                <tr>
+                    <td>Tri</td>
+                    <td>10 + raz&shy;lika</td>
+                    <td class="b">/</td>
+                    <td></td><td class="g">DA</td><td class="g">DA</td>
+                </tr>
+                <tr>
+                    <td>Dve</td>
+                    <td>20 + raz&shy;lika</td>
+                    <td class="b">/</td>
+                    <td></td><td class="g">DA</td><td class="g">DA</td>
+                </tr>
+                <tr >
+                    <td>Ena</td>
+                    <td>30 + raz&shy;lika</td>
+                    <td class="b">/</td>
+                    <td></td><td class="g">DA</td><td class="g">DA</td>
+                </tr>
+                <tr>
+                    <td>Solo tri</td>
+                    <td>40 + raz&shy;lika</td>
+                    <td>10 + raz&shy;lika</td>
+                    <td></td><td></td><td class="g">DA</td>
+                </tr>
+                <tr>
+                    <td>Solo dve</td>
+                    <td>50 + raz&shy;lika</td>
+                    <td>20 + raz&shy;lika</td>
+                    <td></td><td></td><td class="g">DA</td>
+                </tr>
+                <tr>
+                    <td>Solo ena</td>
+                    <td>60 + raz&shy;lika</td>
+                    <td>30 + raz&shy;lika</td>
+                    <td></td><td></td><td class="g">DA</td>
+                </tr>
+                
+                <tr >
+                    <td>Solo brez</td>
+                    <td>80</td>
+                    <td>80</td>
+                    <td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td >Klop</td>
+                    <td>70</td>
+                    <td>70</td>
+                    <td  class="r">DA</td>
+                    <td></td><td ></td>
+                </tr>
+                <tr>
+                    <td>Berač</td>
+                    <td>70</td>
+                    <td>70</td>
+                    <td class="r">DA</td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>Odprti berač</td>
+                    <td>90</td>
+                    <td class="b">/</td>
+                    <td class="r">DA</td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>Barvni valat</td>
+                    <td>125</td>
+                    <td class="b">/</td>
+                    <td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td style="border-bottom-left-radius: 20px;">Valat</td>
+                    <td>500</td>
+                    <td>500</td>
+                    <td></td><td></td><td
+                    style="border-bottom-right-radius: 20px;"></td>
+                </tr>
+            </tbody></table>
+            <b style="font-size: 1.1rem;">Postopek napovedovanja</b><br>
+            Napovedovanje začne igralec nasproti delilca. <br>Vsak igralec bodisi napove igro ali pa reče <b>"naprej"</b> in s tem izstopi iz napovedovanja. To se ponavlja v krogu, dokler ne ostane samo še en igralec. Ta postane aktivni igralec, ki igra zadnjo napovedano igro.
+            <br> <br>
+            Pri napovedovanju ima igralec, ki je v krogu naslednji od delilca poseben status:
+            <br>
+            Ostali igralci morajo vedno preseči najvišjo prejšnjo napoved, medtem ko jo lahko ta tudi izenači.
+            Edini lahko napove najnižji dve igri, klop in tri (ali solo tri), vendar le, če vsi pred njim že v prvem krogu izstopijo.
+
+        </span> </div>
+        <div class="pravilaContainer" id="kralj">
+            <p class=pravilaTitle>Klicanje kralja</p>
+            <md-divider></md-divider>
+            <span>
+                Če aktivni igralec igra igro s partnerjem, partnerja določi tako, da kliče kralja. <br>To naredi tako, da izbere eno izmed štirih barv in kdor ima kralja v tej barvi, postane njegov partner. Seveda ne sme izbrati barve kralja, ki jo ima v rokah, saj bi to pomenilo, da bo igral sam. <br>Na tej točki samo partner ve, kdo je v aktivni ekipi, ostali pa bodo to morali še ugotoviti.
+
+                 To lahko zmede ostale igralce, vendar ponavadi ni dobra odločitev.  
+            </span> </div>
+        <div class="pravilaContainer" id="izmenjava">
+            <p class=pravilaTitle>Izmenjava s talonom</p>
+            <md-divider></md-divider>
+            <span>
+                Če igralec igra igrao, ki ima v imenu številko (tri, dva, ena), izmenja toliko kart s talonom.
+<br><br>
+                V tem primeru, nek igralec odpre talon in ga brez razporejanja razdeli na kupčke po toliko kart, kot je številka v imenu igre. Aktivni igralec izbere eno izmed skupin in jo doda v svoje karte. <br> Iz svojih kart nato izloči enako število kart (se založi), da ima enako število kart kot ostali igralci. Ni dovoljeno izločiti kart, ki so vredne 5 točk (trule in kraljev).
+                <br>
+                Izločene karte se točkujejo aktivni ekipi, preostanek talona pa pasivni ekipi.
+                <br><br>
+                Če se pri odpiranju talona izkaže, da je klicani kralj v talonu, aktivni igralec igra sam. Da se igra uravnovesi, dobi možnost osvojitve preostanka talona, ki bi sicer pripadal pasivni ekipi. Če izbere del talona, v katerem je klicani kralj, in z njim pobere štih, je talon njegov.
+                
+                <br><br><b>Nasvet:</b> Igralec naj se založi tako, da ima v rokah čim manj različnih barv, torej če ima 2 pikovi karti in 3 karine, je najbolje, da založi pike.
+                
+                
+                
+                
+            </span> </div>
+</body>
+<script type="importmap">
+    {
+      "imports": {
+      
+        "@material/material-color-utilities/": "https://unpkg.com/@w3h/material-color-utilities@0.2.8/"
+      }
+    }
+    </script>
+<script async src="https://unpkg.com/es-module-shims@1.3.0/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/element-internals-polyfill@1.3.10/dist/index.js"></script>
+<script type="module" src="./assets/js/module.js?v=11"></script>
+
+</html>

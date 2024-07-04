@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
 import {
 	getDatabase,
 	ref,
@@ -8,14 +8,15 @@ import {
 	get,
 	update,
 	onValue
-} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
 import {
 	getAuth,
-	signInWithRedirect,
+	signInWithPopup,
 	GoogleAuthProvider,
 	signOut,
-	onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+	onAuthStateChanged,
+	signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
 const firebaseConfig = {
 	apiKey: "AIzaSyBrxvJ-fs7wtfnsLzOy6WI_1J_CMHPXpoU",
@@ -33,7 +34,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const provider = new GoogleAuthProvider();
 const signInButton = document.getElementById("signInGoogle");
-
+const analytics = getAnalytics(app);
 const signInMessage = document.getElementById("signInMessage");
 var uid = null;
 
@@ -55,6 +56,11 @@ export function deleteAllDataF() {
 window.deleteAllDataF = deleteAllDataF;
 
 const userSignIn = async () => {
+
+	$('.dot').show();
+	$('#signInTxt').hide();
+	$('#gIcon').hide();
+		
 	if (
 		sessionStorage.uid !== null &&
 		sessionStorage.uid !== undefined &&
@@ -63,7 +69,14 @@ const userSignIn = async () => {
 	) {
 		userSignOut();
 	} else {
-		signInWithRedirect(auth, provider)
+		
+			
+			try {
+				AndroidInt.signInInterface()
+				console.log("android")
+			} catch (error) {
+				
+				signInWithPopup(auth, provider)
 			.then((result) => {
 				const user = result.user;
 
@@ -76,12 +89,20 @@ const userSignIn = async () => {
 			.catch((error) => {
 				signInMessage.innerHTML = "Nekaj je šlo narobe pri prijavi";
 			});
+			}
+			
+		
+			
+		
+		
+		
 	}
 };
 
 const userSignOut = async () => {
 	signOut(auth)
 		.then((result) => {
+			document.getElementById("dlgSlct").innerHTML = ""
 			let clr = localStorage.themeColor;
 			localStorage.clear();
 			localStorage.themeColor = clr;
@@ -92,20 +113,25 @@ const userSignOut = async () => {
 
 onAuthStateChanged(auth, (user) => {
 	try {
-		hideElement(document.getElementById("login-loader"));
+		$('.dot').hide();
+		$('#signInTxt').show();
+		$('#gIcon').show();
 	} catch {}
 
 	if (user) {
+
 		setTimeout(() => {
 			if (location.pathname.includes("users")) {
-				upload();
+			  upload();
 			}
-		}, 200);
-		document.querySelector(".gsi-material-button-contents").innerHTML = "Odjava";
+		  }, 10);
+		
+		document.getElementById("signInTxt").innerHTML = "Odjava";
 
 		sessionStorage.uid = user.uid;
 		if (localStorage.offlineChanges == undefined) {
-			window.loadDataFromWeb();
+			
+		loadDataFromWeb();
 		} else {
 			if (navigator.onLine) {
 				console.log("update");
@@ -113,21 +139,23 @@ onAuthStateChanged(auth, (user) => {
 				localStorage.offlineChanges = undefined;
 			}
 		}
-		if (
-			sessionStorage.uid !== null &&
-			sessionStorage.uid !== undefined &&
-			sessionStorage.uid !== "null" &&
-			sessionStorage.uid !== "undefined"
-		) {
-			watchChanges();
+		if (!navigator.onLine) {
+			Game()
 		}
+			watchChanges();
+		
 		userk = user;
 		signInMessage.innerHTML = "Pozdravljeni, " + user.displayName.split(" ")[0];
 	} else {
-		document.querySelector(".gsi-material-button-contents").innerHTML = "Google prijava";
+		setTimeout(() => {
+			if (location.pathname.includes("users")) {
+			  upload();
+			}
+		  }, 10);
+		document.getElementById("signInTxt").innerHTML = "Prijava";
 
 		sessionStorage.uid = null;
-		signInMessage.innerHTML = "Za dodatne funkcije se prijavite";
+		signInMessage.innerHTML = "Niste prijavljeni";
 	}
 });
 
@@ -179,7 +207,22 @@ export async function updateSharedRemote() {
 		let result = snapshot.val();
 
 		let name = listOfPlayers["!gameName!"];
+		function sortObjectKeys(obj) {
+			// Get the keys of the object and sort them alphabetically
+			const sortedKeys = Object.keys(obj).sort();
+		
+			// Create a new object with sorted keys
+			const sortedObject = {};
+			sortedKeys.forEach(key => {
+				sortedObject[key] = obj[key];
+			});
+		
+			return sortedObject;
+		}
 		const gamesObject = JSON.parse(localStorage.getItem("games")) || {};
+
+		if(decodeURIComponent(JSON.stringify(sortObjectKeys(result))).replace(/\/users\/.*\/games\//, "") !== decodeURIComponent(JSON.stringify(sortObjectKeys(listOfPlayers))).replace(/\/users\/.*\/games\//, "")){
+
 		gamesObject[listOfPlayers["!gameName!"]] = result;
 
 		gamesObject[listOfPlayers["!gameName!"]]["!gameName!"] = name;
@@ -195,15 +238,31 @@ export async function updateSharedRemote() {
 				count(false);
 			}
 		}, 500);
+	}
 	});
 }
 
 export async function watchChanges() {
 	var starCountRef = ref(database, "users/" + sessionStorage.uid);
 	onValue(starCountRef, async (snapshot) => {
-		let result = snapshot.val()["games"];
+		var result = snapshot.val()["games"];
 
 		var gamesObject = JSON.parse(localStorage.getItem("games")) || {};
+		function sortObjectKeys(obj) {
+			// Get the keys of the object and sort them alphabetically
+			const sortedKeys = Object.keys(obj).sort();
+		
+			// Create a new object with sorted keys
+			const sortedObject = {};
+			sortedKeys.forEach(key => {
+				sortedObject[key] = obj[key];
+			});
+		
+			return sortedObject;
+		}
+		
+		if(decodeURIComponent(JSON.stringify(sortObjectKeys(result))) !== decodeURIComponent(JSON.stringify(sortObjectKeys(gamesObject)))){
+			console.log("change");
 		gamesObject = result;
 		for (const key in gamesObject) {
 			if (gamesObject.hasOwnProperty(key) && key.includes("%2Fusers%2F")) {
@@ -222,9 +281,11 @@ export async function watchChanges() {
 					document.querySelector(".cntScreen"),
 					document.querySelector(".crezultLine")
 				);
-				count(false);
+				count(true);
 			}
 		}, 500);
+			
+	}
 	});
 }
 window.watchChanges = watchChanges;
@@ -242,6 +303,8 @@ export function loadDataFromWeb() {
 					localStorage.setItem("games", JSON.stringify(gamesObject));
 				}
 				updateUserData();
+				
+				Game()
 				return true;
 			} else {
 				return false;
@@ -268,6 +331,38 @@ export async function loadDataPath(path) {
 		});
 	return result;
 }
+
+async function signInWithIdAndroid(name) {
+
+	
+	
+	try {
+		$('.dot').hide();
+		$('#signInTxt').show();
+		$('#gIcon').show();
+	} catch {}
+	document.getElementById("signInTxt").innerHTML = "Odjava";
+console.log(uid)
+		sessionStorage.uid = uid;
+		userk = name;
+		signInMessage.innerHTML = "Pozdravljeni, " + name.split(" ")[0]
+}
+export async function registerCredential() {
+
+	// TODO: Add an ability to create a passkey: Obtain the challenge and other options from the server endpoint.
+  
+	// TODO: Add an ability to create a passkey: Create a credential.
+  
+	// TODO: Add an ability to create a passkey: Register the credential to the server endpoint.
+  
+  };
+
+window.signInWithIdAndroid = signInWithIdAndroid;
 window.loadDataFromWeb = loadDataFromWeb;
 window.loadDataPath = loadDataPath;
 window.updateSharedRemote = updateSharedRemote;
+
+
+
+
+
