@@ -8,7 +8,7 @@ var games = {
   "Solo ena": [60, true, "", false, "S1"],
   "Solo brez": [80, false, "", false, "SB"],
   Valat: [250, false, "", true, "V"],
-  "Barvni Valat": [125, false, "", true, "BV"],
+  "Barvni Valat": [125, false, "", false, "BV"],
   Berač: [70, false, "", false, "B"],
   "Odprti Berač": [90, false, "", false, "OB"],
   Klop: ["", false, "", true, "K"],
@@ -43,15 +43,17 @@ async function addScore(firstPlayer) {
     btn.addEventListener("click", function () {
       document.querySelector(".sheetContents").style.display = "flex";
       document.querySelector(".sheetContents").style.overflow = "hidden";
-      newElement.innerHTML = "";
+    
       if (key == "Mondfang") {
-        mondfang(newElement);
+        document.querySelector(".bottomSheetScrim").click();
+        mondfang(firstPlayer);
       } else if (key == "Renons") {
-        renons(newElement);
+        renons(newElement, firstPlayer);
       } else if (key == "Klop") {
+        
         klop(newElement);
       } else if (key == "Po meri") {
-        poMeri(newElement);
+        poMeri(newElement, firstPlayer);
       } else {
         if (key == "Uredi radlce") {
           radlciDodaj(newElement);
@@ -76,11 +78,9 @@ function radlciDodaj(newElement) {
   changeOpis(newElement, "Uredi radlce");
   newElement.innerHTML = "";
   var divHolder = addElement("div", newElement, null);
-  let actions = document.createElement("div");
-  actions.setAttribute("slot", "actions");
-  newElement.parentNode.appendChild(actions);
   createSliders();
-  let dodajRadlc = addElement("md-text-button", actions, null);
+  addElement("div", newElement, "break");
+  let dodajRadlc = addElement("md-text-button", newElement, null);
   dodajRadlc.innerHTML = "Dodaj radlce";
   dodajRadlc.addEventListener("click", function () {
     listOfPlayersCopy.push(JSON.stringify(listOfPlayers));
@@ -93,6 +93,7 @@ function radlciDodaj(newElement) {
     divHolder.innerHTML = "";
     createSliders();
   });
+
   function createSliders() {
     for (const user in listOfPlayers) {
       if (user == "!gamesData!" || user == "!gameName!") {
@@ -116,7 +117,8 @@ function radlciDodaj(newElement) {
       addElement("div", divHolder, "break");
     }
   }
-  let koncano = addElement("md-filled-button", actions, null);
+
+  let koncano = addElement("md-filled-button", newElement, null);
   koncano.innerHTML = "Končano";
   koncano.addEventListener("click", function () {
     listOfPlayersCopy.push(JSON.stringify(listOfPlayers));
@@ -132,50 +134,39 @@ function radlciDodaj(newElement) {
   });
 }
 
-function poMeri(newElement) {
-  changeOpis(newElement, "Vpišite toče");
-
-  var vls = [];
-  for (const user in listOfPlayers) {
-    if (user == "!gamesData!" || user == "!gameName!") {
-      continue;
-    }
-    let player = addElement("md-filled-text-field", newElement, null);
-    addElement("div", newElement, "break");
-    player.classList.add("poMeri");
-    player.type = "number";
-    player.innerHTML = user;
-    player.value = 0;
-    player.name = 0;
-    player.label = user;
-    player.id = "meri_" + user;
-    vls.push(player);
-    player.addEventListener("change", function () {
-      player.name = player.value;
-    });
-  }
+function poMeri(newElement, firstPlayer) {
+  newElement.innerHTML = "";
+  changeOpis(newElement, "Vpišite točke");
+  var player = addElement("md-filled-text-field", newElement, null);
+  addElement("div", newElement, "break");
+  player.classList.add("poMeri");
+  player.type = "number";
+  player.innerHTML = firstPlayer;
+  player.name = 0;
+  player.label = firstPlayer;
+  player.id = "meri_" + firstPlayer;
+  player.addEventListener("change", function () {
+    player.name = player.value;
+  });
+  setTimeout(() => {
+    player.shadowRoot.querySelector(".field").setAttribute("focused", "");
+    player.focus()
+  }, 10);
   var konc = addElement("md-filled-button", newElement, null);
   konc.innerHTML = "Končano";
   konc.setAttribute("type", "reset");
   konc.addEventListener("click", function () {
-    var nmbs = [];
-    var nmbs2 = [];
-    for (const iterator of vls) {
-      nmbs.push(iterator.label);
 
-      nmbs2.push(document.getElementById("meri_" + iterator.label).name);
-    }
-
-    /* gamename, prvi igralc, drug igralc, tocke, ima radlc, razlika, dobil zgubil, bonusi, bonusi Tocke, datum*/
     listOfPlayersCopy.push(JSON.stringify(listOfPlayers));
     if (!navigator.onLine) {
       localStorage.offlineChanges = true;
     }
+   
     listOfPlayers["!gamesData!"].push([
       "Po Meri",
-      nmbs,
+     firstPlayer,
       null,
-      nmbs2,
+     player.value,
       false,
       null,
       true,
@@ -186,13 +177,14 @@ function poMeri(newElement) {
       Date.now(),
     ]);
     document.querySelector(".bottomSheetScrim").click();
-
+    gameAnimation()
     count(false, true);
   });
 }
 var zaokrožuj = JSON.parse(localStorage.getItem("razlikaOkrozi"));
 if (zaokrožuj == null || zaokrožuj == undefined) zaokrožuj = true;
 async function klop(newElement) {
+  newElement.innerHTML = "";
   changeOpis(newElement, "Ali je bil kdo poln oz. prazen?");
   var prazn = addElement("md-outlined-button", newElement, null);
   prazn.innerHTML = "Poln";
@@ -344,37 +336,19 @@ async function klop(newElement) {
   });
 }
 
-async function mondfang(newElement) {
-  newElement.innerHTML = "";
+async function mondfang(firstPlayer) {
 
-  let vsi = [];
-  let playerWho;
-  changeOpis(newElement, "Kdo je izgubil monda?");
-  for (const user in listOfPlayers) {
-    if (user == "!gamesData!" || user == "!gameName!") {
-      continue;
-    }
-    let player = addElement("md-outlined-button", newElement, null);
-    player.innerHTML = user;
-    vsi.push(player);
-    player.setAttribute("type", "reset");
-    player.addEventListener("click", function () {
-      playerWho = player;
-      /* gamename, prvi igralc, drug igralc, tocke, ima radlc, razlika, dobil zgubil, bonusi, bonusi Tocke*/
-      listOfPlayersCopy.push(JSON.stringify(listOfPlayers));
-      if (!navigator.onLine) {
-        localStorage.offlineChanges = true;
-      }
-    });
+  listOfPlayersCopy.push(JSON.stringify(listOfPlayers));
+  if (!navigator.onLine) {
+    localStorage.offlineChanges = true;
   }
-  await waitForButtonClick(vsi);
 
   listOfPlayers["!gamesData!"].push([
     "Mondfang",
-    playerWho.innerHTML,
+    firstPlayer,
     null,
     -21,
-    listOfPlayers[playerWho.innerHTML][0].length > 0,
+    false,
     null,
     true,
     null,
@@ -383,35 +357,13 @@ async function mondfang(newElement) {
     false,
     Date.now(),
   ]);
-  document.querySelector(".bottomSheetScrim").click();
+
   gameAnimation()
   count(false, true);
 }
 
-async function renons(newElement) {
-  newElement.innerHTML = "";
+async function renons(newElement,firstPlayer) {
 
-  let vsi = [];
-  let playerWho;
-  changeOpis(newElement, "Kdo je naredil renons?");
-  for (const user in listOfPlayers) {
-    if (user == "!gamesData!" || user == "!gameName!") {
-      continue;
-    }
-    let player = addElement("md-outlined-button", newElement, null);
-    player.innerHTML = user;
-    vsi.push(player);
-    player.setAttribute("type", "reset");
-    player.addEventListener("click", function () {
-      playerWho = player;
-      /* gamename, prvi igralc, drug igralc, tocke, ima radlc, razlika, dobil zgubil, bonusi, bonusi Tocke*/
-      listOfPlayersCopy.push(JSON.stringify(listOfPlayers));
-      if (!navigator.onLine) {
-        localStorage.offlineChanges = true;
-      }
-    });
-  }
-  await waitForButtonClick(vsi);
   newElement.innerHTML = "";
   changeOpis(newElement, "Koliko znaša renons?");
   let renonsSlider = addElement("md-slider", newElement, "klopPlayer");
@@ -424,9 +376,14 @@ async function renons(newElement) {
   let okButt = addElement("md-filled-button", newElement, null);
   okButt.innerHTML = "Končano";
   okButt.addEventListener("click", function () {
+
+    listOfPlayersCopy.push(JSON.stringify(listOfPlayers));
+    if (!navigator.onLine) {
+      localStorage.offlineChanges = true;
+    }
     listOfPlayers["!gamesData!"].push([
       "Renons",
-      playerWho.innerHTML,
+     firstPlayer,
       null,
       -Math.abs(parseInt(renonsSlider.value)),
       false,
@@ -444,6 +401,7 @@ async function renons(newElement) {
   });
 }
 async function calculate(gameName, properties, newElement, firstPlayer) {
+  newElement.innerHTML = "";
   if (Object.keys(listOfPlayers).length == 5) {
     partner(newElement, gameName, properties, false, firstPlayer);
   } else {
@@ -1365,7 +1323,7 @@ function download() {
   var text = JSON.stringify(listOfPlayers);
   // if (sessionStorage.uid !== null && sessionStorage.uid !== undefined && sessionStorage.uid !== 'null') {
   var result =
-    "https://tarock-counter.web.app/" +
+    "https://stevec-taroka.si/" +
     encodeURIComponent(
       "users/" + sessionStorage.uid + "/games/" + listOfPlayers["!gameName!"]
     );
@@ -1402,7 +1360,6 @@ function deleteAllData() {
   iconaa.innerHTML = "delete_outline";
   iconaa.setAttribute("slot", "icon");
   iks.addEventListener("click", function (e) {
-    document.getElementById("game").style.animation = "none";
     hideDialog(newElement);
   });
   let actions = document.createElement("div");
@@ -1415,8 +1372,9 @@ function deleteAllData() {
 
   actions.appendChild(shareButton);
   actions.appendChild(copyButton);
-  shareButton.addEventListener("click", function () {
-    deleteAllDataF();
+  shareButton.addEventListener("click", async function () {
+    await deleteAllDataF();
+    location.reload()
     hideDialog(newElement);
   });
   copyButton.addEventListener("click", function () {
@@ -1461,7 +1419,6 @@ async function upload() {
         window.history.replaceState({}, document.title, "/" + "");
 
         iks.addEventListener("click", function (e) {
-          document.getElementById("game").style.animation = "none";
           hideDialog(newElement);
         });
         let actions = document.createElement("div");
@@ -1479,6 +1436,7 @@ async function upload() {
           localStorage.setItem("games", JSON.stringify(gamesObject));
           updateUserData();
           hideDialog(newElement);
+          Game()
         });
         copyButton.addEventListener("click", function () {
           hideDialog(newElement);
@@ -1492,7 +1450,6 @@ async function upload() {
       dlgNotif(
         "Za dostop do deljene skupine morate biti prijavljeni in imeti internetno povezavo."
       );
-      window.history.replaceState({}, document.title, "/" + "");
     }
   }
 }
@@ -1582,7 +1539,6 @@ function Game(already) {
     var slct = document.createElement("md-list");
     var slct2 = document.createElement("md-list");
     slct2.style.marginBottom = "30px";
-    dialog.style.borderRadius = "15px";
 
     const gamesObject = JSON.parse(localStorage.getItem("games")) || {};
     if (Object.keys(gamesObject).length == 0) {
@@ -1708,7 +1664,7 @@ function Game(already) {
       var pTxt = document.createElement("p");
       var pTxt2 = document.createElement("p");
       if (slct.getElementsByTagName("md-list-item").length !== 0) {
-        pTxt2.innerHTML = "Zasebne skupine";
+        pTxt2.innerHTML = "Moje skupine";
         dialog.appendChild(pTxt2);
         dialog.appendChild(slct);
       }
@@ -1768,20 +1724,14 @@ async function clickedUser(slcta, fulla) {
     getGenders();
     if (listOfPlayers["!gameName!"].includes("/users/")) {
       updateSharedRemote();
-
+      window.history.pushState({}, document.title, "/" + slcta);
       count(true);
     } else {
+      window.history.pushState({}, document.title, "/"+ slcta);
       count(true);
     }
   }
 
-  if (location.pathname !== "/public/") {
-    window.history.pushState(
-      {},
-      document.title,
-      "/" + encodeURIComponent(listOfPlayers["!gameName!"])
-    );
-  }
 }
 function dlgNotif(msg, title = "Napaka") {
   var iks = addElement("md-text-button", null, null);
@@ -1825,6 +1775,7 @@ function newGame() {
   var endPl = document.createElement("md-filled-tonal-button");
   newPl.setAttribute("id", "addPlayer");
   newPl.setAttribute("slot", "content");
+
   newPl.style.margin = endPl.style.margin = "0";
   newPl.innerHTML = "Dodaj igralca";
   onePl.style.marginBottom = "10px";
@@ -1833,7 +1784,10 @@ function newGame() {
   onePl.setAttribute("slot", "content");
   endPl.innerHTML = "Naprej";
   content.appendChild(onePl);
-  onePl.focus();
+  setTimeout(() => {
+    onePl.shadowRoot.querySelector(".field").setAttribute("focused", "");
+    onePl.focus()
+  }, 10);
   let lnbrk = addElement("div", content, "break");
   lnbrk.style.height = "10px";
 
@@ -1846,7 +1800,10 @@ function newGame() {
     onePl2.label = "Ime";
     onePl2.style.marginBottom = "10px";
     content.insertBefore(onePl2, lnbrk);
-
+    setTimeout(() => {
+      onePl2.shadowRoot.querySelector(".field").setAttribute("focused", "");
+      onePl2.focus()
+    }, 10);
     onePl2.focus;
     index++;
     if (index == 5) {
@@ -1891,6 +1848,10 @@ function newGame() {
 
       changeOpis(content, "Vpišite vzdevek skupine");
       var imeIgre = document.createElement("md-filled-text-field");
+      setTimeout(() => {
+        imeIgre.shadowRoot.querySelector(".field").setAttribute("focused", "");
+        imeIgre.focus()
+      }, 10);
       var koncajIme = document.createElement("md-filled-tonal-button");
       imeIgre.label = "Vzdevek skupine";
       imeIgre.value = JSON.stringify(
@@ -2051,6 +2012,7 @@ async function count(animate, newcScore = null) {
     }
     let name = key;
     var chl = document.createElement("div");
+   
     var prnt = document.createElement("div");
     if (!Array.isArray(listOfPlayers[key])) {
       const set = new Set([listOfPlayers[key]]);
@@ -2066,6 +2028,10 @@ async function count(animate, newcScore = null) {
     chl.innerHTML += '<p style = "" class="noText" ></p>';
     chl.innerHTML += ' <p style = "" class="noText" ></p>';
     chl.setAttribute("class", "chl chlName_" + name.replace(/ /g, "_"));
+    console.log(key, Object.keys(listOfPlayers).at(-1));
+    if(key == Object.keys(listOfPlayers).at(-1)){
+      chl.classList.add("chlScrollBar")
+    }
     let ripple = addElement("md-ripple", prnt, null);
     ripple.style.zIndex = "10";
 
@@ -2284,8 +2250,7 @@ function gameData(infom, number) {
   /* gamename, prvi igralc, drug igralc, tocke, ima radlc, razlika, dobil zgubil, bonusi, bonusi Tocke*/
   var info = listOfPlayers["!gamesData!"][parseInt(infom)];
   console.log(info);
-  var contentWh = dialogBuilder("Igra", false);
-  var newElement = contentWh[0];
+  var newElement = makeBottomheet('Igra')
 
   if (info[0] !== "Po meri" && info[0] !== "Klop") {
     var changeValue = document.createElement("md-outlined-text-field");
@@ -2563,13 +2528,12 @@ if (
     createTableData(element, element1, data);
   }
   newElement.appendChild(table);
-  addElement("div", newElement, "break");
-  var actionsHold = addElement("span", newElement.parentNode, null);
-  actionsHold.setAttribute("slot", "actions");
+  let brk = addElement("div", newElement, "break");
+brk.style.height = "10px";
   var izbrisiIgro = document.createElement("md-text-button");
   izbrisiIgro.innerHTML =
     ' <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg> Izbriši';
-  actionsHold.appendChild(izbrisiIgro);
+  newElement.appendChild(izbrisiIgro);
   izbrisiIgro.style.margin = "0";
   izbrisiIgro.addEventListener("click", function (e) {
     listOfPlayersCopy.push(JSON.stringify(listOfPlayers));
@@ -2600,16 +2564,16 @@ if (
     localStorage.setItem("games", JSON.stringify(gamesObject));
 
     updateUserData();
-    hideDialog(newElement);
+    document.querySelector(".bottomSheetScrim").click();
     count(true);
   });
-  var iks = document.createElement("md-filled-tonal-button");
+  var iks = document.createElement("md-filled-button");
   iks.innerHTML = "Končano";
   iks.style.margin = "0";
-  actionsHold.appendChild(iks);
+  newElement.appendChild(iks);
 
   iks.addEventListener("click", function (e) {
-    hideDialog(newElement);
+    document.querySelector(".bottomSheetScrim").click();
     if (
       info[0] !== "Po Meri" &&
       info[0] !== "Klop" &&
@@ -2621,11 +2585,7 @@ if (
       } else {
         listOfPlayers["!gamesData!"][infom][3] = changeValue.value;
       }
-      removeElement(
-        document.querySelector(".cntScreen"),
-        document.querySelector(".crezultLine")
-      );
-
+      
       count(true);
     }
   });
@@ -2729,14 +2689,9 @@ function privacy() {
 }
 
 function feedback() {
-  var contentWh = dialogBuilder("Povratne informacije");
-  var newElement = contentWh[0];
-  var iks = contentWh[1];
+  var newElement = makeBottomheet("Povratne informacije");
 
-  iks.addEventListener("click", function (e) {
-    document.getElementById("game").style.animation = "none";
-    hideDialog(newElement);
-  });
+ 
   var emailContentInput = document.createElement("md-outlined-text-field");
   emailContentInput.setAttribute("type", "textarea");
   emailContentInput.setAttribute("rows", "10");
@@ -2747,14 +2702,15 @@ function feedback() {
   emailContentInput.label = "Vpišite kaj bi radi izboljšali...";
   emailContentInput.placeholder = "Kar po domače...";
   newElement.appendChild(emailContentInput);
-  emailContentInput.focus();
-  let actions = document.createElement("div");
-  actions.setAttribute("slot", "actions");
-  newElement.parentNode.appendChild(actions);
+  setTimeout(() => {
+    emailContentInput.shadowRoot.querySelector(".field").setAttribute("focused", "");
+    emailContentInput.focus()
+  }, 10);
+
   var shareButton = document.createElement("md-filled-tonal-button");
   shareButton.innerHTML = "Pošlji";
-
-  actions.appendChild(shareButton);
+addElement("div", newElement, "break")
+  newElement.appendChild(shareButton);
   shareButton.addEventListener("click", function () {
     window.open(
       "mailto:stevec.taroka@gmail.com?subject=Imam izbolšavo&body=" +
@@ -2771,6 +2727,11 @@ setTimeout(() => {
 
 var queryAnim = false;
 window.addEventListener("load", function () {
+
+  if(location.pathname.includes("install-app")){
+
+installApp()
+  }
   isLoaded = true;
   queryAnim = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   try {
@@ -2809,6 +2770,50 @@ window.addEventListener("load", function () {
 
   if (queryAnim) document.body.style.setProperty("--transDur", "0s");
 });
+function facebookIntent(link) {
+  let dialogIk
+  if(link.includes('install'))dialogIk = dialogBuilder("Naloži aplikacijo"); else dialogIk= dialogBuilder("Prijava");
+  let dialog = dialogIk[0];
+  let iks = dialogIk[1];
+  iks.addEventListener("click", function (e) {
+    hideDialog(dialog);
+  })
+  dialog.innerHTML ='Zaradi omejitev Facebooka morate aplikacijo odpreti v brskalniku.'
+  let actions = document.createElement("div");
+  actions.setAttribute("slot", "actions");
+  dialog.parentNode.appendChild(actions);
+  let close = addElement("md-filled-button", actions, null);
+  close.innerHTML = "Odpri";
+  close.addEventListener("click", function () {
+    window.location.href = `intent://${link}#Intent;scheme=https;end`// android
+    window.location = `googlechrome://${link}`// ios to chrome
+  });
+
+}
+function installApp() {
+  
+  if (['fb_iab', 'fban', 'fbav', 'instagram'].some(app => navigator.userAgent.toLowerCase().includes(app))){
+    facebookIntent('stevec-taroka.si/install-app')
+    }else{
+  let dialogIk = dialogBuilder("Naloži aplikacijo");
+  let dialog = dialogIk[0];
+  let iks = dialogIk[1];
+  iks.addEventListener("click", function (e) {
+    hideDialog(dialog);
+  })
+
+  dialog.innerHTML ='Prenesite apklikacijo za lažji dostop do vaših iger.'
+  let actions = document.createElement("div");
+  actions.setAttribute("slot", "actions");
+  dialog.parentNode.appendChild(actions);
+  let close = addElement("md-filled-button", actions, null);
+  close.innerHTML = "Prenesi";
+  close.addEventListener("click", function () {
+    document.getElementById("pwa").click()
+    hideDialog(dialog);
+  });
+}
+}
 
 function settings() {
   var contentWh = dialogBuilder("Nastavitve");
@@ -2816,7 +2821,6 @@ function settings() {
   var iks = contentWh[1];
   dialog.parentNode.classList.add("fullscreen");
   iks.addEventListener("click", function (e) {
-    document.getElementById("game").style.animation = "none";
 
     document.getElementById("homeContainer").style.animation = "none";
     $("#homeContainer").show();
@@ -2830,7 +2834,7 @@ function settings() {
 
   var holder = addElement("md-list", dialog, null);
   var razlikaOkroz = addElement("md-list-item", holder, null);
-  razlikaOkroz.setAttribute("style", "display: flex;align-items: center;");
+ 
   razlikaOkroz.innerHTML = "Zaokroževanje razlike&nbsp;&nbsp;&nbsp;&nbsp;";
   var switchRaz = addElement("md-switch", razlikaOkroz, null);
   switchRaz.setAttribute("slot", "end");
@@ -2858,18 +2862,17 @@ function settings() {
 
   var tema = makeThemeChanger();
   holder.appendChild(tema);
-  var polit = addElement("md-text-button", holder);
-  polit.innerHTML = "Politika <md-icon slot='icon'>policy</md-icon>";
+  var polit = addElement("md-list-item", holder);
+  polit.innerHTML = "Politika <md-icon slot='start'>policy</md-icon>";
   polit.addEventListener("click", privacy);
-  polit.setAttribute("style", "margin-top: 10px;");
-  var dltDt = addElement("md-filled-button", holder);
+  polit.setAttribute("style", "margin: 10px 0;");
+  addElement('md-ripple', polit)
+  var dltDt = addElement("md-list-item", holder);
   dltDt.innerHTML =
-    "Izbriši račun <md-icon slot='icon' style='color:var(--md-sys-color-on-error-container)'>delete</md-icon>";
+    "<span style='color:var(--md-sys-color-on-error-container)'>Izbriši račun</span> <md-icon slot='start' style='color:var(--md-sys-color-on-error-container)'>delete</md-icon>";
   dltDt.addEventListener("click", deleteAllData);
-  dltDt.setAttribute(
-    "style",
-    "margin-top: 10px;--_container-color: var(--md-sys-color-error-container);--_label-text-color:var(--md-sys-color-on-error-container);"
-  );
+
+  addElement('md-ripple', dltDt)
 }
 
 function makeThemeChanger() {
@@ -2967,7 +2970,7 @@ function helpMe(dlg) {
     }
     iks.addEventListener("click", function (e) {
       if (!dlg) {
-        document.getElementById("game").style.animation = "none";
+
 
         document.getElementById("homeContainer").style.animation = "none";
         document.getElementById("homeContainer").style.display = "block";
@@ -2977,7 +2980,7 @@ function helpMe(dlg) {
           document.getElementById("homeContainer").style.animation = "";
         }, 1);
       } else {
-        document.getElementById("game").style.animation = "none";
+
 
         setTimeout(() => {
           hideDialog(dialog);
@@ -3021,7 +3024,7 @@ const pomoc = `<div id="pomoc"> <md-list>
     <p style="font-size:1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>Prijava s storitvijo Google vam omogoča enostavno shranjevanje podatkov v oblaku. To pomeni, da lahko na katerikoli napravi, kjer se prijavite s svojim Google računom, dostopate do svojih iger in jih urejate. <br><br>Google prijava vam omogoča tudi deljenje igre s prijatelji.</p>
 </md-list-item>
 <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kaj pomenijo gumbi v spodnjem delu zaslona za štetje?</b> <md-icon slot="end">expand_more</md-icon>
-    <p style="font-size: 1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>● <md-icon>home</md-icon> vam omogoča, da se vrnete na domači zaslon.<br><br>● <md-icon>undo</md-icon> vam omogoča, da razveljavite zadnje dejanje na seznamu.<br><br>● <md-icon>person_add</md-icon> vam omogoča, da povabite prijatelje v skupino, kjer bodo imeli tudi oni možnost urejanja.<br><br>● <md-icon>delete</md-icon> vam omogoča, da izbrišete celotno igro. </p>
+    <p style="font-size: 1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>● <md-icon>home</md-icon> vam omogoča, da se vrnete na domači zaslon.<br><br>● <md-icon>undo</md-icon> vam omogoča, da razveljavite zadnje dejanje na seznamu.<br><br>● <md-icon>person_add</md-icon> vam omogoča, da povabite prijatelje v skupino, kjer bodo imeli tudi oni možnost urejanja.<br><br>● <md-icon>insert_chart</md-icon> vam omogoča vpogled v statistiko igre. </p>
 </md-list-item>
 <md-list-item type="button"><b style="font-size: 1.2rem;margin-bottom:5px">Kako povabiti prijatelje v skupino?</b> <md-icon slot="end">expand_more</md-icon>
     <p style="font-size: 1rem;margin:0px;transition: all var(--transDur) ease-in-out;height:0px;"><br>Če želite povabiti prijatelje v skupino, kliknite na tretji gumb v spodnjem delu zaslona <md-icon>person_add</md-icon>. Odpre se vam okno, kjer lahko kopirate ali delite povezavo do igre.<br><br>Ko prijatelj dobi povezavo, jo mora le odpreti.<br><br>Za dodajanje prijateljev v skupino morate biti prijavljeni in imeti internetno povezavo.</p>
@@ -3074,7 +3077,10 @@ function expandSection(element) {
   // mark the section as "currently not collapsed"
   element.setAttribute("data-collapsed", "false");
 }
-
+window.addEventListener("scroll", (e) => {
+  e.preventDefault();
+  window.scrollTo(0, 0);
+});
 const registerServiceWorker = async () => {
   if ("serviceWorker" in navigator) {
     try {
@@ -3172,8 +3178,18 @@ window.addEventListener("load", async function () {
     installButton.style.display = "none";
   }
 });
+function checkConset() {
 
-function makeBottomheet(title) {
+	const cookies = document.cookie.split(';');
+	for (let i = 0; i < cookies.length; i++) {
+	  const cookie = cookies[i].trim();
+	  if (cookie.startsWith('consentCookies=')) {
+		return true; 
+	  }
+	}
+  return false
+}
+function makeBottomheet(title, permanent) {
   let bottomSheet = addElement("div", document.body, "bottomSheet");
   let sheetContents = addElement("div", bottomSheet, "sheetContents");
   let draggableArea = addElement("div", bottomSheet, "handleHolder");
@@ -3186,12 +3202,17 @@ function makeBottomheet(title) {
   }
   let handle = addElement("div", draggableArea, "bottomSheetHandle");
   let scrim = addElement("div", document.body, "bottomSheetScrim");
+  
+  let mainContent = addElement("main", sheetContents, "mainSheet");
   setTimeout(() => {
     scrim.style.opacity = ".32";
   }, 10);
   scrim.addEventListener("click", function () {
-    sheetHeight = 0;
-    onDragEnd();
+    if (!permanent || checkConset()) {
+      sheetHeight = 0;
+      onDragEnd();
+    }
+    
   });
   let toolbarColor = document
     .querySelector('meta[name="theme-color"]')
@@ -3200,11 +3221,11 @@ function makeBottomheet(title) {
   const setSheetHeight = (value) => {
     sheetHeight = Math.max(0, Math.min(100, value));
 
-    sheetContents.style.height = `${sheetHeight}dvh`;
+   bottomSheet.style.transform = `translateY(${100-sheetHeight}dvh)`;
 
     if (sheetHeight === 100) {
       bottomSheet.classList.add("fullscreenSheet");
-      if (!sheetContents.innerHTML.includes("makAnmFrSht")) {
+   
         document
           .querySelector('meta[name="theme-color"]')
           .setAttribute(
@@ -3213,7 +3234,7 @@ function makeBottomheet(title) {
               "--md-sys-color-surface-container"
             )
           );
-      }
+      
     } else {
       bottomSheet.classList.remove("fullscreenSheet");
       document
@@ -3221,7 +3242,6 @@ function makeBottomheet(title) {
         .setAttribute("content", toolbarColor);
     }
   };
-  setSheetHeight(0);
 
   const touchPosition = (event) => (event.touches ? event.touches[0] : event);
 
@@ -3230,6 +3250,7 @@ function makeBottomheet(title) {
   const onDragStart = (event) => {
     dragPosition = touchPosition(event).pageY;
     sheetContents.classList.add("not-selectable");
+
     vh = Math.max(
       document.documentElement.clientHeight || 0,
       window.innerHeight || 0
@@ -3248,35 +3269,26 @@ function makeBottomheet(title) {
   };
   const onDragMove = (event) => {
     if (mouseDown || event.type == "touchmove") {
+      if (event.target.tagName == "MD-SLIDER") return
+      
       const y = touchPosition(event).pageY;
       var deltaY = dragPosition - y;
 
-      if (
-        mainContent.innerHTML.includes("md-list") &&
-        sheetContents.scrollHeight > sheetContents.clientHeight &&
-        sheetHeight > 75
-      )
-        deltaY = 0;
-      if (
-        mainContent.innerHTML.includes("md-list") &&
-        sheetContents.scrollHeight > sheetContents.clientHeight &&
-        sheetContents.scrollTop !== 0
-      )
-        deltaY = 0;
-      if (
-        mainContent.innerHTML.includes("md-list") &&
-        sheetContents.scrollHeight > sheetContents.clientHeight &&
-        deltaY < 0
-      )
-        sheetContents.scrollTop = 0;
-      const deltaHeight = (deltaY / window.innerHeight) * 100;
+     
 
+      const deltaHeight = (deltaY / window.innerHeight) * 100;
+      if(permanent && sheetHeight<25){
+        setSheetHeight(25);
+        return
+    }
       setSheetHeight(sheetHeight + deltaHeight);
 
       if (sheetHeight > ((vh - 52) / vh) * 100) {
         btTitle.classList.add("titleFull");
+         mainContent.style.paddingTop = '85px'
       } else {
         btTitle.classList.remove("titleFull");
+         mainContent.style.paddingTop = '30px'
       }
       var sheetHeight3;
 
@@ -3296,12 +3308,17 @@ function makeBottomheet(title) {
         }
         bottomSheet.classList.add("escapingSheet");
         scrim.style.opacity = "0";
+        bottomSheet.style.transition= 'all calc(var(--transDur) - 0.1s)';
+      setTimeout(() => {
+        bottomSheet.style.transition= '';
+      }, 400);
       } else {
         if (title !== "") {
           btTitle.style.transform = "scale(1)";
         }
         bottomSheet.classList.remove("escapingSheet");
         scrim.style.opacity = ".32";
+        
       }
       dragPosition = y;
     }
@@ -3325,12 +3342,16 @@ function makeBottomheet(title) {
         } else if (sheetHeight > 25) {
           setSheetHeight(Math.min(sheetHeight3 + 5, 75));
         } else {
-          setIsSheetShown(false);
-          setSheetHeight(0);
+         
+            setIsSheetShown(false);
+            setSheetHeight(0);
+          
         }
       } else if (sheetHeight < sheetHeight3 / 2) {
-        setIsSheetShown(false);
-        setSheetHeight(0);
+      
+          setIsSheetShown(false);
+          setSheetHeight(0);
+       
       } else if (sheetHeight > sheetHeight3 + (100 - sheetHeight3) / 2) {
         setSheetHeight(100);
       } else {
@@ -3339,9 +3360,15 @@ function makeBottomheet(title) {
 
       if (sheetHeight > ((vh - 26) / vh) * 100) {
         btTitle.classList.add("titleFull");
+         mainContent.style.paddingTop = '85px'
       } else {
         btTitle.classList.remove("titleFull");
+         mainContent.style.paddingTop = '30px'
       }
+      bottomSheet.style.transition= 'all calc(var(--transDur) - 0.1s)';
+      setTimeout(() => {
+        bottomSheet.style.transition= '';
+      }, 400);
     }, 6);
   };
   const setIsSheetShown = (isShown) => {
@@ -3370,11 +3397,14 @@ function makeBottomheet(title) {
   window.addEventListener("mouseup", onDragEnd);
   window.addEventListener("touchend", onDragEnd);
 
-  let mainContent = addElement("main", sheetContents, "mainSheet");
-
+  bottomSheet.style.transition= 'all calc(var(--transDur) - 0.1s)';
+  setTimeout(() => {
+    bottomSheet.style.transition= '';
+  }, 400);
   setSheetHeight(
     Math.min(sheetContents.offsetHeight, 50, (720 / window.innerHeight) * 100)
   );
+  
 
   const observer = new MutationObserver((mutations) =>
     mutations.forEach((mutation) => {
@@ -3389,16 +3419,16 @@ function makeBottomheet(title) {
           const sheetHeight2 = (mainContentHeight / vh) * 100;
 
           // Set the height of .mainSheet using the calculated percentage height
-          if (mainContent.innerHTML.includes("makAnmFrSht")) {
-            setSheetHeight(100);
-          } else {
+         
             setSheetHeight(Math.max(Math.min(sheetHeight2 + 5, 75), 25));
-          }
+          
 
           if (sheetHeight > ((vh - 52) / vh) * 100) {
             btTitle.classList.add("titleFull");
+             mainContent.style.paddingTop = '85px'
           } else {
             btTitle.classList.remove("titleFull");
+             mainContent.style.paddingTop = '30px'
           }
           btTitle.style.margin = "-" + (btTitle.offsetHeight + 34) + "px";
         }, 10);
@@ -3547,7 +3577,7 @@ function statistika() {
       completeData[key]["steviloProcentov"] = score
   }
   let maxGames = findKeysWithMaxValue(completeData, "steviloIgranih");
-  makeCardItem("NAJVEČ ODIGRANIG IGER", maxGames);
+  makeCardItem("NAJVEČ ODIGRANIH IGER", maxGames);
   let maxCalls = findKeysWithMaxValue(completeData, "steviloSlepanih");
   makeCardItem("NAJVEČKRAT KLICANI IGRALCI", maxCalls);
   let maxWins = findKeysWithMaxValue(completeData, "steviloZmag", "odstotekZmag");
@@ -3559,3 +3589,4 @@ function statistika() {
   makeCardItem("POVPREČJE (RATING)", percenti);
 
 }
+

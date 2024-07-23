@@ -19,7 +19,8 @@
         <a href="#izmenjava">6. Izmenjava s talonom</a>
         <a href="#bonusi">7. Bonusi</a>
         <a href="#igra">8. Igra</a>
-        <a href="#tockovanje">9. Točkovanje</a>
+        <a href="#stetje">9. Štetje kart</a>
+        <a href="#tockovanje">10. Točkovanje</a>
     </div>
     <div class="pravilaContainer" id="uvod">
         <p class=pravilaTitle>Uvod</p>
@@ -27,9 +28,14 @@
         <span>
         Tarok je igra za 3 ali 4 igralce. Ta pravila so prevod pravil iz <a href="https://valat.si/pravila">te spletne strani</a>, z manjšimi spremembami.<br>
 
-        To je najbolj priljubljena družabna igra. Številni resni igralci imajo raje zahtevnejšo igro za tri igralce, v kateri je manj raznolikosti, a več prostora za strateško igro.<br><br>
+        To je najbolj priljubljena družabna igra. Številni resni igralci imajo raje zahtevnejšo igro za tri igralce, v kateri je manj raznolikosti, a več prostora za strateško igro.<br>
 Taroka se ni težko naučiti, ima pa veliko različnih iger, ki si jih je treba zapomniti. 
-
+<br><br>Tukaj je nekaj besed, ki se uporabljajo v igri: <br>
+&nbsp;&nbsp;- <b>ŠTIH</b> pomeni vzetek, torej ko vsak igralec odloži karto na mizo. <br>
+&nbsp;&nbsp;- <b>AKTIVNI IGRALEC</b> je igralec, ki igra <a style="text-decoration: underline;"  href="#napoved">zadnjo napovedano igro.</a><br>
+&nbsp;&nbsp;- <b>PARTNER</b> je igralec, ki ga je aktivni igralec <a style="text-decoration: underline;" href="#kralj">klical.</a><br>
+&nbsp;&nbsp;- <b>AKTIVNA/PASIVNA EKIPA</b> sta 2 ekipi v kateri se igralci razdelijo z napovedjo igre in klicanjem. Aktivno ekipo sestavlja aktivni igralec (in njegov partner, če ga ima). Pasivno ekipo sestavljajo ostali igralci. <br>
+&nbsp;&nbsp;- <b>RAZLIKA</b> je vrednost, ki se šteje aktivni ekipi, da  <a style="text-decoration: underline;" href="#stetje">seštejemo točke</a> pri kartah, ki jih je pobrala, jih zaokrožimo na 5 in izračunamo koliko manjka do 35. Če ima aktivna ekipa 41 točk, je razlika 5, ker zaokroženo 40 manjka 5 točk do 35.
 </span> </div>
     </div>
     <div class="pravilaContainer" id="karte">
@@ -37,7 +43,8 @@ Taroka se ni težko naučiti, ima pa veliko različnih iger, ki si jih je treba 
         <md-divider></md-divider>
         <span>
             Igro tarok se igra s 54 kartami, od teg je 22 tarokov in 34 platelcev. Karte imajo različne vrednosti in zato različno vplivajo na končni razultat.
-          <br><br>  <b>Taroki</b> so karte, ki imajo na sebi rimsko številko. Te so razporejene od <span style="font-family: ui-sans-serif;">I</span> do <span style="font-family: ui-sans-serif;">XXI</span>, torej od 1 do 21. Zadnji in najvišji tarok se imenuje Škis, na sebi nima nobenega simbola, le človeka.
+          <br><br>  <b>Taroki</b> so karte, ki imajo na sebi rimsko številko. Te so razporejene od <span style="font-family: ui-sans-serif;">I</span> do <span style="font-family: serif;">XXI</span>, torej od 1 do 21. Zadnji in najvišji tarok se imenuje Škis, na sebi nima nobenega simbola, le človeka.
+          <br><br>  <b>Trula</b> so pagat (tarok <span style="font-family: ui-sans-serif;">I</span>), mond (tarok <span style="font-family: ui-sans-serif;">XXI</span>) in škis. So močne karte, zato vsaka od njih šteje 5 točk. <a style="text-decoration: underline;" href="#bonusi">Trulo in pagat ultimo se lahko napove kot bonus.</a> Če padejo vse tri karte naenkrat, štih pobere pagat.
           <br><br>  <b>Platelci</b> so karte, ki so razdeljene na 4 barve- srce, kara, križ in pik.<br> Vsaka barva ima 8 kart, od tega 4 figure in 4 ostale platelce. Pri figurah imamo kranja, kraljico, kavala in fanta. Kavala in fanta najlažje ločimo po tem, da ima kaval konja, fant pa ne. <br>Platelci se točkujejo tako: kralj šteje 5 pik, kraljica 4, kaval 3, fant 2 in ostali placelci 1.
 </span> </div>
     <div class="pravilaContainer" id="deljenje">
@@ -171,7 +178,7 @@ Taroka se ni težko naučiti, ima pa veliko različnih iger, ki si jih je treba 
             <p class=pravilaTitle>Izmenjava s talonom</p>
             <md-divider></md-divider>
             <span>
-                Če igralec igra igrao, ki ima v imenu številko (tri, dva, ena), izmenja toliko kart s talonom.
+                Če igralec igra igro, ki ima v imenu številko (tri, dva, ena), izmenja toliko kart s talonom.
 <br><br>
                 V tem primeru, nek igralec odpre talon in ga brez razporejanja razdeli na kupčke po toliko kart, kot je številka v imenu igre. Aktivni igralec izbere eno izmed skupin in jo doda v svoje karte. <br> Iz svojih kart nato izloči enako število kart (se založi), da ima enako število kart kot ostali igralci. Ni dovoljeno izločiti kart, ki so vredne 5 točk (trule in kraljev).
                 <br>
@@ -184,6 +191,114 @@ Taroka se ni težko naučiti, ima pa veliko različnih iger, ki si jih je treba 
                 
                 
                 
+            </span> </div>
+        <div class="pravilaContainer" id="bonusi">
+            <p class=pravilaTitle>Bonusi</p>
+            <md-divider></md-divider>
+            <span>
+                Pri vseh igrah, razen pri klopu, obstajajo tudi bonusi. Bonusi so lahko osvojeni <b>tiho</b> ali <b>napovedano</b>. Tiho pomeni, da se med igro zgodi, da ekipa naredi bonus brez predhodnje napovedi. Lahko se pa bonusi napovejo že pred igroNapoved vedno začne aktivni igralec. 
+
+                <br>
+                <br>
+                <b>Trula:</b> pomeni, da bo ekipa, ki jo je napovedala pobrala pagata, monda in škisa.
+                <br> <br> <b>Kralji:</b> pomeni, da bo ekipa, ki jih je napovedala pobrala vse 4 kralje.
+                <br><br>  <b>Kralj ultimo:</b> pomeni, da bo partner aktivnega igralca (ali on sam, če nima partnerja), v zadnjem štihu igre vrgel kralja in ga bo pobrala aktivna ekipa.
+                <br> <br> <b>Pagat ultimo:</b> pomeni, da bo igralec, ki ga je napovedal, v zadnjem štihu igre vrgel pagata in z njo pobral štih. Če kdorkoli pagata pobere z višjim tarokom, se šteje minus.
+                <br> <br> <b>Valat:</b> pomeni, da bo ekipa, ki ga je napovedala pobrala vse štihe.
+                
+                <br><br><table class="vseIgre">
+                    <tbody><tr >
+                        <th style="border-top-left-radius: 20px;">Bonus</th>
+                        <th>Vrednost</th>
+                        <th>Napovedana vrednost</th>
+                   
+                        <th style="border-top-right-radius: 20px;">Kdo lahko napove?</th>
+                    </tr>
+                    <tr>
+                        <td>Trula</td>
+                        <td>10</td>
+                        <td>20</td>
+                      
+                        <td>Kdorkoli.</td>
+                    </tr>
+                    <tr>
+                        <td>Kralji</td>
+                        <td>10</td>
+                        <td>20</td>
+                  
+                        <td>Kdorkoli.</td>
+                    </tr>
+                    <tr>
+                        <td>Kralj ultimo</td>
+                        <td>10</td>
+                        <td>20</td>
+                     
+                        <td>Igralec, ki ima klicanega kralja.</td>
+                    </tr>
+                    <tr>
+                        <td>Pagat ultimo</td>
+                        <td>25</td>
+                        <td>50</td>
+        
+                        <td>Igralec, ki ima pagata.</td>
+                    </tr>
+                    <tr>
+                        <td style="border-bottom-left-radius: 20px;">Valat</td>
+                        <td>250</td>
+                        <td>500</td>
+                      
+                        <td style="border-bottom-right-radius: 20px;">Kdorkoli iz aktivne ekipe.</td>
+                    </tr>
+                </tbody></table>
+                
+                
+                
+                
+            </span> </div>
+        <div class="pravilaContainer" id="igra">
+            <p class=pravilaTitle>Igra</p>
+            <md-divider></md-divider>
+            <span>
+
+                Glavni del igre poteka kot zaporedje štihov. <br><br> Začne igralec, ki je imel obezno in nadaljuje naslednji v krogu. Vsak naslednji igralec more na mizo vreči karto, ki ustreza prvi. Torej, če je prvi igralec vrgel srčevo karto, morajo vsi igralci na mizo vreči srčevo karto. Če kateri od igralcev srčeve karte nima, lahko vrže tarok in s tem pobere vse srce. Če pa kakšen igralec nima niti ustrezne karte, niti taroka lahko odvrže katerokoli karto.  <br>Štih vedno zmaga igralec, ki je vrgel najvišjo karto.
+<br><br>
+Naslednji štih začne tisti, ki je zmagal prejšnjega.
+
+Igra se konča, ko igralcem zmanjka kart ali prej, če je končni rezultat v točkah že znan. Po koncu igre se vsem prištejejo zaslužene točke.
+
+            </span> </div>
+        <div class="pravilaContainer" id="tockovanje">
+            <p class=pravilaTitle>Točkovanje</p>
+            <md-divider></md-divider>
+            <span>
+
+                <b style="font-size: 1.1rem;">Klop</b><br>
+                Vsi, ki v igri klopa niso pobrali niti ene karte, so zmagovalci, zato vsak izmed njih piše +70. Če je kdo pobral več kot 35 točk, je poraženec in piše -70.
+                
+                Če ni bilo ne zmagovalcev ne poražencev, vsak piše minus točke, ki jih je pobral.
+                <br><br>
+                <b style="font-size: 1.1rem;">Tri, dva, ena</b><br>
+                Če je aktivna ekipa skupaj dosegla 35 točk ali več, pišejo vsi člani vrednost igre (10, 20 ali 30 točk), skupaj z  <a style="text-decoration: underline;" href="#uvod">razliko</a>, ki jo je pobrala med igro, v nasprotnem primeru pa minus toliko. Poleg prištejemo, še vrednost bonusov.
+                <br><br>
+                <b style="font-size: 1.1rem;">Solo tri, solo dva, solo ena</b><br>
+                Če je aktivni igralec skupaj dosegel 35 točk ali več, piše vrednost igre (10, 20 ali 30 točk), skupaj z  <a style="text-decoration: underline;" href="#uvod">razliko</a>, ki jo je pobral med igro, v nasprotnem primeru pa minus toliko. Poleg prištejemo, še vrednost bonusov.
+                <br><br>
+                <b style="font-size: 1.1rem;">Radlci</b><br>
+                Ko se obračunajo vse točke za igro in za bonuse, se preveri, če ima aktivni igralec kakšen neporabljen radlc. Če ga ima, se podvojijo točke vseh igralcev v aktivni ekipi. Če je aktivni igralec igro zmagal, se mu radlc izbriše, v nasprotnem pa se ohrani.
+                <br>
+                Pravilo je malo drugačno pri igri klop, kjer se vsakemu igralcu, ki ima neporabljen radlc, podvojijo točke za igro. V primeru, da je nekdo zmagal klopa (ni pobral niti ene karte), se mu radlc izbriše.
+                <br>
+               <b> Če se je igralo igro klop, berač, odprti berač, barvni valat ali valat, dobi vsak igralec en dodaten radlc za prihodnje igre.</b>
+             
+                <br><br>
+                <b style="font-size: 1.1rem;">Mondfang (izguba monda)</b><br>
+                Igralec, ki v igrah ena, dva, tri, solo ena, solo dva, solo tri ali solo brez izgubi monda, piše -21 točk. To se lahko zgodi na dva načina: <br>
+                
+                - Če je igralec igral monda in z njim ni zmagal štiha (če je v istem štihu padel še škis). <br>
+                
+                - Če aktivni igralec pusti monda v talonu in ga dobi pasivna ekipa.
+                <br><br>
+                Izguba monda se točkuje brez radlcov, torej se ne podvoji.
             </span> </div>
 </body>
 <script type="importmap">

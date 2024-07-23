@@ -1,5 +1,11 @@
 @media (prefers-color-scheme: dark) {
 body {
+  --md-outlined-text-field-disabled-active-indicator-height: 0;
+        --md-outlined-text-field-container-shape: 15px;
+        --md-filled-text-field-container-shape: 15px;
+        --md-filled-text-field-active-indicator-height: 0px;
+        --md-filled-text-field-focus-active-indicator-height: 0px;
+        --md-filled-text-field-hover-active-indicator-height: 0px;
     --md-sys-color-primary: #abc7ff;
     --md-sys-color-on-primary: #002f65;
     --md-sys-color-primary-container: #00458f;

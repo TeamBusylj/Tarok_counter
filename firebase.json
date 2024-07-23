@@ -9,6 +9,25 @@
     "rewrites": [ {
       "source": "**",
       "destination": "/index.html"
-    } ]
+    } ],
+    "hosting":[{
+      "redirects": [
+      {
+        "source": "https://tarock-counter.web.app",
+        "destination": "https://stevec-taroka.si",
+        "type": 301
+      },
+      {
+        "source": "https://tarock-counter.web.app/:path*",
+        "destination": "https://stevec-taroka.si/:path*",
+        "type": 301
+      },
+      {
+        "source": "https://tarock-counter.web.app/",
+        "destination": "https://stevec-taroka.si/",
+        "type": 301
+      }
+    ]
+    }]
   }
 }
